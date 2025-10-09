@@ -1,0 +1,372 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+// Stores app users who sign up (email or social login)
+// Each user can create clients, quotes, invoices, and manage their business
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String?
+  role          String    @default("user")
+  emailVerified DateTime?
+  image         String?   // For social login avatars
+  
+  // Relations
+  accounts        Account[]
+  clients         Client[]
+  documents       Document[]
+  settings        UserSettings?
+  businessProfile BusinessProfile?
+  products        Product[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([email])
+}
+
+// Stores OAuth provider information for social login (Google, GitHub, etc.)
+// Required for NextAuth to support social authentication
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// ============================================
+// BUSINESS PROFILE
+// ============================================
+
+// Stores YOUR business information that appears on invoices/quotes
+// One profile per user - your company name, logo, address, tax ID, etc.
+model BusinessProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Business details that appear on invoices/quotes
+  businessName String
+  email        String?
+  phone        String?
+  website      String?
+  logo         String? // URL to logo
+  
+  // Address
+  address      String?
+  city         String?
+  state        String?
+  zipCode      String?
+  country      String?
+  
+  // Tax/Legal
+  taxId        String? // VAT, EIN, ABN, etc.
+  registrationNumber String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ============================================
+// USER SETTINGS & DEFAULTS
+// ============================================
+
+// Stores user preferences and default values for quotes & invoices
+// Auto-increment counters, default terms/notes, tax rates, currency, etc.
+model UserSettings {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Quote defaults
+  quotePrefix           String  @default("Q")
+  quoteNextNumber       Int     @default(1)
+  quoteValidityDays     Int     @default(30)
+  quoteDefaultTerms     String? @db.Text
+  quoteDefaultNotes     String? @db.Text
+  
+  // Invoice defaults
+  invoicePrefix         String  @default("INV")
+  invoiceNextNumber     Int     @default(1)
+  invoiceDefaultDueDays Int     @default(30)
+  invoiceDefaultTerms   String? @db.Text
+  invoiceDefaultNotes   String? @db.Text
+  
+  // Tax & Currency
+  defaultTaxRate        Decimal @db.Decimal(5, 2) @default(0)
+  defaultCurrency       String  @default("USD")
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// ============================================
+// CLIENTS & CONTACTS
+// ============================================
+
+// Stores the clients/customers you send quotes and invoices to
+// Each client can have multiple contacts and a preferred currency
+model Client {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Client details
+  name        String
+  email       String?
+  phone       String?
+  website     String?
+  
+  // Address
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String?
+  
+  // Business info
+  currency    String    @default("USD") // Client's preferred currency
+  taxId       String?
+  
+  // Relations
+  contacts    Contact[]
+  documents   Document[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([name])
+}
+
+// Stores individual contacts within a client company
+// Each client can have multiple contacts (e.g. John from Accounting, Sarah from Management)
+model Contact {
+  id         String     @id @default(cuid())
+  clientId   String
+  client     Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  name       String
+  email      String?
+  phone      String?
+  position   String?    // Job title
+  isPrimary  Boolean    @default(false) // Primary contact
+  
+  documents  Document[]
+  
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  
+  @@index([clientId])
+}
+
+// ============================================
+// QUOTES & INVOICES (Single Table)
+// ============================================
+
+// The main table for both Quotes and Invoices (distinguished by 'type' field)
+// Stores all document details: amounts, dates, status, and tracks quote-to-invoice conversion
+model Document {
+  id              String         @id @default(cuid())
+  documentNumber  String         @unique // Q-001, INV-001, or custom
+  type            DocumentType   // QUOTE or INVOICE
+  status          DocumentStatus
+  
+  // Owner
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Client & Contact
+  clientId        String
+  client          Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  
+  contactId       String?        // Selected contact for this document
+  contact         Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  
+  // Dates
+  issueDate       DateTime       @default(now())
+  dueDate         DateTime?      // For invoices
+  validUntil      DateTime?      // For quotes
+  
+  // Conversion tracking
+  convertedAt     DateTime?      // When quote was converted to invoice
+  convertedToId   String?        // If quote, ID of resulting invoice
+  convertedFromId String?        // If invoice, ID of original quote
+  
+  // Amounts
+  currency        String         @default("USD")
+  subtotal        Decimal        @db.Decimal(12, 2)
+  taxRate         Decimal        @db.Decimal(5, 2) @default(0)
+  taxAmount       Decimal        @db.Decimal(12, 2) @default(0)
+  discount        Decimal        @db.Decimal(12, 2) @default(0)
+  total           Decimal        @db.Decimal(12, 2)
+  
+  // Payment tracking (for invoices)
+  amountPaid      Decimal        @db.Decimal(12, 2) @default(0)
+  amountDue       Decimal        @db.Decimal(12, 2) @default(0)
+  
+  // Additional info
+  notes           String?        @db.Text
+  terms           String?        @db.Text
+  internalNotes   String?        @db.Text // Private notes, not shown to client
+  
+  // Line items and payments
+  items           DocumentItem[]
+  payments        Payment[]
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@index([userId])
+  @@index([clientId])
+  @@index([contactId])
+  @@index([type, status])
+  @@index([issueDate])
+  @@index([documentNumber])
+}
+
+// Stores individual line items for each quote/invoice
+// Each line = one product/service with description, quantity, price, and calculated amount
+model DocumentItem {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  description String   @db.Text
+  quantity    Decimal  @db.Decimal(10, 2)
+  unitPrice   Decimal  @db.Decimal(12, 2)
+  amount      Decimal  @db.Decimal(12, 2) // quantity * unitPrice
+  
+  order       Int      // For sorting line items
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([documentId])
+}
+
+// ============================================
+// PAYMENT TRACKING
+// ============================================
+
+// Tracks payments received for invoices
+// Supports partial payments - multiple payment records can be linked to one invoice
+model Payment {
+  id          String        @id @default(cuid())
+  documentId  String
+  document    Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  amount      Decimal       @db.Decimal(12, 2)
+  paymentDate DateTime      @default(now())
+  method      PaymentMethod
+  reference   String?       // Check number, transaction ID, etc.
+  notes       String?       @db.Text
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@index([documentId])
+}
+
+// ============================================
+// PRODUCT/SERVICE CATALOG
+// ============================================
+
+// Optional: Pre-save common products/services for quick adding to quotes/invoices
+// Saves time by not having to re-type descriptions and prices every time
+model Product {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?     @db.Text
+  unitPrice   Decimal     @db.Decimal(12, 2)
+  type        ProductType @default(SERVICE)
+  
+  isActive    Boolean     @default(true)
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@index([userId])
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+// User roles
+enum UserRole {
+  USER
+  ACCOUNTANT
+  ADMIN
+}
+
+// Distinguishes between quotes and invoices
+enum DocumentType {
+  QUOTE
+  INVOICE
+}
+
+// All possible statuses a quote or invoice can have throughout its lifecycle
+enum DocumentStatus {
+  DRAFT       // Initial state
+  SENT        // Sent to client
+  VIEWED      // Client viewed it
+  APPROVED    // Quote approved
+  REJECTED    // Quote rejected
+  CONVERTED   // Quote converted to invoice
+  PARTIAL     // Invoice partially paid
+  PAID        // Invoice fully paid
+  OVERDUE     // Invoice past due date
+  CANCELLED   // Cancelled
+}
+
+// Payment methods for tracking how invoices were paid
+enum PaymentMethod {
+  CASH
+  CHECK
+  BANK_TRANSFER
+  CREDIT_CARD
+  PAYPAL
+  STRIPE
+  OTHER
+}
+
+// Type of product/service being sold
+enum ProductType {
+  PRODUCT
+  SERVICE
+}

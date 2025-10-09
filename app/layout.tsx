@@ -41,7 +41,7 @@ export default function RootLayout({
             <AppSidebar />
             <SidebarInset>
               <TopNav />
-              <main className="p-6">{children}</main>
+              <main>{children}</main>
             </SidebarInset>
           </SidebarProvider>
         </ThemeProvider>

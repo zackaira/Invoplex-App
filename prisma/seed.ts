@@ -300,7 +300,6 @@ async function main() {
     const quoteStatuses = [
       DocumentStatus.DRAFT,
       DocumentStatus.SENT,
-      DocumentStatus.VIEWED,
       DocumentStatus.APPROVED,
       DocumentStatus.CONVERTED,
     ];
@@ -373,7 +372,6 @@ async function main() {
     // Create 10 Invoices with payments
     const invoiceStatuses = [
       DocumentStatus.SENT,
-      DocumentStatus.VIEWED,
       DocumentStatus.PARTIAL,
       DocumentStatus.PAID,
       DocumentStatus.OVERDUE,

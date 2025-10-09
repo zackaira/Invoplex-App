@@ -6,16 +6,16 @@ import { columns } from "./columns";
 const quoteStatusOptions: StatusFilterOption[] = [
   { value: "DRAFT", label: "Draft" },
   { value: "SENT", label: "Sent" },
-  { value: "VIEWED", label: "Viewed" },
   { value: "APPROVED", label: "Approved" },
   { value: "REJECTED", label: "Rejected" },
-  { value: "CONVERTED", label: "Converted" },
   { value: "CANCELLED", label: "Cancelled" },
 ];
 
 export default async function Quotes() {
   // TODO: Replace with actual user ID from authentication
   const quotes = await getQuotesByUserId("cmgexy4630002r7qfecfve8hq");
+
+  console.log(quotes);
 
   // Transform the data to match our Quote type
   const transformedQuotes = quotes.map((quote) => ({
@@ -31,7 +31,7 @@ export default async function Quotes() {
   }));
 
   return (
-    <div>
+    <div className="group document-list quotes">
       <DataTable
         columns={columns}
         data={transformedQuotes}

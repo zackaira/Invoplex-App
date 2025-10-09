@@ -344,7 +344,6 @@ enum DocumentType {
 enum DocumentStatus {
   DRAFT       // Initial state
   SENT        // Sent to client
-  VIEWED      // Client viewed it
   APPROVED    // Quote approved
   REJECTED    // Quote rejected
   CONVERTED   // Quote converted to invoice

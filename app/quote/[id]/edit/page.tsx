@@ -1,11 +1,9 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { DocumentView } from "@/app/components/DocumentView";
-import { DocumentWithRelations } from "@/app/components/templates/types";
-import { Button } from "@/components/ui/button";
+import { DocumentView } from "@/app/components/documents/DocumentView";
+import { DocumentWithRelations } from "@/app/components/documents/templates/types";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save } from "lucide-react";
 import { getDocumentById } from "@/lib/actions";
 
 export default function EditQuotePage({
@@ -18,6 +16,7 @@ export default function EditQuotePage({
   const [document, setDocument] = useState<DocumentWithRelations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [templateId, setTemplateId] = useState("classic");
 
   useEffect(() => {
     async function fetchDocument() {
@@ -66,9 +65,10 @@ export default function EditQuotePage({
       <DocumentView
         document={document}
         type="QUOTE"
-        templateId="classic"
+        templateId={templateId}
         isEditable={true}
         onUpdate={handleUpdate}
+        onTemplateChange={setTemplateId}
       />
     </div>
   );

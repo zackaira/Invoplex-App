@@ -1,5 +1,7 @@
-import { TemplateRenderer } from "@/app/components/templates/TemplateRenderer";
-import { DocumentWithRelations } from "@/app/components/templates/types";
+"use client";
+
+import { TemplateRenderer } from "@/app/components/documents/templates/TemplateRenderer";
+import { DocumentWithRelations } from "@/app/components/documents/templates/types";
 import { DocumentViewBar } from "./DocumentViewBar";
 import { DocumentEditBar } from "./DocumentEditBar";
 
@@ -9,17 +11,23 @@ export function DocumentView({
   templateId = "classic",
   isEditable = false,
   onUpdate,
+  onTemplateChange,
 }: {
   document: DocumentWithRelations;
   type: "QUOTE" | "INVOICE";
   templateId?: string;
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  onTemplateChange?: (templateId: string) => void;
 }) {
   return (
     <>
       {isEditable ? (
-        <DocumentEditBar document={document} />
+        <DocumentEditBar
+          document={document}
+          templateId={templateId}
+          onTemplateChange={onTemplateChange}
+        />
       ) : (
         <DocumentViewBar document={document} />
       )}
@@ -29,7 +37,7 @@ export function DocumentView({
         document={document}
         type={type}
         isEditable={isEditable}
-        onUpdate={onUpdate}
+        onUpdate={isEditable ? onUpdate : undefined}
       />
     </>
   );

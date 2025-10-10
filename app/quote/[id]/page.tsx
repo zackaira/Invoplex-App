@@ -1,9 +1,6 @@
-import { DocumentView } from "@/app/components/DocumentView";
+import { DocumentView } from "@/app/components/documents/DocumentView";
 import { getDocumentById } from "@/lib/actions";
 import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Pencil } from "lucide-react";
 
 export default async function QuotePage({
   params,

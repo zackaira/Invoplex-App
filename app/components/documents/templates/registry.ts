@@ -1,5 +1,6 @@
 import { Template } from "./types";
 import { ClassicTemplate } from "./classic/ClassicTemplate";
+import { ModernTemplate } from "./modern/ModernTemplate";
 
 export const templateRegistry: Record<string, Template> = {
   classic: {
@@ -13,9 +14,21 @@ export const templateRegistry: Record<string, Template> = {
     },
     component: ClassicTemplate,
   },
+  modern: {
+    metadata: {
+      id: "modern",
+      name: "Modern",
+      description:
+        "Contemporary design with gradient accents and card-based layout",
+      preview: "/templates/modern-preview.png",
+      isPremium: false,
+      tier: "FREE",
+    },
+    component: ModernTemplate,
+  },
   // Add more templates here as you create them
-  // modern: { ... },
   // elegant: { ... },
+  // minimal: { ... },
 };
 
 export const getTemplate = (templateId: string): Template => {

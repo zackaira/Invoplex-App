@@ -1,3 +1,5 @@
+"use client";
+
 import { TemplateProps } from "../types";
 import { ClassicHeader } from "./ClassicHeader";
 import { ClassicItems } from "./ClassicItems";

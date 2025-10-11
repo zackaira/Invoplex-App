@@ -77,6 +77,7 @@ model BusinessProfile {
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // Business details that appear on invoices/quotes
+  personalName String? // Personal/owner name
   businessName String
   email        String?
   phone        String?
@@ -93,6 +94,9 @@ model BusinessProfile {
   // Tax/Legal
   taxId        String? // VAT, EIN, ABN, etc.
   registrationNumber String?
+  
+  // Brand settings
+  brandColor   String? @default("#000000")
   
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -111,6 +115,7 @@ model UserSettings {
   
   // Quote defaults
   quotePrefix           String  @default("Q")
+  quoteTitle            String  @default("QUOTE")
   quoteNextNumber       Int     @default(1)
   quoteValidityDays     Int     @default(30)
   quoteDefaultTerms     String? @db.Text
@@ -118,6 +123,7 @@ model UserSettings {
   
   // Invoice defaults
   invoicePrefix         String  @default("INV")
+  invoiceTitle          String  @default("INVOICE")
   invoiceNextNumber     Int     @default(1)
   invoiceDefaultDueDays Int     @default(30)
   invoiceDefaultTerms   String? @db.Text
@@ -126,6 +132,17 @@ model UserSettings {
   // Tax & Currency
   defaultTaxRate        Decimal @db.Decimal(5, 2) @default(0)
   defaultCurrency       String  @default("USD")
+  
+  // Template selection
+  selectedTemplateId    String  @default("classic")
+  
+  // Bank details for invoices
+  bankName              String?
+  accountName           String?
+  accountNumber         String?
+  routingNumber         String?
+  iban                  String?
+  swiftCode             String?
   
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

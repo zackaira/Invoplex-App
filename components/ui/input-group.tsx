@@ -16,7 +16,7 @@ const InputGroup = React.forwardRef<
       ref={ref}
       className={cn(
         "relative min-w-0 rounded-[calc(var(--radius)-2px)] shadow-sm shadow-black/5",
-        "has-[data-slot=input-group-control]:focus-within:outline has-[data-slot=input-group-control]:focus-within:outline-2 has-[data-slot=input-group-control]:focus-within:-outline-offset-1 has-[data-slot=input-group-control]:focus-within:outline-ring/70",
+        "has-[data-slot=input-group-control]:focus-within:outline-2 has-[data-slot=input-group-control]:focus-within:-outline-offset-1 has-[data-slot=input-group-control]:focus-within:outline-ring/70",
         className
       )}
       {...props}

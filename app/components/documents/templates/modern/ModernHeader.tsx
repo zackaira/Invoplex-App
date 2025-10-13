@@ -17,6 +17,21 @@ export function ModernHeader({
   isEditable = false,
   onUpdate,
 }: ModernHeaderProps) {
+  const validDays = 15;
+
+  const handleIssueDateChange = (date: Date | undefined) => {
+    if (!date || !onUpdate) return;
+
+    if (type === "QUOTE") {
+      // Auto-set Valid Until date to 15 days from Issue Date
+      const validUntilDate = new Date(date);
+      validUntilDate.setDate(validUntilDate.getDate() + validDays);
+      onUpdate({ issueDate: date, validUntil: validUntilDate });
+    } else {
+      onUpdate({ issueDate: date });
+    }
+  };
+
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-t-lg">
       <div className="flex justify-between items-start mb-6">
@@ -107,12 +122,12 @@ export function ModernHeader({
           {isEditable ? (
             <SettingsDatePicker
               value={new Date(document.issueDate)}
-              onChange={(date) => date && onUpdate?.({ issueDate: date })}
+              onChange={handleIssueDateChange}
               className="font-medium text-black w-full mt-1"
             />
           ) : (
             <p className="font-medium text-lg mt-1">
-              {new Date(document.issueDate).toLocaleDateString()}
+              {new Date(document.issueDate).toLocaleDateString("en-US")}
             </p>
           )}
         </div>
@@ -131,7 +146,7 @@ export function ModernHeader({
             ) : (
               document.dueDate && (
                 <p className="font-medium text-lg mt-1">
-                  {new Date(document.dueDate).toLocaleDateString()}
+                  {new Date(document.dueDate).toLocaleDateString("en-US")}
                 </p>
               )
             )}
@@ -154,7 +169,7 @@ export function ModernHeader({
             ) : (
               document.validUntil && (
                 <p className="font-medium text-lg mt-1">
-                  {new Date(document.validUntil).toLocaleDateString()}
+                  {new Date(document.validUntil).toLocaleDateString("en-US")}
                 </p>
               )
             )}

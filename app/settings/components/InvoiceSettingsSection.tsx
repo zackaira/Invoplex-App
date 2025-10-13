@@ -14,6 +14,8 @@ interface InvoiceSettingsSectionProps {
   onMarkChanged: () => void;
   showBankDetails: boolean;
   setShowBankDetails: (value: boolean) => void;
+  removeInvoicePoweredBy: boolean;
+  setRemoveInvoicePoweredBy: (value: boolean) => void;
 }
 
 export function InvoiceSettingsSection({
@@ -23,6 +25,8 @@ export function InvoiceSettingsSection({
   onMarkChanged,
   showBankDetails,
   setShowBankDetails,
+  removeInvoicePoweredBy,
+  setRemoveInvoicePoweredBy,
 }: InvoiceSettingsSectionProps) {
   return (
     <SettingsSection
@@ -90,6 +94,14 @@ export function InvoiceSettingsSection({
         placeholder="Enter additional notes for invoices..."
         rows={4}
         onChange={onMarkChanged}
+      />
+
+      <SettingsSwitch
+        label="Remove Powered by Invoplex"
+        helperText="Remove the Powered by Invoplex text from the invoice footer"
+        checked={removeInvoicePoweredBy}
+        onCheckedChange={setRemoveInvoicePoweredBy}
+        name="removeInvoicePoweredBy"
       />
 
       {/* Bank Details Section */}

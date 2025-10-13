@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { DocumentWithRelations } from "../types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DocumentTotals } from "../../shared/DocumentTotals";
+import Link from "next/link";
 
 interface ModernFooterProps {
   document: DocumentWithRelations;
@@ -27,18 +29,20 @@ export function ModernFooter({
         isEditable={isEditable}
         onUpdate={onUpdate}
         render={({ document, isEditable, onTaxUpdate, onDiscountUpdate }) => (
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 p-8 rounded-lg mb-8">
-            <div className="flex justify-between items-start">
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 p-8 rounded-lg mb-10">
+            <div className="flex justify-between items-end">
               {/* Powered By / Branding Logo */}
               <div className="flex-shrink-0">
-                <div className="text-xs text-gray-400 dark:text-gray-500 mb-1">
-                  Powered by
-                </div>
-                <div className="w-24 h-24 bg-white/50 dark:bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-blue-200 dark:border-blue-800">
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">
-                    Your Logo
-                  </span>
-                </div>
+                <div className="text-xs text-gray-400 mb-1">Powered by</div>
+                <Link href="https://kaira.co/" target="_blank">
+                  <Image
+                    src="/invoplex-logo.png"
+                    alt="Invoplex Logo"
+                    width={160}
+                    height={45}
+                    className="object-contain"
+                  />
+                </Link>
               </div>
 
               <div className="max-w-md space-y-3">

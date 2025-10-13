@@ -17,6 +17,8 @@ export default function Settings() {
   const [selectedTemplate, setSelectedTemplate] = useState("classic");
   const [showBankDetails, setShowBankDetails] = useState(false);
   const [showFinancialSettings, setShowFinancialSettings] = useState(false);
+  const [removeQuotePoweredBy, setRemoveQuotePoweredBy] = useState(false);
+  const [removeInvoicePoweredBy, setRemoveInvoicePoweredBy] = useState(false);
 
   // Track unsaved changes for each section
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState({
@@ -26,6 +28,8 @@ export default function Settings() {
     quoteSettings: false,
     invoiceSettings: false,
     templateSettings: false,
+    removeQuotePoweredBy: false,
+    removeInvoicePoweredBy: false,
   });
 
   // Track saving state for each section
@@ -36,6 +40,8 @@ export default function Settings() {
     quoteSettings: false,
     invoiceSettings: false,
     templateSettings: false,
+    removeQuotePoweredBy: false,
+    removeInvoicePoweredBy: false,
   });
 
   const templates = getAllTemplates();
@@ -213,6 +219,8 @@ export default function Settings() {
             hasUnsavedChanges={hasUnsavedChanges.quoteSettings}
             onSave={handleSaveQuoteSettings}
             onMarkChanged={() => markSectionChanged("quoteSettings")}
+            removeQuotePoweredBy={removeQuotePoweredBy}
+            setRemoveQuotePoweredBy={setRemoveQuotePoweredBy}
           />
 
           <InvoiceSettingsSection
@@ -222,6 +230,8 @@ export default function Settings() {
             onMarkChanged={() => markSectionChanged("invoiceSettings")}
             showBankDetails={showBankDetails}
             setShowBankDetails={setShowBankDetails}
+            removeInvoicePoweredBy={removeInvoicePoweredBy}
+            setRemoveInvoicePoweredBy={setRemoveInvoicePoweredBy}
           />
 
           <TemplateSelectionSection

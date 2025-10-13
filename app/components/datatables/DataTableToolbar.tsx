@@ -50,6 +50,7 @@ export function DataTableToolbar<TData>({
       : [...selectedStatuses, status];
     onStatusChange?.(newStatuses);
   };
+  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
   const clearStatusFilters = () => {
     onStatusChange?.([]);
@@ -131,27 +132,38 @@ export function DataTableToolbar<TData>({
 
       {/* Actions - align to the right */}
       <div className="flex-1 flex justify-end gap-2">
-        {table.getFilteredSelectedRowModel().rows.length > 0 && (
+        {selectedCount > 0 && (
           <>
             {/* delete icon */}
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              title={`Delete Quote${selectedCount > 1 ? "s" : ""}`}
+            >
               <Trash className="h-4 w-4" />
             </Button>
 
             {/* download icon */}
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              title={`Download PDF${selectedCount > 1 ? "s" : ""}`}
+            >
               <Download className="h-4 w-4" />
             </Button>
 
             {/* edit icon */}
-            <Button variant="outline">
-              <PencilIcon className="h-4 w-4" />
-            </Button>
+            {selectedCount === 1 && (
+              <Button
+                variant="outline"
+                title={`Edit${selectedCount > 1 ? "s" : ""}`}
+              >
+                <PencilIcon className="h-4 w-4" />
+              </Button>
+            )}
           </>
         )}
 
         {/* download icon */}
-        <Button variant="outline">
+        <Button variant="outline" title="New Quote">
           <PlusIcon className="h-4 w-4" />
           New
         </Button>

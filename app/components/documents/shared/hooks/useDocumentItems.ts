@@ -42,6 +42,7 @@ export function useDocumentItems(
     const newItem = {
       id: `temp-${Date.now()}`,
       documentId: document.id,
+      itemType: "Product",
       description: "New Item",
       quantity: "1",
       unitPrice: "0",

@@ -14,7 +14,7 @@ export function DocumentViewBar({
 }) {
   const router = useRouter();
   return (
-    <div className="flex justify-between items-center border-b px-6 py-4">
+    <div className="container mx-auto flex justify-between items-center border-b px-6 py-4">
       <div>
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-5 w-5" />

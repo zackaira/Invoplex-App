@@ -170,7 +170,12 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className="font-medium">{row.getValue("documentNumber")}</div>
+        <div
+          onClick={() => row.toggleSelected(!row.getIsSelected())}
+          className="text-md font-medium cursor-pointer hover:opacity-70 transition-opacity py-4"
+        >
+          {row.getValue("documentNumber")}
+        </div>
       );
     },
   },
@@ -195,12 +200,12 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div
-          onClick={() => row.toggleSelected(!row.getIsSelected())}
+        <Link
+          href={`/quote/${row.original.id}`}
           className="text-md font-medium cursor-pointer hover:opacity-70 transition-opacity py-4"
         >
           {row.original.client.name}
-        </div>
+        </Link>
       );
     },
   },

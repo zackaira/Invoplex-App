@@ -3,6 +3,7 @@
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { SettingsLabel } from "./SettingsLabel";
+import { SettingsHelperText } from "./SettingsHelperText";
 
 interface SettingsSwitchProps {
   label: string;
@@ -34,9 +35,7 @@ export function SettingsSwitch({
       <div className="flex-1 space-y-0.5">
         <SettingsLabel htmlFor={switchId} label={label} />
 
-        {helperText && (
-          <p className="text-xs text-muted-foreground">{helperText}</p>
-        )}
+        {helperText && <SettingsHelperText text={helperText} />}
       </div>
       <Switch
         id={switchId}

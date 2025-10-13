@@ -4,6 +4,7 @@ import {
   SettingsInput,
   SettingsTextarea,
   SettingsGrid,
+  SettingsSwitch,
 } from "@/app/components/settings";
 
 interface QuoteSettingsSectionProps {
@@ -11,6 +12,8 @@ interface QuoteSettingsSectionProps {
   hasUnsavedChanges: boolean;
   onSave: (e: React.FormEvent<HTMLFormElement>) => void;
   onMarkChanged: () => void;
+  removeQuotePoweredBy: boolean;
+  setRemoveQuotePoweredBy: (value: boolean) => void;
 }
 
 export function QuoteSettingsSection({
@@ -18,6 +21,8 @@ export function QuoteSettingsSection({
   hasUnsavedChanges,
   onSave,
   onMarkChanged,
+  removeQuotePoweredBy,
+  setRemoveQuotePoweredBy,
 }: QuoteSettingsSectionProps) {
   return (
     <SettingsSection
@@ -85,6 +90,14 @@ export function QuoteSettingsSection({
         placeholder="Enter additional notes for quotes..."
         rows={4}
         onChange={onMarkChanged}
+      />
+
+      <SettingsSwitch
+        label="Remove Powered by Invoplex"
+        helperText="Remove the Powered by Invoplex text from the quote footer"
+        checked={removeQuotePoweredBy}
+        onCheckedChange={setRemoveQuotePoweredBy}
+        name="removeQuotePoweredBy"
       />
     </SettingsSection>
   );

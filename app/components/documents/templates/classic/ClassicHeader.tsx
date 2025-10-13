@@ -17,9 +17,24 @@ export function ClassicHeader({
   isEditable = false,
   onUpdate,
 }: ClassicHeaderProps) {
+  const validDays = 15;
+
+  const handleIssueDateChange = (date: Date | undefined) => {
+    if (!date || !onUpdate) return;
+
+    if (type === "QUOTE") {
+      // Auto-set Valid Until date to 15 days from Issue Date
+      const validUntilDate = new Date(date);
+      validUntilDate.setDate(validUntilDate.getDate() + validDays);
+      onUpdate({ issueDate: date, validUntil: validUntilDate });
+    } else {
+      onUpdate({ issueDate: date });
+    }
+  };
+
   return (
     <div className="border-b pb-6">
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex justify-between items-center mb-10">
         {/* Company Logo */}
         <div className="flex-shrink-0">
           <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-sm">
@@ -110,15 +125,16 @@ export function ClassicHeader({
           {isEditable ? (
             <SettingsDatePicker
               value={new Date(document.issueDate)}
-              onChange={(date) => date && onUpdate?.({ issueDate: date })}
+              onChange={handleIssueDateChange}
               className="font-medium w-full mt-1"
             />
           ) : (
             <p className="font-medium">
-              {new Date(document.issueDate).toLocaleDateString()}
+              {new Date(document.issueDate).toLocaleDateString("en-US")}
             </p>
           )}
         </div>
+
         {type === "INVOICE" && (
           <div>
             <p className="text-sm text-gray-500">Due Date</p>
@@ -134,7 +150,7 @@ export function ClassicHeader({
             ) : (
               document.dueDate && (
                 <p className="font-medium">
-                  {new Date(document.dueDate).toLocaleDateString()}
+                  {new Date(document.dueDate).toLocaleDateString("en-US")}
                 </p>
               )
             )}
@@ -157,7 +173,7 @@ export function ClassicHeader({
             ) : (
               document.validUntil && (
                 <p className="font-medium">
-                  {new Date(document.validUntil).toLocaleDateString()}
+                  {new Date(document.validUntil).toLocaleDateString("en-US")}
                 </p>
               )
             )}

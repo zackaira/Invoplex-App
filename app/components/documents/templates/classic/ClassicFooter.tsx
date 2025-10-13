@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { DocumentWithRelations } from "../types";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DocumentTotals } from "../../shared/DocumentTotals";
+import Link from "next/link";
 
 interface ClassicFooterProps {
   document: DocumentWithRelations;
@@ -28,15 +30,19 @@ export function ClassicFooter({
         isEditable={isEditable}
         onUpdate={onUpdate}
         render={({ document, isEditable, onTaxUpdate, onDiscountUpdate }) => (
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex justify-between items-end mb-10">
             {/* Powered By / Branding Logo */}
             <div className="flex-shrink-0">
               <div className="text-xs text-gray-400 mb-1">Powered by</div>
-              <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
-                <span className="text-[10px] text-gray-400 text-center px-2">
-                  Your Logo
-                </span>
-              </div>
+              <Link href="https://kaira.co/" target="_blank">
+                <Image
+                  src="/invoplex-logo.png"
+                  alt="Invoplex Logo"
+                  width={160}
+                  height={45}
+                  className="object-contain"
+                />
+              </Link>
             </div>
 
             <div className="w-full max-w-xs space-y-2">
@@ -157,7 +163,7 @@ export function ClassicFooter({
         )}
 
         {(isEditable || document.terms) && (
-          <div>
+          <div className="mt-10">
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">
               Terms & Conditions
             </h3>
@@ -181,7 +187,7 @@ export function ClassicFooter({
       </div>
 
       {/* Footer message */}
-      <div className="mt-8 pt-6 border-t text-center text-sm text-gray-500">
+      <div className="mt-10 pt-6 border-t text-center text-sm text-gray-500">
         <p>
           Thank you for your business!
           {type === "INVOICE" &&

@@ -25,7 +25,7 @@ export default function SidebarFoot() {
                 size="lg"
                 className="p-2 gap-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-12 group-data-[collapsible=icon]:!p-2"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shrink-0">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-invoplex text-sidebar-primary-foreground shrink-0">
                   <span className="text-sm font-medium">ZV</span>
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">

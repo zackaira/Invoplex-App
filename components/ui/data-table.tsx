@@ -48,48 +48,53 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [selectedStatuses, setSelectedStatuses] = React.useState<string[]>([]);
-  const [pageSize, setPageSize] = React.useState(50);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 50,
+  });
 
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    initialState: {
-      pagination: {
-        pageSize: 50,
-      },
-    },
+    autoResetPageIndex: false,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
-  // Update the page size whenever pageSize changes
-  React.useEffect(() => {
-    table.setPageSize(pageSize);
-  }, [pageSize, table]);
+  // Get current status filter value
+  const selectedStatuses = React.useMemo(() => {
+    if (!statusFilterColumn) return [];
+    const filterValue = columnFilters.find(
+      (filter) => filter.id === statusFilterColumn
+    )?.value;
+    return Array.isArray(filterValue) ? filterValue : [];
+  }, [columnFilters, statusFilterColumn]);
 
-  // Update the status filter whenever selectedStatuses changes
-  React.useEffect(() => {
-    if (statusFilterColumn) {
-      if (selectedStatuses.length === 0) {
-        table.getColumn(statusFilterColumn)?.setFilterValue(undefined);
-      } else {
-        table.getColumn(statusFilterColumn)?.setFilterValue(selectedStatuses);
+  // Handle status change by updating column filters
+  const handleStatusChange = React.useCallback(
+    (statuses: string[]) => {
+      if (statusFilterColumn) {
+        table
+          .getColumn(statusFilterColumn)
+          ?.setFilterValue(statuses.length > 0 ? statuses : undefined);
       }
-    }
-  }, [selectedStatuses, statusFilterColumn, table]);
+    },
+    [statusFilterColumn, table]
+  );
 
   return (
     <div className="w-full">
@@ -100,7 +105,7 @@ export function DataTable<TData, TValue>({
         statusFilterColumn={statusFilterColumn}
         statusFilterOptions={statusFilterOptions}
         selectedStatuses={selectedStatuses}
-        onStatusChange={setSelectedStatuses}
+        onStatusChange={handleStatusChange}
       />
       <div className="overflow-hidden">
         <Table>
@@ -110,8 +115,8 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination
         table={table}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        pageSize={pagination.pageSize}
+        onPageSizeChange={(size) => table.setPageSize(size)}
       />
     </div>
   );

@@ -5,6 +5,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SettingsLabel } from "./SettingsLabel";
+import { cn } from "@/lib/utils";
+import { SettingsHelperText } from "./SettingsHelperText";
 
 interface SettingsSelectProps {
   label: string;
@@ -37,10 +40,8 @@ export function SettingsSelect({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={selectId} className="text-sm font-medium">
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </label>
+      <SettingsLabel htmlFor={selectId} label={label} required={required} />
+
       <Select
         value={value}
         defaultValue={defaultValue}
@@ -50,7 +51,7 @@ export function SettingsSelect({
       >
         <SelectTrigger
           id={selectId}
-          className={error ? "border-destructive" : ""}
+          className={cn("py-6", error ? "border-destructive" : "")}
         >
           <SelectValue
             placeholder={placeholder || `Select ${label.toLowerCase()}`}
@@ -64,9 +65,9 @@ export function SettingsSelect({
           ))}
         </SelectContent>
       </Select>
-      {helperText && !error && (
-        <p className="text-xs text-muted-foreground">{helperText}</p>
-      )}
+
+      {helperText && !error && <SettingsHelperText text={helperText} />}
+
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );

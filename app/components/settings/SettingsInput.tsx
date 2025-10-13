@@ -6,6 +6,8 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 import { cn } from "@/lib/utils";
+import { SettingsLabel } from "./SettingsLabel";
+import { SettingsHelperText } from "./SettingsHelperText";
 
 interface SettingsInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -33,15 +35,19 @@ export function SettingsInput({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={inputId} className="text-sm font-medium">
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </label>
+      <SettingsLabel
+        htmlFor={inputId}
+        className="text-sm font-medium"
+        label={label}
+        required={required}
+      />
+
       {hasAddons ? (
         <InputGroup>
           <InputGroupInput
             id={inputId}
             className={cn(
+              "py-6",
               error && "border-destructive",
               startAddon && "pl-[58px]",
               endAddons && endAddons.length > 0 && "pr-[50px]",
@@ -65,13 +71,13 @@ export function SettingsInput({
       ) : (
         <Input
           id={inputId}
-          className={cn(error && "border-destructive", className)}
+          className={cn("py-6", error && "border-destructive", className)}
           {...props}
         />
       )}
-      {helperText && !error && (
-        <p className="text-xs text-muted-foreground">{helperText}</p>
-      )}
+
+      {helperText && !error && <SettingsHelperText text={helperText} />}
+
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );

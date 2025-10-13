@@ -1,7 +1,10 @@
-import { Building2, InfoIcon } from "lucide-react";
+import { Building2, InfoIcon, Lock, LockOpen } from "lucide-react";
+import { useState } from "react";
 import {
   SettingsSection,
   SettingsInput,
+  SettingsPhoneInput,
+  SettingsCombobox,
   SettingsGrid,
 } from "@/app/components/settings";
 import { InputGroupButton } from "@/components/ui/input-group";
@@ -10,6 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getCountryOptions } from "@/lib/data-utils";
 
 interface BusinessProfileSectionProps {
   isSaving: boolean;
@@ -24,6 +28,7 @@ export function BusinessProfileSection({
   onSave,
   onMarkChanged,
 }: BusinessProfileSectionProps) {
+  const [isEmailLocked, setIsEmailLocked] = useState(true);
   return (
     <SettingsSection
       id="business-profile"
@@ -39,7 +44,26 @@ export function BusinessProfileSection({
         label="Personal Name"
         name="personalName"
         placeholder="John Doe"
+        required
         onChange={onMarkChanged}
+        endAddons={[
+          <Tooltip key="website-info">
+            <TooltipTrigger asChild>
+              <InputGroupButton
+                variant="ghost"
+                size="icon-xs"
+                aria-label="Website info"
+                type="button"
+              >
+                <InfoIcon className="size-4" />
+              </InputGroupButton>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Enter your personal name to be added to Quotes and Invoices</p>
+            </TooltipContent>
+          </Tooltip>,
+        ]}
+        helperText="Enter your name to be added to Quotes and Invoices"
       />
 
       <SettingsGrid columns={2}>
@@ -55,17 +79,52 @@ export function BusinessProfileSection({
           name="email"
           type="email"
           placeholder="contact@acme.com"
+          required
+          disabled={isEmailLocked}
           onChange={onMarkChanged}
+          autoComplete="email"
+          endAddons={[
+            <Tooltip key="email-lock">
+              <TooltipTrigger asChild>
+                <InputGroupButton
+                  variant="ghost"
+                  size="icon-xs"
+                  aria-label={isEmailLocked ? "Unlock email" : "Lock email"}
+                  type="button"
+                  onClick={() => setIsEmailLocked(!isEmailLocked)}
+                >
+                  {isEmailLocked ? (
+                    <Lock className="size-4" />
+                  ) : (
+                    <LockOpen className="size-4" />
+                  )}
+                </InputGroupButton>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {isEmailLocked
+                    ? "Click to unlock and edit email"
+                    : "Click to lock email"}
+                </p>
+              </TooltipContent>
+            </Tooltip>,
+          ]}
         />
       </SettingsGrid>
 
       <SettingsGrid columns={2}>
-        <SettingsInput
+        <SettingsPhoneInput
           label="Phone"
           name="phone"
-          type="tel"
           placeholder="+1 (555) 123-4567"
-          onChange={onMarkChanged}
+          onChange={(value, isValid) => {
+            onMarkChanged();
+            // You can add additional validation logic here if needed
+            console.log("Phone value:", value, "Is valid:", isValid);
+          }}
+          required
+          autoComplete="tel"
+          helperText="Enter phone number with country code (e.g., +1 for US)"
         />
         <SettingsInput
           label="Website"
@@ -95,10 +154,27 @@ export function BusinessProfileSection({
       </SettingsGrid>
 
       <SettingsInput
-        label="Address"
+        label="Address Line 1"
         name="address"
         placeholder="123 Main Street"
         onChange={onMarkChanged}
+        autoComplete="address-line1"
+      />
+
+      <SettingsInput
+        label="Address Line 2"
+        name="address2"
+        placeholder="Suite 100"
+        onChange={onMarkChanged}
+        autoComplete="address-line2"
+      />
+
+      <SettingsInput
+        label="Address Line 3"
+        name="address3"
+        placeholder="Building B"
+        onChange={onMarkChanged}
+        autoComplete="address-line3"
       />
 
       <SettingsGrid columns={2}>
@@ -123,11 +199,14 @@ export function BusinessProfileSection({
           placeholder="94102"
           onChange={onMarkChanged}
         />
-        <SettingsInput
+        <SettingsCombobox
           label="Country"
           name="country"
-          placeholder="United States"
-          onChange={onMarkChanged}
+          options={getCountryOptions()}
+          onValueChange={onMarkChanged}
+          placeholder="Select country..."
+          searchPlaceholder="Search country..."
+          required
         />
       </SettingsGrid>
     </SettingsSection>

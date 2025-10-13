@@ -1,9 +1,8 @@
 "use client";
 
 import { DocumentWithRelations } from "../types";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { getStatusColor } from "../../shared/utils";
+import { SettingsDatePicker } from "@/app/components/settings";
 
 interface ModernHeaderProps {
   document: DocumentWithRelations;
@@ -21,17 +20,33 @@ export function ModernHeader({
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-t-lg">
       <div className="flex justify-between items-start mb-6">
-        <div>
+        {/* Company Logo */}
+        <div className="flex-shrink-0">
+          <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center text-white/60 text-sm">
+            Company Logo
+          </div>
+        </div>
+
+        {/* Title and Document Info */}
+        <div className="text-right">
           <h1 className="text-5xl font-bold mb-2">
             {type === "QUOTE" ? "Quote" : "Invoice"}
           </h1>
-          <p className="text-xl opacity-90">{document.documentNumber}</p>
+          <p className="text-xl opacity-90 mb-3">{document.documentNumber}</p>
+
+          {/* Project Name / Additional Info Field */}
+          {isEditable ? (
+            <Input
+              type="text"
+              placeholder="Project name or description"
+              value={""}
+              onChange={(e) => {}}
+              className="text-sm text-black mt-2"
+            />
+          ) : (
+            document.notes && <p className="text-sm opacity-90 mt-2">{""}</p>
+          )}
         </div>
-        <Badge
-          className={`${getStatusColor(document.status)} text-lg px-4 py-2`}
-        >
-          {document.status}
-        </Badge>
       </div>
 
       <div className="grid grid-cols-2 gap-8 mt-8">
@@ -90,13 +105,10 @@ export function ModernHeader({
         <div>
           <p className="text-sm uppercase opacity-75">Issue Date</p>
           {isEditable ? (
-            <Input
-              type="date"
-              value={new Date(document.issueDate).toISOString().split("T")[0]}
-              onChange={(e) =>
-                onUpdate?.({ issueDate: new Date(e.target.value) })
-              }
-              className="font-medium text-black mt-1"
+            <SettingsDatePicker
+              value={new Date(document.issueDate)}
+              onChange={(date) => date && onUpdate?.({ issueDate: date })}
+              className="font-medium text-black w-full mt-1"
             />
           ) : (
             <p className="font-medium text-lg mt-1">
@@ -108,17 +120,13 @@ export function ModernHeader({
           <div>
             <p className="text-sm uppercase opacity-75">Due Date</p>
             {isEditable ? (
-              <Input
-                type="date"
+              <SettingsDatePicker
                 value={
-                  document.dueDate
-                    ? new Date(document.dueDate).toISOString().split("T")[0]
-                    : ""
+                  document.dueDate ? new Date(document.dueDate) : undefined
                 }
-                onChange={(e) =>
-                  onUpdate?.({ dueDate: new Date(e.target.value) })
-                }
-                className="font-medium text-black mt-1"
+                onChange={(date) => onUpdate?.({ dueDate: date })}
+                placeholder="Select due date"
+                className="font-medium text-black w-full mt-1"
               />
             ) : (
               document.dueDate && (
@@ -133,17 +141,15 @@ export function ModernHeader({
           <div>
             <p className="text-sm uppercase opacity-75">Valid Until</p>
             {isEditable ? (
-              <Input
-                type="date"
+              <SettingsDatePicker
                 value={
                   document.validUntil
-                    ? new Date(document.validUntil).toISOString().split("T")[0]
-                    : ""
+                    ? new Date(document.validUntil)
+                    : undefined
                 }
-                onChange={(e) =>
-                  onUpdate?.({ validUntil: new Date(e.target.value) })
-                }
-                className="font-medium text-black mt-1"
+                onChange={(date) => onUpdate?.({ validUntil: date })}
+                placeholder="Select valid until date"
+                className="font-medium text-black w-full mt-1"
               />
             ) : (
               document.validUntil && (

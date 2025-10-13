@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CloudUpload, X } from "lucide-react";
+import { SettingsLabel } from "./SettingsLabel";
+import { SettingsHelperText } from "./SettingsHelperText";
 
 interface SettingsLogoUploadProps {
   label: string;
@@ -80,7 +82,7 @@ export function SettingsLogoUpload({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">{label}</label>
+      <SettingsLabel htmlFor={uploadId} label={label} />
 
       {!preview ? (
         <label
@@ -109,9 +111,8 @@ export function SettingsLogoUpload({
             <p className="text-sm text-muted-foreground">
               JPG, PNG, or GIF formats.
             </p>
-            {helperText && (
-              <p className="text-sm text-muted-foreground">{helperText}</p>
-            )}
+
+            {helperText && <SettingsHelperText text={helperText} />}
           </div>
           <Input
             id={uploadId}

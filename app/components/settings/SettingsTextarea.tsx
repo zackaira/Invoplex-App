@@ -1,5 +1,7 @@
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { SettingsLabel } from "./SettingsLabel";
+import { SettingsHelperText } from "./SettingsHelperText";
 
 interface SettingsTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -23,18 +25,16 @@ export function SettingsTextarea({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={textareaId} className="text-sm font-medium">
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </label>
+      <SettingsLabel htmlFor={textareaId} label={label} required={required} />
+
       <Textarea
         id={textareaId}
-        className={cn(error && "border-destructive", className)}
+        className={cn("py-4", error && "border-destructive", className)}
         {...props}
       />
-      {helperText && !error && (
-        <p className="text-xs text-muted-foreground">{helperText}</p>
-      )}
+
+      {helperText && !error && <SettingsHelperText text={helperText} />}
+
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );

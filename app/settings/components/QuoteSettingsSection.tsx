@@ -1,4 +1,4 @@
-import { FileText } from "lucide-react";
+import { FilePlus } from "lucide-react";
 import {
   SettingsSection,
   SettingsInput,
@@ -22,8 +22,8 @@ export function QuoteSettingsSection({
   return (
     <SettingsSection
       id="quote-settings"
-      icon={FileText}
-      title="Quote-Specific Settings"
+      icon={FilePlus}
+      title="Quote Settings"
       description="Configure settings that are unique to quotes only."
       onSubmit={onSave}
       isSaving={isSaving}
@@ -83,7 +83,7 @@ export function QuoteSettingsSection({
         label="Quote Notes (Optional)"
         name="quoteDefaultNotes"
         placeholder="Enter additional notes for quotes..."
-        rows={3}
+        rows={4}
         onChange={onMarkChanged}
       />
     </SettingsSection>

@@ -28,7 +28,17 @@ export function ClassicFooter({
         isEditable={isEditable}
         onUpdate={onUpdate}
         render={({ document, isEditable, onTaxUpdate, onDiscountUpdate }) => (
-          <div className="flex justify-end mb-8">
+          <div className="flex justify-between items-start mb-8">
+            {/* Powered By / Branding Logo */}
+            <div className="flex-shrink-0">
+              <div className="text-xs text-gray-400 mb-1">Powered by</div>
+              <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                <span className="text-[10px] text-gray-400 text-center px-2">
+                  Your Logo
+                </span>
+              </div>
+            </div>
+
             <div className="w-full max-w-xs space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Subtotal</span>

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Table } from "@tanstack/react-table";
-import { ChevronDown, Filter, X } from "lucide-react";
+import { ChevronDown, Download, Filter, Trash, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +57,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex items-center gap-2 pl-6 pr-4 py-6">
+      {/* Search Filter */}
       {filterColumn && (
         <Input
           placeholder={filterPlaceholder}
@@ -70,6 +71,8 @@ export function DataTableToolbar<TData>({
           name="search filter"
         />
       )}
+
+      {/* Status */}
       {statusFilterOptions.length > 0 && (
         <Popover>
           <PopoverTrigger asChild>
@@ -125,6 +128,22 @@ export function DataTableToolbar<TData>({
           </PopoverContent>
         </Popover>
       )}
+
+      {table.getFilteredSelectedRowModel().rows.length > 0 && (
+        <div className="flex items-center gap-2">
+          {/* delete icon */}
+          <Button variant="outline" className="ml-auto">
+            <Trash className="h-4 w-4" />
+          </Button>
+
+          {/* download icon */}
+          <Button variant="outline" className="ml-auto">
+            <Download className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Columns */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="ml-auto">

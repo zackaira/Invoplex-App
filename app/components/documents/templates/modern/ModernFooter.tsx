@@ -28,101 +28,115 @@ export function ModernFooter({
         onUpdate={onUpdate}
         render={({ document, isEditable, onTaxUpdate, onDiscountUpdate }) => (
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 p-8 rounded-lg mb-8">
-            <div className="max-w-md ml-auto space-y-3">
-              <div className="flex justify-between text-base">
-                <span className="text-gray-700 dark:text-gray-300">
-                  Subtotal
-                </span>
-                <span className="font-semibold">
-                  {document.currency} {document.subtotal.toString()}
-                </span>
+            <div className="flex justify-between items-start">
+              {/* Powered By / Branding Logo */}
+              <div className="flex-shrink-0">
+                <div className="text-xs text-gray-400 dark:text-gray-500 mb-1">
+                  Powered by
+                </div>
+                <div className="w-24 h-24 bg-white/50 dark:bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-blue-200 dark:border-blue-800">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">
+                    Your Logo
+                  </span>
+                </div>
               </div>
 
-              {(isEditable || Number(document.discount) > 0) && (
-                <div className="flex justify-between items-center">
+              <div className="max-w-md space-y-3">
+                <div className="flex justify-between text-base">
                   <span className="text-gray-700 dark:text-gray-300">
-                    Discount
+                    Subtotal
                   </span>
-                  {isEditable ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">{document.currency}</span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={document.discount.toString()}
-                        onChange={(e) => onDiscountUpdate(e.target.value)}
-                        className="w-28 h-9"
-                      />
-                    </div>
-                  ) : (
-                    <span className="font-semibold text-red-600">
-                      -{document.currency} {document.discount.toString()}
-                    </span>
-                  )}
+                  <span className="font-semibold">
+                    {document.currency} {document.subtotal.toString()}
+                  </span>
                 </div>
-              )}
 
-              {(isEditable || Number(document.taxRate) > 0) && (
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
+                {(isEditable || Number(document.discount) > 0) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-700 dark:text-gray-300">
-                      Tax
+                      Discount
                     </span>
-                    {isEditable && (
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={document.taxRate.toString()}
-                        onChange={(e) => onTaxUpdate(e.target.value)}
-                        className="w-20 h-9"
-                        placeholder="%"
-                      />
-                    )}
-                    {!isEditable && (
-                      <span className="text-gray-600 dark:text-gray-400">
-                        ({document.taxRate.toString()}%)
+                    {isEditable ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{document.currency}</span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={document.discount.toString()}
+                          onChange={(e) => onDiscountUpdate(e.target.value)}
+                          className="w-28 h-9"
+                        />
+                      </div>
+                    ) : (
+                      <span className="font-semibold text-red-600">
+                        -{document.currency} {document.discount.toString()}
                       </span>
                     )}
                   </div>
-                  <span className="font-semibold">
-                    {document.currency} {document.taxAmount.toString()}
+                )}
+
+                {(isEditable || Number(document.taxRate) > 0) && (
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-700 dark:text-gray-300">
+                        Tax
+                      </span>
+                      {isEditable && (
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={document.taxRate.toString()}
+                          onChange={(e) => onTaxUpdate(e.target.value)}
+                          className="w-20 h-9"
+                          placeholder="%"
+                        />
+                      )}
+                      {!isEditable && (
+                        <span className="text-gray-600 dark:text-gray-400">
+                          ({document.taxRate.toString()}%)
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-semibold">
+                      {document.currency} {document.taxAmount.toString()}
+                    </span>
+                  </div>
+                )}
+
+                <div className="h-px bg-gradient-to-r from-blue-200 to-purple-200 dark:from-blue-800 dark:to-purple-800 my-4"></div>
+
+                <div className="flex justify-between text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <span>Total</span>
+                  <span>
+                    {document.currency} {document.total.toString()}
                   </span>
                 </div>
-              )}
 
-              <div className="h-px bg-gradient-to-r from-blue-200 to-purple-200 dark:from-blue-800 dark:to-purple-800 my-4"></div>
+                {/* Invoice specific totals */}
+                {type === "INVOICE" && (
+                  <>
+                    {Number(document.amountPaid) > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-700 dark:text-gray-300">
+                          Amount Paid
+                        </span>
+                        <span className="font-semibold text-green-600">
+                          {document.currency} {document.amountPaid.toString()}
+                        </span>
+                      </div>
+                    )}
 
-              <div className="flex justify-between text-2xl font-bold text-blue-600 dark:text-blue-400">
-                <span>Total</span>
-                <span>
-                  {document.currency} {document.total.toString()}
-                </span>
+                    {Number(document.amountDue) > 0 && (
+                      <div className="flex justify-between text-xl font-bold text-purple-600 dark:text-purple-400">
+                        <span>Amount Due</span>
+                        <span>
+                          {document.currency} {document.amountDue.toString()}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-
-              {/* Invoice specific totals */}
-              {type === "INVOICE" && (
-                <>
-                  {Number(document.amountPaid) > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-700 dark:text-gray-300">
-                        Amount Paid
-                      </span>
-                      <span className="font-semibold text-green-600">
-                        {document.currency} {document.amountPaid.toString()}
-                      </span>
-                    </div>
-                  )}
-
-                  {Number(document.amountDue) > 0 && (
-                    <div className="flex justify-between text-xl font-bold text-purple-600 dark:text-purple-400">
-                      <span>Amount Due</span>
-                      <span>
-                        {document.currency} {document.amountDue.toString()}
-                      </span>
-                    </div>
-                  )}
-                </>
-              )}
             </div>
           </div>
         )}

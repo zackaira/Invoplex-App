@@ -132,6 +132,8 @@ model UserSettings {
   // Tax & Currency
   defaultTaxRate        Decimal @db.Decimal(5, 2) @default(0)
   defaultCurrency       String  @default("USD")
+  fiscalYearStartMonth  Int     @default(3)   // 1-12, month when fiscal year starts
+  fiscalYearStartDay    Int     @default(1)   // 1-31, day when fiscal year starts
   
   // Template selection
   selectedTemplateId    String  @default("classic")

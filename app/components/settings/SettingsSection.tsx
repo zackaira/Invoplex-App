@@ -36,14 +36,14 @@ export function SettingsSection({
 }: SettingsSectionProps) {
   const content = (
     <>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+      <CardHeader className="bg-accent/50 border-b py-6 mt-0">
+        <CardTitle className="flex items-center gap-2 m-0">
           {Icon && <Icon className="h-5 w-5" />}
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 mb-6">{children}</CardContent>
+      <CardContent className="space-y-4 my-6 py-2">{children}</CardContent>
       {showSaveButton && (
         <CardFooter className="bg-accent/50 border-t pb-6 justify-end">
           <Button
@@ -60,7 +60,7 @@ export function SettingsSection({
 
   if (onSubmit) {
     return (
-      <Card id={id} className="pb-0 shadow-md">
+      <Card id={id} className="p-0 shadow-md">
         <form onSubmit={onSubmit}>{content}</form>
       </Card>
     );

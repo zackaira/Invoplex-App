@@ -24,6 +24,7 @@ export function DataTableBody<TData, TValue>({
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
+                className="py-4"
                 style={{
                   width: cell.column.columnDef.meta?.width,
                 }}
@@ -35,7 +36,7 @@ export function DataTableBody<TData, TValue>({
         ))
       ) : (
         <TableRow>
-          <TableCell colSpan={columns.length} className="h-24 text-center">
+          <TableCell colSpan={columns.length} className="h-24 text-center py-4">
             {emptyMessage}
           </TableCell>
         </TableRow>

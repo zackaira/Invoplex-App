@@ -28,8 +28,15 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex items-center justify-end space-x-2 pl-6 pr-4 py-8">
       <div className="text-muted-foreground flex-1 text-sm">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {table.getFilteredSelectedRowModel().rows.length === 0
+          ? `${table.getFilteredRowModel().rows.length} ${
+              table.getFilteredRowModel().rows.length === 1 ? "item" : "items"
+            }`
+          : `${table.getFilteredSelectedRowModel().rows.length} of ${
+              table.getFilteredRowModel().rows.length
+            } ${
+              table.getFilteredRowModel().rows.length === 1 ? "item" : "items"
+            } selected`}
       </div>
 
       <div className="flex items-center space-x-6">

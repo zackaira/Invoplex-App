@@ -1,6 +1,6 @@
 export { BusinessProfileSection } from "./BusinessProfileSection";
 export { BrandSettingsSection } from "./BrandSettingsSection";
-export { TaxSettingsSection } from "./TaxSettingsSection";
+export { FinancialSettingsSection } from "./FinancialSettingsSection";
 export { QuoteSettingsSection } from "./QuoteSettingsSection";
 export { InvoiceSettingsSection } from "./InvoiceSettingsSection";
 export { TemplateSelectionSection } from "./TemplateSelectionSection";

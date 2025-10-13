@@ -123,7 +123,7 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     accessorKey: "createdAt",
     meta: {
       width: "155px",
-      label: "Created At",
+      label: "Created",
     },
     header: ({ column }) => {
       return (
@@ -133,8 +133,8 @@ const columnDefinitions: ColumnDef<Quote>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="p-0! hover:bg-transparent!"
           >
-            <ArrowUpDown className="mr-2 h-4 w-4" />
-            Created At
+            <ArrowUpDown className="mr-2 h-4 w-4 text-gray-400" />
+            Created
           </Button>
         </div>
       );
@@ -164,7 +164,7 @@ const columnDefinitions: ColumnDef<Quote>[] = [
           className="p-0! hover:bg-transparent!"
         >
           No.
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-4 w-4 text-gray-400" />
         </Button>
       );
     },
@@ -189,14 +189,17 @@ const columnDefinitions: ColumnDef<Quote>[] = [
           className="p-0! hover:bg-transparent!"
         >
           Client
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-4 w-4 text-gray-400" />
         </Button>
       );
     },
     cell: ({ row }) => {
       return (
         <div>
-          <Link href={`/quote/${row.original.id}`}>
+          <Link
+            href={`/quote/${row.original.id}`}
+            className="text-md font-medium"
+          >
             {row.original.client.name}
           </Link>
         </div>

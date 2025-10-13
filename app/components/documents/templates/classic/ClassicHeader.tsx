@@ -1,9 +1,8 @@
 "use client";
 
 import { DocumentWithRelations } from "../types";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { getStatusColor } from "../../shared/utils";
+import { SettingsDatePicker } from "@/app/components/settings";
 
 interface ClassicHeaderProps {
   document: DocumentWithRelations;
@@ -21,16 +20,34 @@ export function ClassicHeader({
   return (
     <div className="border-b pb-6">
       <div className="flex justify-between items-start mb-6">
-        <div>
+        {/* Company Logo */}
+        <div className="flex-shrink-0">
+          <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+            Company Logo
+          </div>
+        </div>
+
+        {/* Title and Document Info */}
+        <div className="text-right">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             {type === "QUOTE" ? "Quote" : "Invoice"}
           </h1>
-          <p className="text-lg text-gray-600">{document.documentNumber}</p>
-        </div>
-        <div className="text-right">
-          <Badge className={getStatusColor(document.status)}>
-            {document.status}
-          </Badge>
+          <p className="text-lg text-gray-600 mb-3">
+            {document.documentNumber}
+          </p>
+
+          {/* Project Name / Additional Info Field */}
+          {isEditable ? (
+            <Input
+              type="text"
+              placeholder="Project name or description"
+              value={""}
+              onChange={(e) => {}}
+              className="text-sm text-black mt-2"
+            />
+          ) : (
+            document.notes && <p className="text-sm opacity-90 mt-2">{""}</p>
+          )}
         </div>
       </div>
 
@@ -91,13 +108,10 @@ export function ClassicHeader({
         <div>
           <p className="text-sm text-gray-500">Issue Date</p>
           {isEditable ? (
-            <Input
-              type="date"
-              value={new Date(document.issueDate).toISOString().split("T")[0]}
-              onChange={(e) =>
-                onUpdate?.({ issueDate: new Date(e.target.value) })
-              }
-              className="font-medium"
+            <SettingsDatePicker
+              value={new Date(document.issueDate)}
+              onChange={(date) => date && onUpdate?.({ issueDate: date })}
+              className="font-medium w-full mt-1"
             />
           ) : (
             <p className="font-medium">
@@ -109,17 +123,13 @@ export function ClassicHeader({
           <div>
             <p className="text-sm text-gray-500">Due Date</p>
             {isEditable ? (
-              <Input
-                type="date"
+              <SettingsDatePicker
                 value={
-                  document.dueDate
-                    ? new Date(document.dueDate).toISOString().split("T")[0]
-                    : ""
+                  document.dueDate ? new Date(document.dueDate) : undefined
                 }
-                onChange={(e) =>
-                  onUpdate?.({ dueDate: new Date(e.target.value) })
-                }
-                className="font-medium"
+                onChange={(date) => onUpdate?.({ dueDate: date })}
+                placeholder="Select due date"
+                className="font-medium w-full mt-1"
               />
             ) : (
               document.dueDate && (
@@ -134,17 +144,15 @@ export function ClassicHeader({
           <div>
             <p className="text-sm text-gray-500">Valid Until</p>
             {isEditable ? (
-              <Input
-                type="date"
+              <SettingsDatePicker
                 value={
                   document.validUntil
-                    ? new Date(document.validUntil).toISOString().split("T")[0]
-                    : ""
+                    ? new Date(document.validUntil)
+                    : undefined
                 }
-                onChange={(e) =>
-                  onUpdate?.({ validUntil: new Date(e.target.value) })
-                }
-                className="font-medium"
+                onChange={(date) => onUpdate?.({ validUntil: date })}
+                placeholder="Select valid until date"
+                className="font-medium w-full mt-1"
               />
             ) : (
               document.validUntil && (

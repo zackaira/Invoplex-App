@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getAllTemplates } from "@/app/components/documents/templates/registry";
 import { BusinessProfileSection } from "./components/BusinessProfileSection";
 import { BrandSettingsSection } from "./components/BrandSettingsSection";
-import { TaxSettingsSection } from "./components/TaxSettingsSection";
+import { FinancialSettingsSection } from "./components/FinancialSettingsSection";
 import { QuoteSettingsSection } from "./components/QuoteSettingsSection";
 import { InvoiceSettingsSection } from "./components/InvoiceSettingsSection";
 import { TemplateSelectionSection } from "./components/TemplateSelectionSection";
@@ -15,12 +15,14 @@ export default function Settings() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState("classic");
+  const [showBankDetails, setShowBankDetails] = useState(false);
+  const [showFinancialSettings, setShowFinancialSettings] = useState(false);
 
   // Track unsaved changes for each section
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState({
     businessProfile: false,
     brandSettings: false,
-    taxSettings: false,
+    financialSettings: false,
     quoteSettings: false,
     invoiceSettings: false,
     templateSettings: false,
@@ -30,7 +32,7 @@ export default function Settings() {
   const [isSaving, setIsSaving] = useState({
     businessProfile: false,
     brandSettings: false,
-    taxSettings: false,
+    financialSettings: false,
     quoteSettings: false,
     invoiceSettings: false,
     templateSettings: false,
@@ -100,21 +102,21 @@ export default function Settings() {
     }
   };
 
-  const handleSaveDocumentSettings = async (
+  const handleSaveFinancialSettings = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    setIsSaving((prev) => ({ ...prev, taxSettings: true }));
+    setIsSaving((prev) => ({ ...prev, financialSettings: true }));
     try {
       // TODO: Implement save logic
-      // await saveTaxSettings(formData);
+      // await saveFinancialSettings(formData);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("taxSettings");
-      alert("Tax Settings saved successfully!");
+      clearSectionChanges("financialSettings");
+      alert("Financial Settings saved successfully!");
     } catch (error) {
-      alert("Failed to save Tax Settings");
+      alert("Failed to save Financial Settings");
     } finally {
-      setIsSaving((prev) => ({ ...prev, taxSettings: false }));
+      setIsSaving((prev) => ({ ...prev, financialSettings: false }));
     }
   };
 
@@ -173,7 +175,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="bg-accent">
+    <div className="bg-accent p-2">
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         {/* Header Section */}
         <div className="mb-8">
@@ -184,14 +186,23 @@ export default function Settings() {
         </div>
 
         {/* Two Column Layout */}
-        <div className="flex gap-8">
+        <div className="flex flex-col gap-6 md:flex-row">
           {/* Settings Cards - Left Side */}
-          <div className="flex-1 space-y-8 max-w-[820px]">
+          <div className="flex-1 space-y-8 max-w-[820px] order-2 md:order-1">
             <BusinessProfileSection
               isSaving={isSaving.businessProfile}
               hasUnsavedChanges={hasUnsavedChanges.businessProfile}
               onSave={handleSaveBusinessProfile}
               onMarkChanged={() => markSectionChanged("businessProfile")}
+            />
+
+            <FinancialSettingsSection
+              isSaving={isSaving.financialSettings}
+              hasUnsavedChanges={hasUnsavedChanges.financialSettings}
+              onSave={handleSaveFinancialSettings}
+              onMarkChanged={() => markSectionChanged("financialSettings")}
+              showFinancialSettings={showFinancialSettings}
+              setShowFinancialSettings={setShowFinancialSettings}
             />
 
             <BrandSettingsSection
@@ -206,13 +217,6 @@ export default function Settings() {
               onLogoRemove={handleRemoveLogo}
             />
 
-            <TaxSettingsSection
-              isSaving={isSaving.taxSettings}
-              hasUnsavedChanges={hasUnsavedChanges.taxSettings}
-              onSave={handleSaveDocumentSettings}
-              onMarkChanged={() => markSectionChanged("taxSettings")}
-            />
-
             <QuoteSettingsSection
               isSaving={isSaving.quoteSettings}
               hasUnsavedChanges={hasUnsavedChanges.quoteSettings}
@@ -225,6 +229,8 @@ export default function Settings() {
               hasUnsavedChanges={hasUnsavedChanges.invoiceSettings}
               onSave={handleSaveInvoiceSettings}
               onMarkChanged={() => markSectionChanged("invoiceSettings")}
+              showBankDetails={showBankDetails}
+              setShowBankDetails={setShowBankDetails}
             />
 
             <TemplateSelectionSection
@@ -238,7 +244,7 @@ export default function Settings() {
             />
           </div>
 
-          <SettingsNavigationSidebar />
+          <SettingsNavigationSidebar showBankDetails={showBankDetails} />
         </div>
       </div>
     </div>

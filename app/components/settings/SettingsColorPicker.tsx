@@ -2,6 +2,8 @@
 
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { SettingsLabel } from "./SettingsLabel";
+import { SettingsHelperText } from "./SettingsHelperText";
 
 interface SettingsColorPickerProps {
   label: string;
@@ -22,9 +24,7 @@ export function SettingsColorPicker({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={colorId} className="text-sm font-medium">
-        {label}
-      </label>
+      <SettingsLabel htmlFor={colorId} label={label} />
 
       <div className="space-y-3">
         <label
@@ -36,6 +36,7 @@ export function SettingsColorPicker({
             style={{ backgroundColor: value }}
           />
           <Input
+            id={`${colorId}-input`}
             type="text"
             value={value}
             disabled
@@ -47,14 +48,12 @@ export function SettingsColorPicker({
             type="color"
             value={value}
             onChange={(e) => onChange(e.target.value.toUpperCase())}
-            className="sr-only"
+            className="sr-only max-w-10"
           />
         </label>
       </div>
 
-      {helperText && (
-        <p className="text-xs text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && <SettingsHelperText text={helperText} />}
     </div>
   );
 }

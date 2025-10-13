@@ -1,8 +1,9 @@
-import { Receipt } from "lucide-react";
+import { FileInput } from "lucide-react";
 import {
   SettingsSection,
   SettingsInput,
   SettingsTextarea,
+  SettingsSwitch,
   SettingsGrid,
 } from "@/app/components/settings";
 
@@ -11,6 +12,8 @@ interface InvoiceSettingsSectionProps {
   hasUnsavedChanges: boolean;
   onSave: (e: React.FormEvent<HTMLFormElement>) => void;
   onMarkChanged: () => void;
+  showBankDetails: boolean;
+  setShowBankDetails: (value: boolean) => void;
 }
 
 export function InvoiceSettingsSection({
@@ -18,12 +21,14 @@ export function InvoiceSettingsSection({
   hasUnsavedChanges,
   onSave,
   onMarkChanged,
+  showBankDetails,
+  setShowBankDetails,
 }: InvoiceSettingsSectionProps) {
   return (
     <SettingsSection
       id="invoice-settings"
-      icon={Receipt}
-      title="Invoice-Specific Settings"
+      icon={FileInput}
+      title="Invoice Settings"
       description="Configure settings that are unique to invoices only."
       onSubmit={onSave}
       isSaving={isSaving}
@@ -83,63 +88,79 @@ export function InvoiceSettingsSection({
         label="Invoice Notes (Optional)"
         name="invoiceDefaultNotes"
         placeholder="Enter additional notes for invoices..."
-        rows={3}
+        rows={4}
         onChange={onMarkChanged}
       />
 
       {/* Bank Details Section */}
-      <div className="space-y-4 pt-4 border-t">
-        <div>
-          <h4 className="text-sm font-semibold mb-1">Bank Details</h4>
-          <p className="text-xs text-muted-foreground">
-            These details will appear on invoices for payment instructions
-          </p>
+      <div id="bank-details" className="space-y-4 pt-8 mt-8 border-t">
+        <div className="flex items-start justify-between gap-4 pb-4">
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold mb-1">Bank Details</h4>
+            <p className="text-xs text-muted-foreground">
+              These details will appear on invoices for payment instructions
+            </p>
+          </div>
+          <SettingsSwitch
+            label="Enable Bank Details"
+            checked={showBankDetails}
+            onCheckedChange={setShowBankDetails}
+            name="showBankDetails"
+          />
         </div>
 
-        <SettingsGrid columns={2}>
-          <SettingsInput
-            label="Bank Name"
-            name="bankName"
-            placeholder="Chase Bank"
-            onChange={onMarkChanged}
-          />
-          <SettingsInput
-            label="Account Name"
-            name="accountName"
-            placeholder="Business Account Name"
-            onChange={onMarkChanged}
-          />
-        </SettingsGrid>
+        {showBankDetails && (
+          <>
+            <SettingsGrid columns={2}>
+              <SettingsInput
+                label="Bank Name"
+                name="bankName"
+                placeholder="Chase Bank"
+                onChange={onMarkChanged}
+                required
+              />
+              <SettingsInput
+                label="Account Name"
+                name="accountName"
+                placeholder="Business Account Name"
+                onChange={onMarkChanged}
+                required
+              />
+            </SettingsGrid>
 
-        <SettingsGrid columns={2}>
-          <SettingsInput
-            label="Account Number"
-            name="accountNumber"
-            placeholder="123456789"
-            onChange={onMarkChanged}
-          />
-          <SettingsInput
-            label="Routing Number / Sort Code"
-            name="routingNumber"
-            placeholder="021000021"
-            onChange={onMarkChanged}
-          />
-        </SettingsGrid>
+            <SettingsGrid columns={2}>
+              <SettingsInput
+                label="Account Number"
+                name="accountNumber"
+                placeholder="123456789"
+                onChange={onMarkChanged}
+                required
+              />
+              <SettingsInput
+                label="Routing Number / Sort Code"
+                name="routingNumber"
+                placeholder="021000021"
+                onChange={onMarkChanged}
+                required
+              />
+            </SettingsGrid>
 
-        <SettingsGrid columns={2}>
-          <SettingsInput
-            label="IBAN (International)"
-            name="iban"
-            placeholder="GB29 NWBK 6016 1331 9268 19"
-            onChange={onMarkChanged}
-          />
-          <SettingsInput
-            label="SWIFT / BIC Code"
-            name="swiftCode"
-            placeholder="CHASUS33"
-            onChange={onMarkChanged}
-          />
-        </SettingsGrid>
+            <SettingsGrid columns={2}>
+              <SettingsInput
+                label="IBAN (International)"
+                name="iban"
+                placeholder="GB29 NWBK 6016 1331 9268 19"
+                onChange={onMarkChanged}
+              />
+              <SettingsInput
+                label="SWIFT / BIC Code"
+                name="swiftCode"
+                placeholder="CHASUS33"
+                onChange={onMarkChanged}
+              />
+            </SettingsGrid>
+          </>
+        )}
       </div>
     </SettingsSection>
   );

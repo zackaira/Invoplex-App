@@ -195,13 +195,11 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div>
-          <Link
-            href={`/quote/${row.original.id}`}
-            className="text-md font-medium"
-          >
-            {row.original.client.name}
-          </Link>
+        <div
+          onClick={() => row.toggleSelected(!row.getIsSelected())}
+          className="text-md font-medium cursor-pointer hover:opacity-70 transition-opacity py-4"
+        >
+          {row.original.client.name}
         </div>
       );
     },

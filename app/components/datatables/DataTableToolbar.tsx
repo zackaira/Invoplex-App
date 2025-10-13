@@ -2,16 +2,16 @@
 
 import * as React from "react";
 import { Table } from "@tanstack/react-table";
-import { ChevronDown, Download, Filter, Trash, X } from "lucide-react";
+import { Download, Filter, PencilIcon, PlusIcon, Trash, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+// import {
+//   DropdownMenu,
+//   DropdownMenuCheckboxItem,
+//   DropdownMenuContent,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 import {
   Popover,
   PopoverContent,
@@ -129,22 +129,34 @@ export function DataTableToolbar<TData>({
         </Popover>
       )}
 
-      {table.getFilteredSelectedRowModel().rows.length > 0 && (
-        <div className="flex items-center gap-2">
-          {/* delete icon */}
-          <Button variant="outline" className="ml-auto">
-            <Trash className="h-4 w-4" />
-          </Button>
+      {/* Actions - align to the right */}
+      <div className="flex-1 flex justify-end gap-2">
+        {table.getFilteredSelectedRowModel().rows.length > 0 && (
+          <>
+            {/* delete icon */}
+            <Button variant="outline">
+              <Trash className="h-4 w-4" />
+            </Button>
 
-          {/* download icon */}
-          <Button variant="outline" className="ml-auto">
-            <Download className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
+            {/* download icon */}
+            <Button variant="outline">
+              <Download className="h-4 w-4" />
+            </Button>
 
-      {/* Columns */}
-      <DropdownMenu>
+            {/* edit icon */}
+            <Button variant="outline">
+              <PencilIcon className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+
+        {/* download icon */}
+        <Button variant="outline">
+          <PlusIcon className="h-4 w-4" />
+          New
+        </Button>
+      </div>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="ml-auto">
             Columns <ChevronDown />
@@ -167,7 +179,7 @@ export function DataTableToolbar<TData>({
               );
             })}
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
     </div>
   );
 }

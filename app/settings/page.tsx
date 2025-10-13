@@ -175,77 +175,67 @@ export default function Settings() {
   };
 
   return (
-    <div className="bg-accent p-2">
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your business profile, default settings, and preferences.
-          </p>
+    <div className="container mx-auto p-6 max-w-7xl">
+      {/* Two Column Layout */}
+      <div className="flex flex-col gap-6 md:flex-row">
+        {/* Settings Cards - Left Side */}
+        <div className="flex-1 space-y-8 max-w-[820px] order-2 md:order-1">
+          <BusinessProfileSection
+            isSaving={isSaving.businessProfile}
+            hasUnsavedChanges={hasUnsavedChanges.businessProfile}
+            onSave={handleSaveBusinessProfile}
+            onMarkChanged={() => markSectionChanged("businessProfile")}
+          />
+
+          <FinancialSettingsSection
+            isSaving={isSaving.financialSettings}
+            hasUnsavedChanges={hasUnsavedChanges.financialSettings}
+            onSave={handleSaveFinancialSettings}
+            onMarkChanged={() => markSectionChanged("financialSettings")}
+            showFinancialSettings={showFinancialSettings}
+            setShowFinancialSettings={setShowFinancialSettings}
+          />
+
+          <BrandSettingsSection
+            isSaving={isSaving.brandSettings}
+            hasUnsavedChanges={hasUnsavedChanges.brandSettings}
+            onSave={handleSaveBrandSettings}
+            onMarkChanged={() => markSectionChanged("brandSettings")}
+            brandColor={brandColor}
+            setBrandColor={setBrandColor}
+            logoPreview={logoPreview}
+            onLogoSelect={handleLogoSelect}
+            onLogoRemove={handleRemoveLogo}
+          />
+
+          <QuoteSettingsSection
+            isSaving={isSaving.quoteSettings}
+            hasUnsavedChanges={hasUnsavedChanges.quoteSettings}
+            onSave={handleSaveQuoteSettings}
+            onMarkChanged={() => markSectionChanged("quoteSettings")}
+          />
+
+          <InvoiceSettingsSection
+            isSaving={isSaving.invoiceSettings}
+            hasUnsavedChanges={hasUnsavedChanges.invoiceSettings}
+            onSave={handleSaveInvoiceSettings}
+            onMarkChanged={() => markSectionChanged("invoiceSettings")}
+            showBankDetails={showBankDetails}
+            setShowBankDetails={setShowBankDetails}
+          />
+
+          <TemplateSelectionSection
+            isSaving={isSaving.templateSettings}
+            hasUnsavedChanges={hasUnsavedChanges.templateSettings}
+            onSave={handleSaveTemplateSettings}
+            onMarkChanged={() => markSectionChanged("templateSettings")}
+            selectedTemplate={selectedTemplate}
+            setSelectedTemplate={setSelectedTemplate}
+            templates={templates}
+          />
         </div>
 
-        {/* Two Column Layout */}
-        <div className="flex flex-col gap-6 md:flex-row">
-          {/* Settings Cards - Left Side */}
-          <div className="flex-1 space-y-8 max-w-[820px] order-2 md:order-1">
-            <BusinessProfileSection
-              isSaving={isSaving.businessProfile}
-              hasUnsavedChanges={hasUnsavedChanges.businessProfile}
-              onSave={handleSaveBusinessProfile}
-              onMarkChanged={() => markSectionChanged("businessProfile")}
-            />
-
-            <FinancialSettingsSection
-              isSaving={isSaving.financialSettings}
-              hasUnsavedChanges={hasUnsavedChanges.financialSettings}
-              onSave={handleSaveFinancialSettings}
-              onMarkChanged={() => markSectionChanged("financialSettings")}
-              showFinancialSettings={showFinancialSettings}
-              setShowFinancialSettings={setShowFinancialSettings}
-            />
-
-            <BrandSettingsSection
-              isSaving={isSaving.brandSettings}
-              hasUnsavedChanges={hasUnsavedChanges.brandSettings}
-              onSave={handleSaveBrandSettings}
-              onMarkChanged={() => markSectionChanged("brandSettings")}
-              brandColor={brandColor}
-              setBrandColor={setBrandColor}
-              logoPreview={logoPreview}
-              onLogoSelect={handleLogoSelect}
-              onLogoRemove={handleRemoveLogo}
-            />
-
-            <QuoteSettingsSection
-              isSaving={isSaving.quoteSettings}
-              hasUnsavedChanges={hasUnsavedChanges.quoteSettings}
-              onSave={handleSaveQuoteSettings}
-              onMarkChanged={() => markSectionChanged("quoteSettings")}
-            />
-
-            <InvoiceSettingsSection
-              isSaving={isSaving.invoiceSettings}
-              hasUnsavedChanges={hasUnsavedChanges.invoiceSettings}
-              onSave={handleSaveInvoiceSettings}
-              onMarkChanged={() => markSectionChanged("invoiceSettings")}
-              showBankDetails={showBankDetails}
-              setShowBankDetails={setShowBankDetails}
-            />
-
-            <TemplateSelectionSection
-              isSaving={isSaving.templateSettings}
-              hasUnsavedChanges={hasUnsavedChanges.templateSettings}
-              onSave={handleSaveTemplateSettings}
-              onMarkChanged={() => markSectionChanged("templateSettings")}
-              selectedTemplate={selectedTemplate}
-              setSelectedTemplate={setSelectedTemplate}
-              templates={templates}
-            />
-          </div>
-
-          <SettingsNavigationSidebar showBankDetails={showBankDetails} />
-        </div>
+        <SettingsNavigationSidebar showBankDetails={showBankDetails} />
       </div>
     </div>
   );

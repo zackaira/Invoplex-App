@@ -24,7 +24,6 @@ export function DataTableBody<TData, TValue>({
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
-                className="py-4"
                 style={{
                   width: cell.column.columnDef.meta?.width,
                 }}

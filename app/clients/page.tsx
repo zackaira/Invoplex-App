@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { getClientsByUserId } from "@/lib/actions";
-import Modal from "../components/modal/Modal";
+import Modal from "@/app/components/Modal";
 
 export default async function Clients() {
   const clients = await getClientsByUserId("cmgexy4630002r7qfecfve8hq");

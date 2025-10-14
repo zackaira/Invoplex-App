@@ -1,5 +1,5 @@
 import { mockClients } from "@/lib/mocks";
-import ClientCardSkeleton from "./components/ClientCardSkeleton";
+import ClientCardSkeleton from "./components/overview/ClientCardSkeleton";
 
 export default async function HomePage() {
   await new Promise((resolve) => setTimeout(resolve, 3000));

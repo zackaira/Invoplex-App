@@ -281,20 +281,21 @@ model Document {
 // Stores individual line items for each quote/invoice
 // Each line = one product/service with description, quantity, price, and calculated amount
 model DocumentItem {
-  id          String   @id @default(cuid())
-  documentId  String
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id                 String   @id @default(cuid())
+  documentId         String
+  document           Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
   
-  itemType    String?  @default("Product") // Product, Service, or custom type
-  description String   @db.Text
-  quantity    Decimal  @db.Decimal(10, 2)
-  unitPrice   Decimal  @db.Decimal(12, 2)
-  amount      Decimal  @db.Decimal(12, 2) // quantity * unitPrice
+  itemType           String?  @default("Product") // Product, Service, or custom type
+  description        String   @db.Text
+  quantity           Decimal  @db.Decimal(10, 2)
+  unitPrice          Decimal  @db.Decimal(12, 2)
+  amount             Decimal  @db.Decimal(12, 2) // quantity * unitPrice
+  hasQuantityColumn  Boolean  @default(false) // Whether to show quantity column for this item
   
-  order       Int      // For sorting line items
+  order              Int      // For sorting line items
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
   
   @@index([documentId])
 }

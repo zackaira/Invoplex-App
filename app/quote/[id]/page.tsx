@@ -1,4 +1,4 @@
-import { DocumentView } from "@/app/components/documents/DocumentView";
+import { TemplateRenderer } from "@/app/components/documents/TemplateRenderer";
 import { getDocumentById } from "@/lib/actions";
 import { notFound } from "next/navigation";
 
@@ -16,7 +16,7 @@ export default async function QuotePage({
 
   return (
     <div className="relative">
-      <DocumentView document={document} type="QUOTE" />
+      <TemplateRenderer document={document} type="QUOTE" />
     </div>
   );
 }

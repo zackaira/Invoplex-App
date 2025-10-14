@@ -16,10 +16,10 @@ import {
 import {
   DataTableToolbar,
   StatusFilterOption,
-} from "@/app/components/datatables/DataTableToolbar";
-import { DataTablePagination } from "@/app/components/datatables/DataTablePagination";
-import { DataTableHeader } from "@/app/components/datatables/DataTableHeader";
-import { DataTableBody } from "@/app/components/datatables/DataTableBody";
+} from "@/app/components/data-table/Toolbar";
+import { DataTablePagination } from "@/app/components/data-table/Pagination";
+import { DataTableHeader } from "@/app/components/data-table/Header";
+import { DataTableBody } from "@/app/components/data-table/Body";
 import { Table } from "@/components/ui/table";
 
 export type { StatusFilterOption };

@@ -1,14 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { DocumentWithRelations } from "../types";
-import { Input } from "@/components/ui/input";
 import { SettingsDatePicker } from "@/app/components/settings";
+import { ProjectSelect } from "../../projects";
+import { ClientSelect, DUMMY_CLIENTS } from "../../clients";
 
 interface ModernHeaderProps {
   document: DocumentWithRelations;
   type: "QUOTE" | "INVOICE";
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  onOpenProjectModal?: () => void;
+  onOpenClientModal?: () => void;
 }
 
 export function ModernHeader({
@@ -16,8 +20,16 @@ export function ModernHeader({
   type,
   isEditable = false,
   onUpdate,
+  onOpenProjectModal,
+  onOpenClientModal,
 }: ModernHeaderProps) {
   const validDays = 15;
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    string | undefined
+  >(undefined);
+  const [selectedClientId, setSelectedClientId] = useState<string | undefined>(
+    document.client?.id
+  );
 
   const handleIssueDateChange = (date: Date | undefined) => {
     if (!date || !onUpdate) return;
@@ -31,6 +43,22 @@ export function ModernHeader({
       onUpdate({ issueDate: date });
     }
   };
+
+  const handleProjectChange = (projectId: string | undefined) => {
+    setSelectedProjectId(projectId);
+    // TODO: Update document with projectId when backend is ready
+    // onUpdate?.({ projectId });
+  };
+
+  const handleClientChange = (clientId: string | undefined) => {
+    setSelectedClientId(clientId);
+    // TODO: Update document with clientId when backend is ready
+    // onUpdate?.({ clientId });
+  };
+
+  // Get selected client info for display
+  const displayClient =
+    DUMMY_CLIENTS.find((c) => c.id === selectedClientId) || document.client;
 
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-t-lg">
@@ -49,18 +77,17 @@ export function ModernHeader({
           </h1>
           <p className="text-xl opacity-90 mb-3">{document.documentNumber}</p>
 
-          {/* Project Name / Additional Info Field */}
-          {isEditable ? (
-            <Input
-              type="text"
-              placeholder="Project name or description"
-              value={""}
-              onChange={(e) => {}}
-              className="text-sm text-black mt-2"
+          {/* Project Selection */}
+          <div className="mt-2">
+            <ProjectSelect
+              value={selectedProjectId}
+              onChange={handleProjectChange}
+              onCreateNew={onOpenProjectModal}
+              isEditable={isEditable}
+              className="w-full text-sm bg-white"
+              selectedClientId={selectedClientId}
             />
-          ) : (
-            document.notes && <p className="text-sm opacity-90 mt-2">{""}</p>
-          )}
+          </div>
         </div>
       </div>
 
@@ -84,32 +111,43 @@ export function ModernHeader({
 
         {/* To Section */}
         <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-          <h3 className="text-sm font-semibold uppercase mb-2 opacity-75">
-            {type === "QUOTE" ? "Quote For" : "Bill To"}
-          </h3>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-sm font-semibold uppercase opacity-75">
+              {type === "QUOTE" ? "Quote For" : "Bill To"}
+            </h3>
+            {isEditable && (
+              <ClientSelect
+                value={selectedClientId}
+                onChange={handleClientChange}
+                onCreateNew={onOpenClientModal}
+                className="text-xs h-6 bg-white"
+                align="start"
+              />
+            )}
+          </div>
           <div>
-            <p className="font-semibold text-lg">{document.client.name}</p>
+            <p className="font-semibold text-lg">{displayClient.name}</p>
             {document.contact && (
               <p className="text-sm opacity-90 mt-1">
                 Attn: {document.contact.name}
               </p>
             )}
             <div className="text-sm opacity-90 mt-1">
-              {document.client.address && <p>{document.client.address}</p>}
-              {(document.client.city ||
-                document.client.state ||
-                document.client.zipCode) && (
+              {displayClient.address && <p>{displayClient.address}</p>}
+              {(displayClient.city ||
+                displayClient.state ||
+                displayClient.zipCode) && (
                 <p>
                   {[
-                    document.client.city,
-                    document.client.state,
-                    document.client.zipCode,
+                    displayClient.city,
+                    displayClient.state,
+                    displayClient.zipCode,
                   ]
                     .filter(Boolean)
                     .join(", ")}
                 </p>
               )}
-              {document.client.email && <p>{document.client.email}</p>}
+              {displayClient.email && <p>{displayClient.email}</p>}
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { DocumentView } from "@/app/components/documents/DocumentView";
+import { TemplateRenderer } from "@/app/components/documents/TemplateRenderer";
 import { DocumentWithRelations } from "@/app/components/documents/templates/types";
 import { useRouter } from "next/navigation";
 import { getDocumentById } from "@/lib/actions";
@@ -62,7 +62,7 @@ export default function EditQuotePage({
 
   return (
     <div className="min-h-screen">
-      <DocumentView
+      <TemplateRenderer
         document={document}
         type="QUOTE"
         templateId={templateId}

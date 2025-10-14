@@ -10,23 +10,25 @@ export function ClassicTemplate({
   type,
   isEditable = false,
   onUpdate,
+  onOpenProjectModal,
+  onOpenClientModal,
 }: TemplateProps) {
   return (
-    <div className="bg-white border border-border p-8 mx-auto max-w-[960px] shadow-xl/30 rounded-xs">
+    <>
       <ClassicHeader
         document={document}
         type={type}
         isEditable={isEditable}
         onUpdate={onUpdate}
+        onOpenProjectModal={onOpenProjectModal}
+        onOpenClientModal={onOpenClientModal}
       />
 
-      <div className="my-8">
-        <ClassicItems
-          document={document}
-          isEditable={isEditable}
-          onUpdate={onUpdate}
-        />
-      </div>
+      <ClassicItems
+        document={document}
+        isEditable={isEditable}
+        onUpdate={onUpdate}
+      />
 
       <ClassicFooter
         document={document}
@@ -34,6 +36,6 @@ export function ClassicTemplate({
         isEditable={isEditable}
         onUpdate={onUpdate}
       />
-    </div>
+    </>
   );
 }

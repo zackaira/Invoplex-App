@@ -10,14 +10,18 @@ export function ModernTemplate({
   type,
   isEditable = false,
   onUpdate,
+  onOpenProjectModal,
+  onOpenClientModal,
 }: TemplateProps) {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 mx-auto max-w-[960px] shadow-2xl rounded-lg overflow-hidden">
+    <>
       <ModernHeader
         document={document}
         type={type}
         isEditable={isEditable}
         onUpdate={onUpdate}
+        onOpenProjectModal={onOpenProjectModal}
+        onOpenClientModal={onOpenClientModal}
       />
 
       <div className="p-8">
@@ -36,6 +40,6 @@ export function ModernTemplate({
           onUpdate={onUpdate}
         />
       </div>
-    </div>
+    </>
   );
 }

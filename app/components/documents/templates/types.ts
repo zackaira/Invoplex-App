@@ -14,6 +14,8 @@ export interface TemplateProps {
   type: "QUOTE" | "INVOICE";
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  onOpenProjectModal?: () => void;
+  onOpenClientModal?: () => void;
 }
 
 export interface TemplateMetadata {
@@ -32,4 +34,5 @@ export interface Template {
   metadata: TemplateMetadata;
   component: React.ComponentType<TemplateProps>;
   pdfComponent?: React.ComponentType<TemplateProps>;
+  containerClassName?: string;
 }

@@ -1,5 +1,5 @@
 import { mockClients } from "@/lib/mocks";
-import ClientCard from "./components/ClientCard";
+import ClientCard from "./components/overview/ClientCard";
 
 export default async function HomePage() {
   await new Promise((resolve) => setTimeout(resolve, 4000));

@@ -14,8 +14,7 @@ const quoteStatusOptions: StatusFilterOption[] = [
 export default async function Quotes() {
   // TODO: Replace with actual user ID from authentication
   const quotes = await getQuotesByUserId("cmgexy4630002r7qfecfve8hq");
-
-  console.log(quotes);
+  await new Promise((resolve) => setTimeout(resolve, 4000));
 
   // Transform the data to match our Quote type
   const transformedQuotes = quotes.map((quote) => ({

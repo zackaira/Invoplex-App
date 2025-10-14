@@ -11,16 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  SettingsInput,
+  SettingsTextarea,
+  SettingsSelect,
+} from "@/app/components/settings";
 import { DUMMY_CLIENTS } from "../clients";
 
 export interface CreateProjectModalProps {
@@ -88,75 +83,43 @@ export function CreateProjectModal({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            {/* Project Title */}
-            <div className="grid gap-2">
-              <label
-                htmlFor="project-title"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Project Title
-              </label>
-              <Input
-                id="project-title"
-                placeholder="Enter project name"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                autoFocus
-              />
-            </div>
+            <SettingsInput
+              label="Project Title"
+              id="project-title"
+              placeholder="Enter project name"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              autoFocus
+            />
 
-            {/* Description */}
-            <div className="grid gap-2">
-              <label
-                htmlFor="project-description"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Description{" "}
-                <span className="text-muted-foreground">(Optional)</span>
-              </label>
-              <Textarea
-                id="project-description"
-                placeholder="Enter project description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
+            <SettingsSelect
+              label="Client"
+              placeholder="Select a client"
+              value={clientId}
+              onValueChange={handleSelectChange}
+              required
+              options={[
+                ...DUMMY_CLIENTS.map((client) => ({
+                  value: client.id,
+                  label: client.name,
+                })),
+                {
+                  value: "__add_new__",
+                  label: "Add new client",
+                  icon: <Plus className="h-4 w-4" />,
+                },
+              ]}
+            />
 
-            {/* Client Select */}
-            <div className="grid gap-2">
-              <label
-                htmlFor="project-client"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Client
-              </label>
-              <Select
-                value={clientId}
-                onValueChange={handleSelectChange}
-                required
-              >
-                <SelectTrigger id="project-client">
-                  <SelectValue placeholder="Select a client" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {DUMMY_CLIENTS.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                  <SelectItem value="__add_new__" className="text-primary">
-                    <div className="flex items-center">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add new client
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <SettingsTextarea
+              label="Description"
+              id="project-description"
+              placeholder="Enter project description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+            />
           </div>
 
           <DialogFooter>

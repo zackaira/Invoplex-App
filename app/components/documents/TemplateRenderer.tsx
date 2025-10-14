@@ -42,13 +42,10 @@ export function TemplateRenderer({
   };
 
   const handleAddClient = (client: {
-    name: string;
+    company: string;
+    contactName: string;
     email: string;
     phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
   }) => {
     console.log("Adding client:", client);
     // TODO: Create client via API when backend is ready

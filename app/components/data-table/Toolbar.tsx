@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Table } from "@tanstack/react-table";
 import { Download, Filter, PencilIcon, PlusIcon, Trash, X } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,9 +164,11 @@ export function DataTableToolbar<TData>({
         )}
 
         {/* download icon */}
-        <Button variant="outline" title="New Quote">
-          <PlusIcon className="h-4 w-4" />
-          New
+        <Button variant="outline" title="New Quote" asChild>
+          <Link href="/quote/new/edit">
+            <PlusIcon className="h-4 w-4" />
+            New Quote
+          </Link>
         </Button>
       </div>
       {/* <DropdownMenu>

@@ -6,6 +6,62 @@ import { DocumentWithRelations } from "@/app/components/documents/templates/type
 import { useRouter } from "next/navigation";
 import { getDocumentById } from "@/lib/actions";
 
+// Helper function to create an empty new quote
+function createEmptyQuote(): DocumentWithRelations {
+  const now = new Date();
+  const validUntil = new Date();
+  validUntil.setDate(validUntil.getDate() + 30); // 30 days validity
+
+  return {
+    id: "new",
+    documentNumber: "DRAFT",
+    type: "QUOTE",
+    status: "DRAFT",
+    userId: "cmgexy4630002r7qfecfve8hq", // TODO: Replace with actual user ID from authentication
+    clientId: "",
+    client: {
+      id: "",
+      userId: "",
+      name: "",
+      email: null,
+      phone: null,
+      website: null,
+      address: null,
+      city: null,
+      state: null,
+      zipCode: null,
+      country: null,
+      currency: "USD",
+      taxId: null,
+      createdAt: now,
+      updatedAt: now,
+    },
+    contactId: null,
+    contact: null,
+    issueDate: now,
+    dueDate: null,
+    validUntil: validUntil,
+    convertedAt: null,
+    convertedToId: null,
+    convertedFromId: null,
+    currency: "USD",
+    subtotal: "0.00",
+    taxRate: "0.00",
+    taxAmount: "0.00",
+    discount: "0.00",
+    total: "0.00",
+    amountPaid: "0.00",
+    amountDue: "0.00",
+    notes: null,
+    terms: null,
+    internalNotes: null,
+    items: [],
+    payments: [],
+    createdAt: now,
+    updatedAt: now,
+  } as unknown as DocumentWithRelations;
+}
+
 export default function EditQuotePage({
   params,
 }: {
@@ -21,8 +77,14 @@ export default function EditQuotePage({
   useEffect(() => {
     async function fetchDocument() {
       try {
-        const doc = await getDocumentById(id, "QUOTE");
-        setDocument(doc);
+        if (id === "new") {
+          // Create a new empty quote
+          setDocument(createEmptyQuote());
+        } else {
+          // Fetch existing quote
+          const doc = await getDocumentById(id, "QUOTE");
+          setDocument(doc);
+        }
       } catch (error) {
         console.error("Failed to fetch document:", error);
       } finally {
@@ -42,9 +104,16 @@ export default function EditQuotePage({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // TODO: Implement save to database
-      // await updateDocument(document);
-      router.push(`/quote/${id}`);
+      if (id === "new") {
+        // TODO: Implement create new document in database
+        // const newDoc = await createDocument(document);
+        // router.push(`/quote/${newDoc.id}`);
+        console.log("Creating new quote:", document);
+      } else {
+        // TODO: Implement update existing document
+        // await updateDocument(document);
+        router.push(`/quote/${id}`);
+      }
     } catch (error) {
       console.error("Failed to save:", error);
     } finally {

@@ -14,6 +14,8 @@ export default async function QuotePage({
     return notFound();
   }
 
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   return (
     <div className="relative">
       <TemplateRenderer document={document} type="QUOTE" />

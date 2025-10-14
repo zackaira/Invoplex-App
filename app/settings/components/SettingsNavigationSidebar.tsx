@@ -36,14 +36,7 @@ export function SettingsNavigationSidebar({
             <Building2 className="mr-1 h-4 w-4" />
             Business Profile
           </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => scrollToSection("brand-settings")}
-          >
-            <FileCheck className="mr-1 h-4 w-4" />
-            Company Branding
-          </Button>
+
           <Button
             variant="ghost"
             className="w-full justify-start"
@@ -52,6 +45,16 @@ export function SettingsNavigationSidebar({
             <Receipt className="mr-1 h-4 w-4" />
             Financial Settings
           </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={() => scrollToSection("brand-settings")}
+          >
+            <FileCheck className="mr-1 h-4 w-4" />
+            Company Branding
+          </Button>
+
           <Button
             variant="ghost"
             className="w-full justify-start"
@@ -60,6 +63,7 @@ export function SettingsNavigationSidebar({
             <FilePlus className="mr-1 h-4 w-4" />
             Quote Settings
           </Button>
+
           <Button
             variant="ghost"
             className="w-full justify-start"

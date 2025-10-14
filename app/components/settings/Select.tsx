@@ -15,7 +15,7 @@ interface SettingsSelectProps {
   required?: boolean;
   error?: string;
   placeholder?: string;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; icon?: React.ReactNode }>;
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -60,7 +60,14 @@ export function SettingsSelect({
         <SelectContent>
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
-              {option.label}
+              {option.icon ? (
+                <div className="flex items-center">
+                  {option.icon}
+                  <span className="ml-2">{option.label}</span>
+                </div>
+              ) : (
+                option.label
+              )}
             </SelectItem>
           ))}
         </SelectContent>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, PencilIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -23,6 +23,7 @@ export const DUMMY_CLIENTS = [
   {
     id: "client-1",
     name: "Acme Corporation",
+    contact: "John Doe",
     email: "contact@acme.com",
     phone: "+1 (555) 123-4567",
     address: "123 Business St",
@@ -33,6 +34,7 @@ export const DUMMY_CLIENTS = [
   {
     id: "client-2",
     name: "TechStart Inc.",
+    contact: "Jane Smith",
     email: "hello@techstart.com",
     phone: "+1 (555) 234-5678",
     address: "456 Innovation Ave",
@@ -75,7 +77,7 @@ export function ClientSelect({
   onChange,
   onCreateNew,
   className,
-  align = "start",
+  align = "center",
 }: ClientSelectProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -90,17 +92,14 @@ export function ClientSelect({
           aria-expanded={open}
           className={cn("justify-between", className)}
         >
-          {selectedClient ? (
-            <span className="truncate">{selectedClient.name}</span>
-          ) : (
-            <span className="text-muted-foreground">Select client...</span>
-          )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <span className="text-muted-foreground">
+            <PencilIcon className="h-4 w-4" />
+          </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align={align}>
         <Command>
-          <CommandInput placeholder="Search clients..." className="h-9" />
+          <CommandInput placeholder="Search Clients..." className="h-9" />
           <CommandList>
             <CommandEmpty>No client found.</CommandEmpty>
             <CommandGroup>

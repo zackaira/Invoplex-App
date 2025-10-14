@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getAllTemplates } from "@/app/components/documents/templates/registry";
 import { BusinessProfileSection } from "./components/BusinessProfileSection";
 import { BrandSettingsSection } from "./components/BrandSettingsSection";
@@ -9,6 +9,7 @@ import { QuoteSettingsSection } from "./components/QuoteSettingsSection";
 import { InvoiceSettingsSection } from "./components/InvoiceSettingsSection";
 import { TemplateSelectionSection } from "./components/TemplateSelectionSection";
 import { SettingsNavigationSidebar } from "./components/SettingsNavigationSidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Settings() {
   const [brandColor, setBrandColor] = useState("#000000");

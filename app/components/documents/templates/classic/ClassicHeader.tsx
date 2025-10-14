@@ -62,7 +62,7 @@ export function ClassicHeader({
 
   return (
     <div className="border-b pb-6">
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex justify-between items-center mb-16">
         {/* Company Logo */}
         <div className="flex-shrink-0">
           <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-sm">
@@ -95,7 +95,7 @@ export function ClassicHeader({
 
       <div className="grid grid-cols-2 gap-8">
         {/* From Section - Your Business */}
-        <div>
+        <div className="min-h-38">
           <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">
             From
           </h3>
@@ -113,7 +113,7 @@ export function ClassicHeader({
         </div>
 
         {/* To Section - Client */}
-        <div>
+        <div className="min-h-38">
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-sm font-semibold text-gray-500 uppercase">
               {type === "QUOTE" ? "Quote For" : "Bill To"}
@@ -124,15 +124,15 @@ export function ClassicHeader({
                 onChange={handleClientChange}
                 onCreateNew={onOpenClientModal}
                 className="text-xs h-6"
-                align="start"
+                align="center"
               />
             )}
           </div>
           <div className="text-gray-900">
             <p className="font-semibold">{displayClient.name}</p>
-            {document.contact && (
+            {"contact" in displayClient && displayClient.contact && (
               <p className="text-sm text-gray-700 mt-1">
-                Attn: {document.contact.name}
+                Attn: {displayClient.contact}
               </p>
             )}
             <div className="text-sm text-gray-600 mt-1">

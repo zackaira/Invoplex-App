@@ -79,21 +79,29 @@ export function ProjectSelect({
           className={cn("justify-between", className)}
         >
           {selectedProject ? (
-            <span className="truncate">{selectedProject.name}</span>
+            <span className="truncate !text-gray-900">
+              {selectedProject.name}
+            </span>
           ) : (
-            <span className="text-muted-foreground">Select project...</span>
+            <span className="!text-gray-500">Select project...</span>
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 !text-gray-600" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0" align="end">
+      <PopoverContent
+        className="w-[300px] p-0 !bg-white !border-gray-300 !text-gray-900"
+        align="end"
+      >
         {!effectiveClientId ? (
-          <div className="p-4 text-sm text-muted-foreground text-center">
+          <div className="p-4 text-sm !text-gray-500 text-center">
             Please select a client below first
           </div>
         ) : (
-          <Command>
-            <CommandInput placeholder="Search projects..." className="h-9" />
+          <Command className="!bg-white !text-gray-900">
+            <CommandInput
+              placeholder="Search projects..."
+              className="h-9 !border-gray-200 !text-gray-900 placeholder:!text-gray-400"
+            />
             <CommandList>
               <CommandEmpty>No project found.</CommandEmpty>
               <CommandGroup>

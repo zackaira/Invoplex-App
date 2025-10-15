@@ -96,7 +96,7 @@ export function BaseItemsTable({
         </div>
 
         {/* Items */}
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="divide-y divide-gray-200">
           <DocumentItemsTable
             document={document}
             isEditable={isEditable}
@@ -110,7 +110,7 @@ export function BaseItemsTable({
                   className={`grid ${rowGridCols} ${styles.rowClassName}`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-sm text-gray-700">
                       {item.itemType || "Product"}
                     </span>
                     {isEditable && (
@@ -126,7 +126,7 @@ export function BaseItemsTable({
                             item.hasQuantityColumn ?? false
                           )
                         }
-                        className="h-6 w-6 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-950"
+                        className="h-6 w-6 text-gray-900 bg-transparent! hover:text-green-600"
                       >
                         <Save className="h-3 w-3" />
                       </Button>
@@ -139,11 +139,11 @@ export function BaseItemsTable({
                         onChange={(e) =>
                           onUpdate("description", e.target.value)
                         }
-                        className="w-full min-h-[60px] resize-y"
+                        className="w-full min-h-[60px] resize-y !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                         placeholder="Item description"
                       />
                     ) : (
-                      <span className="font-medium text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                      <span className="font-medium text-gray-900 whitespace-pre-wrap">
                         {item.description}
                       </span>
                     )}
@@ -159,15 +159,15 @@ export function BaseItemsTable({
                             onChange={(e) =>
                               onUpdate("quantity", e.target.value)
                             }
-                            className="w-20 text-right h-9"
+                            className="w-20 text-right h-9 !bg-white !border-gray-300 !text-gray-900"
                           />
                         ) : (
-                          <span className="text-gray-700 dark:text-gray-300">
+                          <span className="text-gray-700">
                             {item.quantity.toString()}
                           </span>
                         )
                       ) : (
-                        <span className="text-gray-400 dark:text-gray-600"></span>
+                        <span className="text-gray-400"></span>
                       )}
                     </div>
                   )}
@@ -175,7 +175,7 @@ export function BaseItemsTable({
                     {isEditable ? (
                       <InputGroup className="w-28">
                         <InputGroupAddon align="inline-start">
-                          <InputGroupText className="text-xs">
+                          <InputGroupText className="text-xs text-gray-600">
                             {currency}
                           </InputGroupText>
                         </InputGroupAddon>
@@ -186,17 +186,17 @@ export function BaseItemsTable({
                           onChange={(e) =>
                             onUpdate("unitPrice", e.target.value)
                           }
-                          className="ps-10 text-right h-9"
+                          className="ps-10 text-right h-9 !bg-white !border-gray-300 !text-gray-900"
                         />
                       </InputGroup>
                     ) : (
-                      <span className="text-gray-700 dark:text-gray-300">
+                      <span className="text-gray-700">
                         {currency} {item.unitPrice.toString()}
                       </span>
                     )}
                   </div>
                   <div className="text-right flex items-center justify-end">
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="font-semibold text-gray-900">
                       {currency} {item.amount.toString()}
                     </span>
                   </div>
@@ -206,7 +206,7 @@ export function BaseItemsTable({
                         variant="ghost"
                         size="icon"
                         onClick={onRemove}
-                        className="h-8 w-8 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                        className="h-8 w-8 text-gray-900 bg-transparent! hover:text-red-600"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

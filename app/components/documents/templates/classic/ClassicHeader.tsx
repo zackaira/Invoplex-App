@@ -37,7 +37,7 @@ export function ClassicHeader({
   } = useDocumentHeader({ document, type, onUpdate });
 
   return (
-    <div className="border-b pb-6">
+    <div className="border-b border-gray-200 pb-6">
       <div className="flex justify-between items-center mb-16">
         {/* Company Logo */}
         <div className="flex-shrink-0">
@@ -62,7 +62,7 @@ export function ClassicHeader({
               onChange={handleProjectChange}
               onCreateNew={onOpenProjectModal}
               isEditable={isEditable}
-              className="w-full text-sm"
+              className="w-full text-sm !bg-white !border-gray-300 !text-gray-900 hover:!bg-gray-50 hover:!text-gray-900"
               selectedClientId={selectedClientId}
             />
           </div>
@@ -80,7 +80,7 @@ export function ClassicHeader({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-6 w-6 !text-invoplex hover:!bg-gray-100 hover:!text-gray-900"
                 onClick={onOpenBusinessInfoModal}
               >
                 <Settings className="h-4 w-4" />
@@ -120,7 +120,7 @@ export function ClassicHeader({
                 value={selectedClientId}
                 onChange={handleClientChange}
                 onCreateNew={onOpenClientModal}
-                className="text-xs h-6"
+                className="text-xs h-6 !text-gray-600 hover:!bg-gray-100 hover:!text-gray-900"
                 align="center"
               />
             )}
@@ -161,10 +161,10 @@ export function ClassicHeader({
             <SettingsDatePicker
               value={new Date(document.issueDate)}
               onChange={handleIssueDateChange}
-              className="font-medium w-full mt-1"
+              className="font-medium w-full mt-1 !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400 hover:!bg-gray-50 hover:!text-gray-900"
             />
           ) : (
-            <p className="font-medium">
+            <p className="font-medium text-gray-900">
               {new Date(document.issueDate).toLocaleDateString("en-US")}
             </p>
           )}
@@ -180,11 +180,11 @@ export function ClassicHeader({
                 }
                 onChange={(date) => onUpdate?.({ dueDate: date })}
                 placeholder="Select due date"
-                className="font-medium w-full mt-1"
+                className="font-medium w-full mt-1 !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400 hover:!bg-gray-50 hover:!text-gray-900"
               />
             ) : (
               document.dueDate && (
-                <p className="font-medium">
+                <p className="font-medium text-gray-900">
                   {new Date(document.dueDate).toLocaleDateString("en-US")}
                 </p>
               )
@@ -203,11 +203,11 @@ export function ClassicHeader({
                 }
                 onChange={(date) => onUpdate?.({ validUntil: date })}
                 placeholder="Select valid until date"
-                className="font-medium w-full mt-1"
+                className="font-medium w-full mt-1 !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400 hover:!bg-gray-50 hover:!text-gray-900"
               />
             ) : (
               document.validUntil && (
-                <p className="font-medium">
+                <p className="font-medium text-gray-900">
                   {new Date(document.validUntil).toLocaleDateString("en-US")}
                 </p>
               )

@@ -41,7 +41,7 @@ export function ClassicFooter({
             <div className="w-full max-w-xs space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">
+                <span className="font-medium text-gray-900">
                   {document.currency} {document.subtotal.toString()}
                 </span>
               </div>
@@ -51,13 +51,15 @@ export function ClassicFooter({
                   <span className="text-gray-600">Discount</span>
                   {isEditable ? (
                     <div className="flex items-center gap-1">
-                      <span className="text-sm">{document.currency}</span>
+                      <span className="text-sm text-gray-900">
+                        {document.currency}
+                      </span>
                       <Input
                         type="number"
                         step="0.01"
                         value={document.discount.toString()}
                         onChange={(e) => onDiscountUpdate(e.target.value)}
-                        className="w-24 h-8 text-right"
+                        className="w-24 h-8 text-right !bg-white !border-gray-300 !text-gray-900"
                       />
                     </div>
                   ) : (
@@ -78,7 +80,7 @@ export function ClassicFooter({
                         step="0.01"
                         value={document.taxRate.toString()}
                         onChange={(e) => onTaxUpdate(e.target.value)}
-                        className="w-16 h-8 text-right"
+                        className="w-16 h-8 text-right !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                         placeholder="%"
                       />
                     )}
@@ -88,15 +90,15 @@ export function ClassicFooter({
                       </span>
                     )}
                   </div>
-                  <span className="font-medium">
+                  <span className="font-medium text-gray-900">
                     {document.currency} {document.taxAmount.toString()}
                   </span>
                 </div>
               )}
 
-              <Separator />
+              <Separator className="bg-gray-200" />
 
-              <div className="flex justify-between text-lg font-bold">
+              <div className="flex justify-between text-lg font-bold text-gray-900">
                 <span>Total</span>
                 <span>
                   {document.currency} {document.total.toString()}
@@ -144,7 +146,7 @@ export function ClassicFooter({
                   onUpdate?.({ notes: e.target.value })
                 }
                 placeholder="Add notes for your client..."
-                className="text-sm"
+                className="text-sm !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                 rows={3}
               />
             ) : (
@@ -167,7 +169,7 @@ export function ClassicFooter({
                   onUpdate?.({ terms: e.target.value })
                 }
                 placeholder="Add terms and conditions..."
-                className="text-sm"
+                className="text-sm !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                 rows={3}
               />
             ) : (
@@ -180,7 +182,7 @@ export function ClassicFooter({
       </div>
 
       {/* Footer message */}
-      <div className="mt-10 pt-6 border-t text-center text-sm text-gray-500">
+      <div className="mt-10 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
         <p>
           Thank you for your business!
           {type === "INVOICE" &&

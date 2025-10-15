@@ -60,7 +60,7 @@ export function ModernHeader({
               onChange={handleProjectChange}
               onCreateNew={onOpenProjectModal}
               isEditable={isEditable}
-              className="w-full text-sm bg-white"
+              className="w-full text-sm !bg-white !border-gray-300 !text-gray-900 hover:!bg-gray-50 hover:!text-gray-900"
               selectedClientId={selectedClientId}
             />
           </div>
@@ -76,7 +76,7 @@ export function ModernHeader({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 text-white hover:bg-white/20"
+                className="h-6 w-6 text-white hover:bg-white/20 hover:text-white"
                 onClick={onOpenBusinessInfoModal}
               >
                 <Settings className="h-4 w-4" />
@@ -116,7 +116,7 @@ export function ModernHeader({
                 value={selectedClientId}
                 onChange={handleClientChange}
                 onCreateNew={onOpenClientModal}
-                className="text-xs h-6 bg-white"
+                className="text-xs h-6 !bg-white !text-gray-900 hover:!bg-gray-100"
                 align="start"
               />
             )}
@@ -157,7 +157,7 @@ export function ModernHeader({
             <SettingsDatePicker
               value={new Date(document.issueDate)}
               onChange={handleIssueDateChange}
-              className="font-medium text-black w-full mt-1"
+              className="font-medium w-full mt-1 !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400 hover:!bg-gray-50 hover:!text-gray-900"
             />
           ) : (
             <p className="font-medium text-lg mt-1">
@@ -175,7 +175,7 @@ export function ModernHeader({
                 }
                 onChange={(date) => onUpdate?.({ dueDate: date })}
                 placeholder="Select due date"
-                className="font-medium text-black w-full mt-1"
+                className="font-medium w-full mt-1 !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400 hover:!bg-gray-50 hover:!text-gray-900"
               />
             ) : (
               document.dueDate && (
@@ -198,7 +198,7 @@ export function ModernHeader({
                 }
                 onChange={(date) => onUpdate?.({ validUntil: date })}
                 placeholder="Select valid until date"
-                className="font-medium text-black w-full mt-1"
+                className="font-medium w-full mt-1 !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400 hover:!bg-gray-50 hover:!text-gray-900"
               />
             ) : (
               document.validUntil && (

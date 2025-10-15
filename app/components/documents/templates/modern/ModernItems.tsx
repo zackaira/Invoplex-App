@@ -13,13 +13,13 @@ const modernStyles: ItemsTableStyles = {
 
   // Header styling - rounded with background
   headerClassName:
-    "gap-4 px-6 py-3 bg-gray-50 dark:bg-gray-900 rounded-lg font-semibold text-sm",
+    "gap-4 px-6 py-3 bg-gray-50 rounded-lg font-semibold text-sm",
   headerGridCols: "grid-cols-[1.5fr_2.5fr_1.5fr_1.5fr_auto]",
   headerGridColsWithQty: "grid-cols-[1.5fr_2.5fr_1.5fr_1.5fr_1.5fr_auto]",
 
   // Row styling - cards with shadows
   rowClassName:
-    "gap-4 px-6 py-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow",
+    "gap-4 px-6 py-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow",
   rowGridCols: "grid-cols-[1.5fr_2.5fr_1.5fr_1.5fr_auto]",
   rowGridColsWithQty: "grid-cols-[1.5fr_2.5fr_1.5fr_1.5fr_1.5fr_auto]",
 
@@ -27,7 +27,8 @@ const modernStyles: ItemsTableStyles = {
   footerClassName: "",
 
   // Add button - larger with dashed border
-  addButtonClassName: "w-full py-6 border-dashed border-2 hover:border-solid",
+  addButtonClassName:
+    "w-full py-6 border-dashed border-2 hover:border-solid !bg-white !border-gray-300 !text-gray-900 hover:!bg-gray-50 hover:!border-gray-400",
 };
 
 /**

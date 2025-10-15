@@ -75,7 +75,10 @@ export function SettingsDatePicker({
             {value ? format(value, "PPP") : <span>{placeholder}</span>}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent
+          className="w-auto p-0 !bg-white !border-gray-300 !text-gray-900"
+          align="start"
+        >
           <Calendar
             mode="single"
             selected={value}
@@ -84,6 +87,7 @@ export function SettingsDatePicker({
               setOpen(false);
             }}
             initialFocus
+            className="!bg-white !text-gray-900"
           />
         </PopoverContent>
       </Popover>

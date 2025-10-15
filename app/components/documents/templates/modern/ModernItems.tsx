@@ -1,13 +1,7 @@
 "use client";
 
-import { DocumentWithRelations } from "../types";
+import { TemplateItemsProps } from "../types";
 import { BaseItemsTable, ItemsTableStyles } from "../../items/BaseTable";
-
-interface ModernItemsProps {
-  document: DocumentWithRelations;
-  isEditable?: boolean;
-  onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
-}
 
 /**
  * Modern template styling configuration
@@ -44,7 +38,7 @@ export function ModernItems({
   document,
   isEditable = false,
   onUpdate,
-}: ModernItemsProps) {
+}: TemplateItemsProps) {
   return (
     <BaseItemsTable
       document={document}

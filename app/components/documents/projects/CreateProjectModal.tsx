@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,12 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  SettingsInput,
-  SettingsTextarea,
-  SettingsSelect,
-} from "@/app/components/settings";
-import { DUMMY_CLIENTS } from "../clients";
+import { SettingsInput, SettingsTextarea } from "@/app/components/settings";
 
 export interface CreateProjectModalProps {
   open: boolean;
@@ -26,46 +20,39 @@ export interface CreateProjectModalProps {
     description: string;
     clientId: string;
   }) => void;
-  defaultClientId?: string;
-  onAddClient?: () => void;
+  client?: {
+    id: string;
+    name: string;
+    email?: string | null;
+    [key: string]: any;
+  };
 }
 
 export function CreateProjectModal({
   open,
   onOpenChange,
   onSubmit,
-  defaultClientId,
-  onAddClient,
+  client,
 }: CreateProjectModalProps) {
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
-  const [clientId, setClientId] = React.useState(defaultClientId || "");
-
-  const handleSelectChange = (value: string) => {
-    if (value === "__add_new__") {
-      onAddClient?.();
-    } else {
-      setClientId(value);
-    }
-  };
 
   // Reset form when modal closes
   React.useEffect(() => {
     if (!open) {
       setTitle("");
       setDescription("");
-      setClientId(defaultClientId || "");
     }
-  }, [open, defaultClientId]);
+  }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !clientId) return;
+    if (!title.trim() || !client?.id) return;
 
     onSubmit?.({
       title: title.trim(),
       description: description.trim(),
-      clientId,
+      clientId: client.id,
     });
 
     onOpenChange(false);
@@ -93,25 +80,6 @@ export function CreateProjectModal({
               autoFocus
             />
 
-            <SettingsSelect
-              label="Client"
-              placeholder="Select a client"
-              value={clientId}
-              onValueChange={handleSelectChange}
-              required
-              options={[
-                ...DUMMY_CLIENTS.map((client) => ({
-                  value: client.id,
-                  label: client.name,
-                })),
-                {
-                  value: "__add_new__",
-                  label: "Add new client",
-                  icon: <Plus className="h-4 w-4" />,
-                },
-              ]}
-            />
-
             <SettingsTextarea
               label="Description"
               id="project-description"
@@ -122,6 +90,24 @@ export function CreateProjectModal({
             />
           </div>
 
+          {client && (
+            <div className="mb-4 rounded-lg border border-muted bg-muted/30 p-4">
+              <div className="text-sm font-medium text-muted-foreground mb-2">
+                Assigning this project to Client
+              </div>
+              <div className="space-y-1">
+                <div className="font-semibold text-foreground">
+                  {client.name}
+                </div>
+                {client.email && (
+                  <div className="text-sm text-muted-foreground">
+                    {client.email}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <DialogFooter>
             <Button
               type="button"
@@ -130,7 +116,7 @@ export function CreateProjectModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={!title.trim() || !clientId}>
+            <Button type="submit" disabled={!title.trim() || !client?.id}>
               Create Project
             </Button>
           </DialogFooter>

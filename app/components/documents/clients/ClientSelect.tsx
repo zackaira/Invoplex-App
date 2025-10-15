@@ -87,10 +87,11 @@ export function ClientSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
+          size="icon"
           role="combobox"
           aria-expanded={open}
-          className={cn("justify-between", className)}
+          className={cn("h-6 w-6", className)}
         >
           <span className="text-muted-foreground">
             <PencilIcon className="h-4 w-4" />

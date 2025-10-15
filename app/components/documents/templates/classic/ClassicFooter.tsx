@@ -1,26 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { DocumentWithRelations } from "../types";
+import { TemplateFooterProps } from "../types";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DocumentTotals } from "../../items/Totals";
 import Link from "next/link";
 
-interface ClassicFooterProps {
-  document: DocumentWithRelations;
-  type: "QUOTE" | "INVOICE";
-  isEditable?: boolean;
-  onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
-}
-
 export function ClassicFooter({
   document,
   type,
   isEditable = false,
   onUpdate,
-}: ClassicFooterProps) {
+}: TemplateFooterProps) {
   return (
     <div>
       {/* Totals Section */}

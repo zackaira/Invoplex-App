@@ -1,0 +1,1 @@
+export { useDocumentHeader } from "./useDocumentHeader";

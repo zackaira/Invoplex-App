@@ -12,6 +12,8 @@ export function ModernTemplate({
   onUpdate,
   onOpenProjectModal,
   onOpenClientModal,
+  onOpenBusinessInfoModal,
+  businessInfoVisibility,
 }: TemplateProps) {
   return (
     <>
@@ -22,6 +24,8 @@ export function ModernTemplate({
         onUpdate={onUpdate}
         onOpenProjectModal={onOpenProjectModal}
         onOpenClientModal={onOpenClientModal}
+        onOpenBusinessInfoModal={onOpenBusinessInfoModal}
+        businessInfoVisibility={businessInfoVisibility}
       />
 
       <div className="p-8">

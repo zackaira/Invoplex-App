@@ -7,6 +7,10 @@ import { DocumentViewBar } from "./ViewBar";
 import { DocumentEditBar } from "./EditBar";
 import { CreateProjectModal } from "./projects";
 import { AddClientModal } from "./clients";
+import {
+  BusinessInfoVisibilityModal,
+  BusinessInfoVisibility,
+} from "./BusinessInfoVisibilityModal";
 
 export function TemplateRenderer({
   document,
@@ -29,6 +33,19 @@ export function TemplateRenderer({
   // Modal states
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [isBusinessInfoModalOpen, setIsBusinessInfoModalOpen] = useState(false);
+
+  // Business info visibility state
+  const [businessInfoVisibility, setBusinessInfoVisibility] =
+    useState<BusinessInfoVisibility>({
+      businessName: true,
+      personalName: false,
+      email: true,
+      phone: true,
+      website: true,
+      taxId: false,
+      address: false,
+    });
 
   // Handlers
   const handleCreateProject = (project: {
@@ -77,6 +94,8 @@ export function TemplateRenderer({
             onUpdate={isEditable ? onUpdate : undefined}
             onOpenProjectModal={() => setIsProjectModalOpen(true)}
             onOpenClientModal={() => setIsClientModalOpen(true)}
+            onOpenBusinessInfoModal={() => setIsBusinessInfoModalOpen(true)}
+            businessInfoVisibility={businessInfoVisibility}
           />
         </div>
       </div>
@@ -86,17 +105,20 @@ export function TemplateRenderer({
         open={isProjectModalOpen}
         onOpenChange={setIsProjectModalOpen}
         onSubmit={handleCreateProject}
-        defaultClientId={document.client.id}
-        onAddClient={() => {
-          setIsProjectModalOpen(false);
-          setIsClientModalOpen(true);
-        }}
+        client={document.client}
       />
 
       <AddClientModal
         open={isClientModalOpen}
         onOpenChange={setIsClientModalOpen}
         onSubmit={handleAddClient}
+      />
+
+      <BusinessInfoVisibilityModal
+        open={isBusinessInfoModalOpen}
+        onOpenChange={setIsBusinessInfoModalOpen}
+        visibility={businessInfoVisibility}
+        onVisibilityChange={setBusinessInfoVisibility}
       />
     </>
   );

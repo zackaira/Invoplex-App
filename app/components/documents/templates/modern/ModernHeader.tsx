@@ -1,19 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { DocumentWithRelations } from "../types";
+import { TemplateHeaderProps } from "../types";
 import { SettingsDatePicker } from "@/app/components/settings";
 import { ProjectSelect } from "../../projects";
-import { ClientSelect, DUMMY_CLIENTS } from "../../clients";
-
-interface ModernHeaderProps {
-  document: DocumentWithRelations;
-  type: "QUOTE" | "INVOICE";
-  isEditable?: boolean;
-  onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
-  onOpenProjectModal?: () => void;
-  onOpenClientModal?: () => void;
-}
+import { ClientSelect } from "../../clients";
+import { Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useDocumentHeader } from "../../hooks";
 
 export function ModernHeader({
   document,
@@ -22,43 +15,26 @@ export function ModernHeader({
   onUpdate,
   onOpenProjectModal,
   onOpenClientModal,
-}: ModernHeaderProps) {
-  const validDays = 15;
-  const [selectedProjectId, setSelectedProjectId] = useState<
-    string | undefined
-  >(undefined);
-  const [selectedClientId, setSelectedClientId] = useState<string | undefined>(
-    document.client?.id
-  );
-
-  const handleIssueDateChange = (date: Date | undefined) => {
-    if (!date || !onUpdate) return;
-
-    if (type === "QUOTE") {
-      // Auto-set Valid Until date to 15 days from Issue Date
-      const validUntilDate = new Date(date);
-      validUntilDate.setDate(validUntilDate.getDate() + validDays);
-      onUpdate({ issueDate: date, validUntil: validUntilDate });
-    } else {
-      onUpdate({ issueDate: date });
-    }
-  };
-
-  const handleProjectChange = (projectId: string | undefined) => {
-    setSelectedProjectId(projectId);
-    // TODO: Update document with projectId when backend is ready
-    // onUpdate?.({ projectId });
-  };
-
-  const handleClientChange = (clientId: string | undefined) => {
-    setSelectedClientId(clientId);
-    // TODO: Update document with clientId when backend is ready
-    // onUpdate?.({ clientId });
-  };
-
-  // Get selected client info for display
-  const displayClient =
-    DUMMY_CLIENTS.find((c) => c.id === selectedClientId) || document.client;
+  onOpenBusinessInfoModal,
+  businessInfoVisibility = {
+    businessName: true,
+    personalName: false,
+    email: true,
+    phone: true,
+    website: true,
+    taxId: false,
+    address: false,
+  },
+}: TemplateHeaderProps) {
+  // Use the shared hook for all business logic
+  const {
+    selectedProjectId,
+    selectedClientId,
+    displayClient,
+    handleIssueDateChange,
+    handleProjectChange,
+    handleClientChange,
+  } = useDocumentHeader({ document, type, onUpdate });
 
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-t-lg">
@@ -94,18 +70,38 @@ export function ModernHeader({
       <div className="grid grid-cols-2 gap-8 mt-8">
         {/* From Section */}
         <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-          <h3 className="text-sm font-semibold uppercase mb-2 opacity-75">
-            From
-          </h3>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-sm font-semibold uppercase opacity-75">From</h3>
+            {isEditable && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-white hover:bg-white/20"
+                onClick={onOpenBusinessInfoModal}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
           <div>
-            <p className="font-semibold text-lg">Your Business Name</p>
-            <p className="text-sm opacity-90 mt-1">
-              123 Business Street
-              <br />
-              City, State 12345
-              <br />
-              email@business.com
-            </p>
+            {businessInfoVisibility.businessName && (
+              <p className="font-semibold text-lg">Your Business Name</p>
+            )}
+            {businessInfoVisibility.personalName && (
+              <p className="text-sm opacity-90 mt-1">John Doe</p>
+            )}
+            <div className="text-sm opacity-90 mt-1">
+              {businessInfoVisibility.email && <p>email@business.com</p>}
+              {businessInfoVisibility.phone && <p>+1 (555) 123-4567</p>}
+              {businessInfoVisibility.website && <p>www.yourbusiness.com</p>}
+              {businessInfoVisibility.taxId && <p>Tax ID: 12-3456789</p>}
+              {businessInfoVisibility.address && (
+                <>
+                  <p>123 Business Street</p>
+                  <p>City, State 12345</p>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

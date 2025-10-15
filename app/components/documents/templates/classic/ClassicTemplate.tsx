@@ -12,6 +12,8 @@ export function ClassicTemplate({
   onUpdate,
   onOpenProjectModal,
   onOpenClientModal,
+  onOpenBusinessInfoModal,
+  businessInfoVisibility,
 }: TemplateProps) {
   return (
     <>
@@ -22,6 +24,8 @@ export function ClassicTemplate({
         onUpdate={onUpdate}
         onOpenProjectModal={onOpenProjectModal}
         onOpenClientModal={onOpenClientModal}
+        onOpenBusinessInfoModal={onOpenBusinessInfoModal}
+        businessInfoVisibility={businessInfoVisibility}
       />
 
       <ClassicItems

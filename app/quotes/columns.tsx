@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { TooltipWrapper } from "../components/ui/TooltipWrapper";
 
 // Extend ColumnMeta to include width properties and display label
 declare module "@tanstack/react-table" {
@@ -97,13 +98,28 @@ const columnDefinitions: ColumnDef<Quote>[] = [
       const status = row.getValue("status") as string;
       return (
         <div className="text-right">
-          <span
-            className={`inline-flex justify-center rounded-sm min-w-[90px] px-2.5 py-0.5 text-xs font-medium ${
-              statusColors[status] || statusColors.DRAFT
-            }`}
-          >
-            {status}
-          </span>
+          {status !== "DRAFT" ? (
+            <TooltipWrapper
+              tooltip={`Status changed to ${status} on this date`}
+              side="top"
+            >
+              <span
+                className={`inline-flex justify-center rounded-sm min-w-[90px] px-2.5 py-0.5 text-xs font-medium ${
+                  statusColors[status] || statusColors.DRAFT
+                }`}
+              >
+                {status}
+              </span>
+            </TooltipWrapper>
+          ) : (
+            <span
+              className={`inline-flex justify-center rounded-sm min-w-[90px] px-2.5 py-0.5 text-xs font-medium ${
+                statusColors[status] || statusColors.DRAFT
+              }`}
+            >
+              {status}
+            </span>
+          )}
         </div>
       );
     },
@@ -213,9 +229,9 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     accessorKey: "total",
     meta: {
       width: "120px",
-      label: "Amount",
+      label: "Amount Due",
     },
-    header: () => <div className="text-right">Amount</div>,
+    header: () => <div className="text-right">Amount Due</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("total"));
       const currency = row.original.currency;
@@ -225,7 +241,16 @@ const columnDefinitions: ColumnDef<Quote>[] = [
         currency: currency || "USD",
       }).format(amount);
 
-      return <div className="text-right">{formatted}</div>;
+      return (
+        <div className="text-right">
+          <TooltipWrapper
+            tooltip={`Last Payment of [amount] received on [date]`}
+            side="top"
+          >
+            <span>{formatted}</span>
+          </TooltipWrapper>
+        </div>
+      );
     },
   },
   {

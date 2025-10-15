@@ -1,25 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { DocumentWithRelations } from "../types";
+import { TemplateFooterProps } from "../types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DocumentTotals } from "../../items/Totals";
 import Link from "next/link";
-
-interface ModernFooterProps {
-  document: DocumentWithRelations;
-  type: "QUOTE" | "INVOICE";
-  isEditable?: boolean;
-  onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
-}
 
 export function ModernFooter({
   document,
   type,
   isEditable = false,
   onUpdate,
-}: ModernFooterProps) {
+}: TemplateFooterProps) {
   return (
     <div>
       {/* Totals Section */}

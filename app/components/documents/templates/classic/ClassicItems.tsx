@@ -1,13 +1,7 @@
 "use client";
 
-import { DocumentWithRelations } from "../types";
+import { TemplateItemsProps } from "../types";
 import { BaseItemsTable, ItemsTableStyles } from "../../items/BaseTable";
-
-interface ClassicItemsProps {
-  document: DocumentWithRelations;
-  isEditable?: boolean;
-  onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
-}
 
 /**
  * Classic template styling configuration
@@ -46,7 +40,7 @@ export function ClassicItems({
   document,
   isEditable = false,
   onUpdate,
-}: ClassicItemsProps) {
+}: TemplateItemsProps) {
   return (
     <BaseItemsTable
       document={document}

@@ -6,7 +6,7 @@ import { ProjectSelect } from "../../projects";
 import { ClientSelect } from "../../clients";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDocumentHeader } from "../../hooks";
+import { useDocumentHeader } from "../hooks";
 
 export function ModernHeader({
   document,

@@ -10,6 +10,7 @@ import { SettingsHelperText } from "./HelperText";
 interface SettingsLogoUploadProps {
   label: string;
   helperText?: string;
+  error?: string;
   preview: string | null;
   onFileSelect: (file: File) => void;
   onRemove: () => void;
@@ -20,6 +21,7 @@ interface SettingsLogoUploadProps {
 export function SettingsLogoUpload({
   label,
   helperText,
+  error,
   preview,
   onFileSelect,
   onRemove,
@@ -143,6 +145,8 @@ export function SettingsLogoUpload({
           </div>
         </div>
       )}
+
+      {error && <p className="text-xs text-destructive mt-2">{error}</p>}
     </div>
   );
 }

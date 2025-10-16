@@ -1,6 +1,6 @@
 import { TemplateRenderer } from "@/app/components/documents/TemplateRenderer";
 import { getDocumentById } from "@/lib/actions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function QuotePage({
   params,
@@ -8,13 +8,17 @@ export default async function QuotePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  // Redirect to quotes page if ID is missing or invalid
+  if (!id || id.trim() === "") {
+    redirect("/quotes");
+  }
+
   const document = await getDocumentById(id, "QUOTE");
 
   if (!document) {
     return notFound();
   }
-
-  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   return (
     <div className="relative">

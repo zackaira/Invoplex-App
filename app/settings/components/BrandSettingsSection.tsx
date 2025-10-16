@@ -4,6 +4,7 @@ import {
   SettingsColorPicker,
   SettingsLogoUpload,
 } from "@/app/components/settings";
+import type { ValidationError } from "@/lib/validation";
 
 interface BrandSettingsSectionProps {
   isSaving: boolean;
@@ -15,6 +16,8 @@ interface BrandSettingsSectionProps {
   logoPreview: string | null;
   onLogoSelect: (file: File) => void;
   onLogoRemove: () => void;
+  validationErrors?: ValidationError[];
+  initialData?: any;
 }
 
 export function BrandSettingsSection({
@@ -27,7 +30,19 @@ export function BrandSettingsSection({
   logoPreview,
   onLogoSelect,
   onLogoRemove,
+  validationErrors,
 }: BrandSettingsSectionProps) {
+  // Helper to get error for a specific field
+  const getFieldError = (fieldName: string): string | undefined => {
+    if (!validationErrors) return undefined;
+    const error = validationErrors.find(
+      (err) =>
+        err.path.join(".") === fieldName ||
+        err.path[err.path.length - 1] === fieldName
+    );
+    return error?.message;
+  };
+
   return (
     <SettingsSection
       id="brand-settings"
@@ -45,16 +60,19 @@ export function BrandSettingsSection({
         onFileSelect={onLogoSelect}
         onRemove={onLogoRemove}
         helperText="Recommended size: 300 x 200 pixels."
+        error={getFieldError("logo")}
       />
 
       <SettingsColorPicker
         label="Brand Color"
+        name="brandColor"
         value={brandColor}
         onChange={(value) => {
           setBrandColor(value);
           onMarkChanged();
         }}
         helperText="This color will be used for accents in your documents"
+        error={getFieldError("brandColor")}
       />
     </SettingsSection>
   );

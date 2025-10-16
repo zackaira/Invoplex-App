@@ -21,13 +21,14 @@ import { SettingsHelperText } from "./HelperText";
 interface SettingsPhoneInputProps
   extends Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
-    "value" | "onChange"
+    "value" | "onChange" | "defaultValue"
   > {
   label: string;
   helperText?: string;
   required?: boolean;
   error?: string;
   value?: string;
+  defaultValue?: string;
   onChange?: (value: string, isValid: boolean) => void;
   defaultCountry?: CountryCode;
 }
@@ -115,19 +116,38 @@ export function SettingsPhoneInput({
   error,
   className,
   id,
-  value = "",
+  value,
+  defaultValue = "",
   onChange,
   defaultCountry = "US",
   ...props
 }: SettingsPhoneInputProps) {
   const inputId = id || `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
-  const [phoneValue, setPhoneValue] = useState(value);
-  const [countryCode, setCountryCode] = useState<string | undefined>(undefined);
-  const [isValid, setIsValid] = useState<boolean>(false);
+  const initialValue = value !== undefined ? value : defaultValue;
+  const [phoneValue, setPhoneValue] = useState(initialValue);
 
-  // Update local state when external value changes
+  // Initialize country code and validity based on initial value
+  const [countryCode, setCountryCode] = useState<string | undefined>(() => {
+    if (initialValue) {
+      return detectCountryFromCallingCode(initialValue, defaultCountry);
+    }
+    return undefined;
+  });
+
+  const [isValid, setIsValid] = useState<boolean>(() => {
+    if (initialValue) {
+      try {
+        return isValidPhoneNumber(initialValue);
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
+
+  // Update local state when external value changes (only for controlled component)
   useEffect(() => {
-    if (value !== phoneValue) {
+    if (value !== undefined && value !== phoneValue) {
       setPhoneValue(value);
       // Parse and update country code
       if (value) {

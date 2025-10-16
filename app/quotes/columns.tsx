@@ -28,7 +28,7 @@ export type Quote = {
   id: string;
   documentNumber: string;
   status: string;
-  createdAt: Date;
+  createdAt: string;
   total: number;
   currency: string;
   client: {
@@ -218,7 +218,7 @@ const columnDefinitions: ColumnDef<Quote>[] = [
       return (
         <Link
           href={`/quote/${row.original.id}`}
-          className="text-md font-medium cursor-pointer hover:opacity-70 transition-opacity py-4"
+          className="text-md font-medium cursor-pointer transition-colors py-4 group-hover/row:text-invoplex"
         >
           {row.original.client.name}
         </Link>

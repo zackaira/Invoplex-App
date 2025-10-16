@@ -11,6 +11,7 @@ import {
   getFiscalYearMonthOptions,
   getFiscalYearDayOptions,
 } from "@/lib/data-utils";
+import type { ValidationError } from "@/lib/validation";
 
 interface FinancialSettingsSectionProps {
   isSaving: boolean;
@@ -19,6 +20,11 @@ interface FinancialSettingsSectionProps {
   onMarkChanged: () => void;
   showFinancialSettings: boolean;
   setShowFinancialSettings: (value: boolean) => void;
+  validationErrors?: ValidationError[];
+  initialData?: {
+    businessProfile?: any;
+    userSettings?: any;
+  };
 }
 
 export function FinancialSettingsSection({
@@ -28,7 +34,20 @@ export function FinancialSettingsSection({
   onMarkChanged,
   showFinancialSettings,
   setShowFinancialSettings,
+  validationErrors,
+  initialData,
 }: FinancialSettingsSectionProps) {
+  // Helper to get error for a specific field
+  const getFieldError = (fieldName: string): string | undefined => {
+    if (!validationErrors) return undefined;
+    const error = validationErrors.find(
+      (err) =>
+        err.path.join(".") === fieldName ||
+        err.path[err.path.length - 1] === fieldName
+    );
+    return error?.message;
+  };
+
   return (
     <SettingsSection
       id="financial-settings"
@@ -43,34 +62,41 @@ export function FinancialSettingsSection({
       <SettingsCombobox
         label="Default Currency"
         name="defaultCurrency"
-        defaultValue="USD"
+        defaultValue={initialData?.userSettings?.defaultCurrency || "USD"}
         options={getCurrencyOptions()}
         onValueChange={onMarkChanged}
         placeholder="Select currency..."
         searchPlaceholder="Search currency..."
         required
+        error={getFieldError("defaultCurrency")}
       />
 
       <SettingsGrid columns={2}>
         <SettingsCombobox
           label="Fiscal Year Start Month"
           name="fiscalYearStartMonth"
-          defaultValue="3"
+          defaultValue={
+            initialData?.userSettings?.fiscalYearStartMonth?.toString() || "3"
+          }
           options={getFiscalYearMonthOptions()}
           onValueChange={onMarkChanged}
           placeholder="Select month..."
           searchPlaceholder="Search month..."
           helperText="Month when your fiscal/tax year begins"
+          error={getFieldError("fiscalYearStartMonth")}
         />
         <SettingsCombobox
           label="Fiscal Year Start Day"
           name="fiscalYearStartDay"
-          defaultValue="1"
+          defaultValue={
+            initialData?.userSettings?.fiscalYearStartDay?.toString() || "1"
+          }
           options={getFiscalYearDayOptions()}
           onValueChange={onMarkChanged}
           placeholder="Select day..."
           searchPlaceholder="Search day..."
           helperText="Day when your fiscal/tax year begins"
+          error={getFieldError("fiscalYearStartDay")}
         />
       </SettingsGrid>
 
@@ -80,6 +106,8 @@ export function FinancialSettingsSection({
         placeholder="12-3456789"
         onChange={onMarkChanged}
         required
+        error={getFieldError("taxId")}
+        defaultValue={initialData?.businessProfile?.taxId || ""}
       />
 
       <div className="flex items-start justify-between gap-4 pb-4 pt-8 mt-8 border-t">
@@ -106,10 +134,13 @@ export function FinancialSettingsSection({
           type="number"
           step="0.01"
           placeholder="0.00"
-          defaultValue="0.00"
+          defaultValue={
+            initialData?.userSettings?.defaultTaxRate?.toString() || "0.00"
+          }
           min="0"
           max="100"
           onChange={onMarkChanged}
+          error={getFieldError("defaultTaxRate")}
         />
       )}
     </SettingsSection>

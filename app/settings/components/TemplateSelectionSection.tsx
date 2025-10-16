@@ -2,6 +2,7 @@ import { Palette } from "lucide-react";
 import { SettingsSection } from "@/app/components/settings";
 import { TemplateCarousel } from "./TemplateCarousel";
 import type { Template } from "@/app/components/documents/templates/types";
+import type { ValidationError } from "@/lib/validation";
 
 interface TemplateSelectionSectionProps {
   isSaving: boolean;
@@ -11,6 +12,8 @@ interface TemplateSelectionSectionProps {
   selectedTemplate: string;
   setSelectedTemplate: (id: string) => void;
   templates: Template[];
+  validationErrors?: ValidationError[];
+  initialData?: any;
 }
 
 export function TemplateSelectionSection({
@@ -21,7 +24,19 @@ export function TemplateSelectionSection({
   selectedTemplate,
   setSelectedTemplate,
   templates,
+  validationErrors,
 }: TemplateSelectionSectionProps) {
+  // Helper to get error for a specific field
+  const getFieldError = (fieldName: string): string | undefined => {
+    if (!validationErrors) return undefined;
+    const error = validationErrors.find(
+      (err) =>
+        err.path.join(".") === fieldName ||
+        err.path[err.path.length - 1] === fieldName
+    );
+    return error?.message;
+  };
+
   return (
     <SettingsSection
       id="template-settings"

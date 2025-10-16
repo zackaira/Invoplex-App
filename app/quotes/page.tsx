@@ -20,7 +20,7 @@ export default async function Quotes() {
     id: quote.id,
     documentNumber: quote.documentNumber,
     status: quote.status,
-    createdAt: quote.createdAt,
+    createdAt: quote.createdAt.toISOString(),
     total: Number(quote.total),
     currency: quote.currency,
     client: {

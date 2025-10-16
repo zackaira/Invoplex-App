@@ -11,3 +11,4 @@ export { SettingsDatePicker } from "./DatePicker";
 export { SettingsSection } from "./Section";
 export { SettingsGrid } from "./Grid";
 export { SettingsLabel } from "./Label";
+export { ErrorMessage } from "./ErrorMessage";

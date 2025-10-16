@@ -14,12 +14,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getCountryOptions } from "@/lib/data-utils";
+import type { ValidationError } from "@/lib/validation";
 
 interface BusinessProfileSectionProps {
   isSaving: boolean;
   hasUnsavedChanges: boolean;
   onSave: (e: React.FormEvent<HTMLFormElement>) => void;
   onMarkChanged: () => void;
+  validationErrors?: ValidationError[];
+  initialData?: any;
 }
 
 export function BusinessProfileSection({
@@ -27,8 +30,22 @@ export function BusinessProfileSection({
   hasUnsavedChanges,
   onSave,
   onMarkChanged,
+  validationErrors,
+  initialData,
 }: BusinessProfileSectionProps) {
   const [isEmailLocked, setIsEmailLocked] = useState(true);
+
+  // Helper to get error for a specific field
+  const getFieldError = (fieldName: string): string | undefined => {
+    if (!validationErrors) return undefined;
+    const error = validationErrors.find(
+      (err) =>
+        err.path.join(".") === fieldName ||
+        err.path[err.path.length - 1] === fieldName
+    );
+    return error?.message;
+  };
+
   return (
     <SettingsSection
       id="business-profile"
@@ -46,6 +63,8 @@ export function BusinessProfileSection({
         placeholder="John Doe"
         required
         onChange={onMarkChanged}
+        error={getFieldError("personalName")}
+        defaultValue={initialData?.personalName || ""}
         endAddons={[
           <Tooltip key="website-info">
             <TooltipTrigger asChild>
@@ -73,6 +92,8 @@ export function BusinessProfileSection({
           placeholder="Acme Corporation"
           required
           onChange={onMarkChanged}
+          error={getFieldError("businessName")}
+          defaultValue={initialData?.businessName || ""}
         />
         <SettingsInput
           label="Email"
@@ -80,9 +101,11 @@ export function BusinessProfileSection({
           type="email"
           placeholder="contact@acme.com"
           required
-          disabled={isEmailLocked}
+          readOnly={isEmailLocked}
           onChange={onMarkChanged}
           autoComplete="email"
+          error={getFieldError("email")}
+          defaultValue={initialData?.email || ""}
           endAddons={[
             <Tooltip key="email-lock">
               <TooltipTrigger asChild>
@@ -125,14 +148,17 @@ export function BusinessProfileSection({
           required
           autoComplete="tel"
           helperText="Enter phone number with country code (e.g., +1 for US)"
+          error={getFieldError("phone")}
+          defaultValue={initialData?.phone || ""}
         />
         <SettingsInput
           label="Website"
           name="website"
-          type="url"
           placeholder="acme.com"
           onChange={onMarkChanged}
           startAddon="https://"
+          error={getFieldError("website")}
+          defaultValue={initialData?.website?.replace("https://www.", "") || ""}
           endAddons={[
             <Tooltip key="website-info">
               <TooltipTrigger asChild>
@@ -159,6 +185,8 @@ export function BusinessProfileSection({
         placeholder="123 Main Street"
         onChange={onMarkChanged}
         autoComplete="address-line1"
+        error={getFieldError("address")}
+        defaultValue={initialData?.address || ""}
       />
 
       <SettingsInput
@@ -167,6 +195,8 @@ export function BusinessProfileSection({
         placeholder="Suite 100"
         onChange={onMarkChanged}
         autoComplete="address-line2"
+        error={getFieldError("address2")}
+        defaultValue={initialData?.address2 || ""}
       />
 
       <SettingsInput
@@ -175,6 +205,8 @@ export function BusinessProfileSection({
         placeholder="Building B"
         onChange={onMarkChanged}
         autoComplete="address-line3"
+        error={getFieldError("address3")}
+        defaultValue={initialData?.address3 || ""}
       />
 
       <SettingsGrid columns={2}>
@@ -183,12 +215,16 @@ export function BusinessProfileSection({
           name="city"
           placeholder="San Francisco"
           onChange={onMarkChanged}
+          error={getFieldError("city")}
+          defaultValue={initialData?.city || ""}
         />
         <SettingsInput
           label="State / Province"
           name="state"
           placeholder="CA"
           onChange={onMarkChanged}
+          error={getFieldError("state")}
+          defaultValue={initialData?.state || ""}
         />
       </SettingsGrid>
 
@@ -198,6 +234,8 @@ export function BusinessProfileSection({
           name="zipCode"
           placeholder="94102"
           onChange={onMarkChanged}
+          error={getFieldError("zipCode")}
+          defaultValue={initialData?.zipCode || ""}
         />
         <SettingsCombobox
           label="Country"
@@ -207,6 +245,8 @@ export function BusinessProfileSection({
           placeholder="Select country..."
           searchPlaceholder="Search country..."
           required
+          error={getFieldError("country")}
+          defaultValue={initialData?.country || ""}
         />
       </SettingsGrid>
     </SettingsSection>

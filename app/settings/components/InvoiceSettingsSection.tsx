@@ -6,6 +6,7 @@ import {
   SettingsSwitch,
   SettingsGrid,
 } from "@/app/components/settings";
+import type { ValidationError } from "@/lib/validation";
 
 interface InvoiceSettingsSectionProps {
   isSaving: boolean;
@@ -16,6 +17,11 @@ interface InvoiceSettingsSectionProps {
   setShowBankDetails: (value: boolean) => void;
   removeInvoicePoweredBy: boolean;
   setRemoveInvoicePoweredBy: (value: boolean) => void;
+  validationErrors?: ValidationError[];
+  initialData?: {
+    businessProfile?: any;
+    userSettings?: any;
+  };
 }
 
 export function InvoiceSettingsSection({
@@ -27,7 +33,20 @@ export function InvoiceSettingsSection({
   setShowBankDetails,
   removeInvoicePoweredBy,
   setRemoveInvoicePoweredBy,
+  validationErrors,
+  initialData,
 }: InvoiceSettingsSectionProps) {
+  // Helper to get error for a specific field
+  const getFieldError = (fieldName: string): string | undefined => {
+    if (!validationErrors) return undefined;
+    const error = validationErrors.find(
+      (err) =>
+        err.path.join(".") === fieldName ||
+        err.path[err.path.length - 1] === fieldName
+    );
+    return error?.message;
+  };
+
   return (
     <SettingsSection
       id="invoice-settings"
@@ -43,9 +62,10 @@ export function InvoiceSettingsSection({
         label="Invoice Title"
         name="invoiceTitle"
         placeholder="INVOICE"
-        defaultValue="INVOICE"
+        defaultValue={initialData?.userSettings?.invoiceTitle || "INVOICE"}
         helperText="The title text that appears at the top of invoices"
         onChange={onMarkChanged}
+        error={getFieldError("invoiceTitle")}
       />
 
       <SettingsGrid columns={2}>
@@ -53,19 +73,23 @@ export function InvoiceSettingsSection({
           label="Invoice Prefix"
           name="invoicePrefix"
           placeholder="INV"
-          defaultValue="INV"
+          defaultValue={initialData?.userSettings?.invoicePrefix || "INV"}
           helperText="Example: INV-001, INV-002"
           onChange={onMarkChanged}
+          error={getFieldError("invoicePrefix")}
         />
         <SettingsInput
           label="Next Invoice Number"
           name="invoiceNextNumber"
           type="number"
           placeholder="1"
-          defaultValue="1"
+          defaultValue={
+            initialData?.userSettings?.invoiceNextNumber?.toString() || "1"
+          }
           min="1"
           helperText="Auto-increments with each invoice"
           onChange={onMarkChanged}
+          error={getFieldError("invoiceNextNumber")}
         />
       </SettingsGrid>
 
@@ -74,10 +98,13 @@ export function InvoiceSettingsSection({
         name="invoiceDefaultDueDays"
         type="number"
         placeholder="30"
-        defaultValue="30"
+        defaultValue={
+          initialData?.userSettings?.invoiceDefaultDueDays?.toString() || "30"
+        }
         min="1"
         helperText="Default days until invoice payment is due"
         onChange={onMarkChanged}
+        error={getFieldError("invoiceDefaultDueDays")}
       />
 
       <SettingsTextarea
@@ -86,6 +113,8 @@ export function InvoiceSettingsSection({
         placeholder="Enter default terms and conditions for invoices..."
         rows={4}
         onChange={onMarkChanged}
+        error={getFieldError("invoiceDefaultTerms")}
+        defaultValue={initialData?.userSettings?.invoiceDefaultTerms || ""}
       />
 
       <SettingsTextarea
@@ -94,6 +123,8 @@ export function InvoiceSettingsSection({
         placeholder="Enter additional notes for invoices..."
         rows={4}
         onChange={onMarkChanged}
+        error={getFieldError("invoiceDefaultNotes")}
+        defaultValue={initialData?.userSettings?.invoiceDefaultNotes || ""}
       />
 
       <SettingsSwitch
@@ -130,6 +161,8 @@ export function InvoiceSettingsSection({
                 placeholder="Chase Bank"
                 onChange={onMarkChanged}
                 required
+                error={getFieldError("bankName")}
+                defaultValue={initialData?.userSettings?.bankName || ""}
               />
               <SettingsInput
                 label="Account Name"
@@ -137,6 +170,8 @@ export function InvoiceSettingsSection({
                 placeholder="Business Account Name"
                 onChange={onMarkChanged}
                 required
+                error={getFieldError("accountName")}
+                defaultValue={initialData?.userSettings?.accountName || ""}
               />
             </SettingsGrid>
 
@@ -147,6 +182,8 @@ export function InvoiceSettingsSection({
                 placeholder="123456789"
                 onChange={onMarkChanged}
                 required
+                error={getFieldError("accountNumber")}
+                defaultValue={initialData?.userSettings?.accountNumber || ""}
               />
               <SettingsInput
                 label="Routing Number / Sort Code"
@@ -154,6 +191,8 @@ export function InvoiceSettingsSection({
                 placeholder="021000021"
                 onChange={onMarkChanged}
                 required
+                error={getFieldError("routingNumber")}
+                defaultValue={initialData?.userSettings?.routingNumber || ""}
               />
             </SettingsGrid>
 
@@ -163,12 +202,16 @@ export function InvoiceSettingsSection({
                 name="iban"
                 placeholder="GB29 NWBK 6016 1331 9268 19"
                 onChange={onMarkChanged}
+                error={getFieldError("iban")}
+                defaultValue={initialData?.userSettings?.iban || ""}
               />
               <SettingsInput
                 label="SWIFT / BIC Code"
                 name="swiftCode"
                 placeholder="CHASUS33"
                 onChange={onMarkChanged}
+                error={getFieldError("swiftCode")}
+                defaultValue={initialData?.userSettings?.swiftCode || ""}
               />
             </SettingsGrid>
           </>

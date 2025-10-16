@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DocumentWithRelations } from "@/app/components/documents/templates/types";
-import { DUMMY_CLIENTS } from "../clients";
+import { DUMMY_CLIENTS } from "../../clients";
 
 interface UseDocumentHeaderProps {
   document: DocumentWithRelations;

@@ -8,6 +8,7 @@ import { SettingsHelperText } from "./HelperText";
 interface SettingsColorPickerProps {
   label: string;
   helperText?: string;
+  error?: string;
   value: string;
   onChange: (value: string) => void;
   name?: string;
@@ -16,6 +17,7 @@ interface SettingsColorPickerProps {
 export function SettingsColorPicker({
   label,
   helperText,
+  error,
   value,
   onChange,
   name,
@@ -53,7 +55,9 @@ export function SettingsColorPicker({
         </label>
       </div>
 
-      {helperText && <SettingsHelperText text={helperText} />}
+      {helperText && !error && <SettingsHelperText text={helperText} />}
+
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }

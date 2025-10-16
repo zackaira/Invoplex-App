@@ -7,18 +7,13 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-// import {
-//   DropdownMenu,
-//   DropdownMenuCheckboxItem,
-//   DropdownMenuContent,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { TooltipWrapper } from "@/app/components/ui/TooltipWrapper";
 
 export interface StatusFilterOption {
   value: string;
@@ -30,7 +25,6 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   filterColumn?: string;
   filterPlaceholder?: string;
-  statusFilterColumn?: string;
   statusFilterOptions?: StatusFilterOption[];
   selectedStatuses?: string[];
   onStatusChange?: (statuses: string[]) => void;
@@ -40,7 +34,6 @@ export function DataTableToolbar<TData>({
   table,
   filterColumn,
   filterPlaceholder = "Filter...",
-  statusFilterColumn,
   statusFilterOptions = [],
   selectedStatuses = [],
   onStatusChange,
@@ -136,29 +129,35 @@ export function DataTableToolbar<TData>({
         {selectedCount > 0 && (
           <>
             {/* delete icon */}
-            <Button
-              variant="outline"
-              title={`Delete Quote${selectedCount > 1 ? "s" : ""}`}
+            <TooltipWrapper
+              tooltip={`Delete Quote${selectedCount > 1 ? "s" : ""}`}
+              side="bottom"
             >
-              <Trash className="h-4 w-4" />
-            </Button>
+              <Button variant="outline">
+                <Trash className="h-4 w-4" />
+              </Button>
+            </TooltipWrapper>
 
             {/* download icon */}
-            <Button
-              variant="outline"
-              title={`Download PDF${selectedCount > 1 ? "s" : ""}`}
+            <TooltipWrapper
+              tooltip={`Download PDF${selectedCount > 1 ? "s" : ""}`}
+              side="bottom"
             >
-              <Download className="h-4 w-4" />
-            </Button>
+              <Button
+                variant="outline"
+                title={`Download PDF${selectedCount > 1 ? "s" : ""}`}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </TooltipWrapper>
 
             {/* edit icon */}
             {selectedCount === 1 && (
-              <Button
-                variant="outline"
-                title={`Edit${selectedCount > 1 ? "s" : ""}`}
-              >
-                <PencilIcon className="h-4 w-4" />
-              </Button>
+              <TooltipWrapper tooltip="Edit Quote" side="bottom">
+                <Button variant="outline">
+                  <PencilIcon className="h-4 w-4" />
+                </Button>
+              </TooltipWrapper>
             )}
           </>
         )}
@@ -171,30 +170,6 @@ export function DataTableToolbar<TData>({
           </Link>
         </Button>
       </div>
-      {/* <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="ml-auto">
-            Columns <ChevronDown />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {table
-            .getAllColumns()
-            .filter((column) => column.getCanHide())
-            .map((column) => {
-              return (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.columnDef.meta?.label || column.id}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-        </DropdownMenuContent>
-      </DropdownMenu> */}
     </div>
   );
 }

@@ -9,9 +9,21 @@ import { QuoteSettingsSection } from "./components/QuoteSettingsSection";
 import { InvoiceSettingsSection } from "./components/InvoiceSettingsSection";
 import { TemplateSelectionSection } from "./components/TemplateSelectionSection";
 import { SettingsNavigationSidebar } from "./components/SettingsNavigationSidebar";
-import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/lib/toast";
+import {
+  getUserSettings,
+  saveBusinessProfile,
+  saveBrandSettings,
+  saveFinancialSettings,
+  saveQuoteSettings,
+  saveInvoiceSettings,
+  saveTemplateSettings,
+} from "@/lib/actions/settings";
+import type { ValidationError } from "@/lib/validation";
 
 export default function Settings() {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [brandColor, setBrandColor] = useState("#000000");
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -20,6 +32,26 @@ export default function Settings() {
   const [showFinancialSettings, setShowFinancialSettings] = useState(false);
   const [removeQuotePoweredBy, setRemoveQuotePoweredBy] = useState(false);
   const [removeInvoicePoweredBy, setRemoveInvoicePoweredBy] = useState(false);
+
+  // Store loaded data for form initialization
+  const [initialData, setInitialData] = useState<{
+    businessProfile?: any;
+    userSettings?: any;
+  }>({});
+
+  console.log("userId", userId);
+  console.log("initialData", initialData);
+
+  // Validation errors state for each section
+  // Edit Validation errors in lib/validation/schemas/settings.ts
+  const [validationErrors, setValidationErrors] = useState<{
+    businessProfile?: ValidationError[];
+    brandSettings?: ValidationError[];
+    financialSettings?: ValidationError[];
+    quoteSettings?: ValidationError[];
+    invoiceSettings?: ValidationError[];
+    templateSettings?: ValidationError[];
+  }>({});
 
   // Track unsaved changes for each section
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState({
@@ -46,6 +78,63 @@ export default function Settings() {
   });
 
   const templates = getAllTemplates();
+
+  // Load user data on mount
+  useEffect(() => {
+    async function loadUserData() {
+      try {
+        // TODO: Replace with actual user session from authentication
+        // TODO: CHECK that loading.tsx is working while waiting for the data to load
+        // Hardcoded user ID for development (Zack Viljoen)
+        const hardcodedUserId = "cmgexy4630002r7qfecfve8hq";
+        setUserId(hardcodedUserId);
+
+        // Fetch user settings
+        const result = await getUserSettings(hardcodedUserId);
+
+        if (result.success && result.data) {
+          const { businessProfile, userSettings } = result.data;
+          setInitialData({ businessProfile, userSettings });
+
+          // Populate form fields with loaded data
+          if (businessProfile) {
+            if (businessProfile.logo) {
+              setLogoPreview(businessProfile.logo);
+            }
+            if (businessProfile.brandColor) {
+              setBrandColor(businessProfile.brandColor);
+            }
+          }
+
+          if (userSettings) {
+            if (userSettings.selectedTemplateId) {
+              setSelectedTemplate(userSettings.selectedTemplateId);
+            }
+            // Check if bank details exist to determine if they should be shown
+            if (
+              userSettings.bankName ||
+              userSettings.accountName ||
+              userSettings.accountNumber
+            ) {
+              setShowBankDetails(true);
+            }
+            // Check if tax rate is set to determine if tax settings should be shown
+            if (
+              userSettings.defaultTaxRate &&
+              parseFloat(userSettings.defaultTaxRate.toString()) > 0
+            ) {
+              setShowFinancialSettings(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        toast.error("Failed to load settings");
+      }
+    }
+
+    loadUserData();
+  }, []);
 
   // Mark section as having unsaved changes
   const markSectionChanged = (section: keyof typeof hasUnsavedChanges) => {
@@ -77,15 +166,32 @@ export default function Settings() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!userId) {
+      toast.error("User not loaded");
+      return;
+    }
     setIsSaving((prev) => ({ ...prev, businessProfile: true }));
+    setValidationErrors((prev) => ({ ...prev, businessProfile: undefined }));
+
     try {
-      // TODO: Implement save logic
-      // await saveBusinessProfile(formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("businessProfile");
-      alert("Business Profile saved successfully!");
+      const formData = new FormData(e.currentTarget);
+      const result = await saveBusinessProfile(userId, formData);
+
+      if (result.success) {
+        clearSectionChanges("businessProfile");
+        toast.success("Business Profile saved successfully!");
+      } else {
+        if (result.errors) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            businessProfile: result.errors,
+          }));
+        }
+        toast.error("Validation failed");
+      }
     } catch (error) {
-      alert("Failed to save Business Profile");
+      console.error("Error saving business profile:", error);
+      toast.error("Failed to save Business Profile");
     } finally {
       setIsSaving((prev) => ({ ...prev, businessProfile: false }));
     }
@@ -95,15 +201,35 @@ export default function Settings() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!userId) {
+      toast.error("User not loaded");
+      return;
+    }
     setIsSaving((prev) => ({ ...prev, brandSettings: true }));
+    setValidationErrors((prev) => ({ ...prev, brandSettings: undefined }));
+
     try {
-      // TODO: Implement save logic
-      // await saveBrandSettings({ logo, brandColor });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("brandSettings");
-      alert("Brand Settings saved successfully!");
+      const formData = new FormData(e.currentTarget);
+      if (logoFile) {
+        formData.set("logo", logoFile);
+      }
+      const result = await saveBrandSettings(userId, formData);
+
+      if (result.success) {
+        clearSectionChanges("brandSettings");
+        toast.success("Brand Settings saved successfully!");
+      } else {
+        if (result.errors) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            brandSettings: result.errors,
+          }));
+        }
+        toast.error("Validation failed");
+      }
     } catch (error) {
-      alert("Failed to save Brand Settings");
+      console.error("Error saving brand settings:", error);
+      toast.error("Failed to save Brand Settings");
     } finally {
       setIsSaving((prev) => ({ ...prev, brandSettings: false }));
     }
@@ -113,15 +239,36 @@ export default function Settings() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!userId) {
+      toast.error("User not loaded");
+      return;
+    }
     setIsSaving((prev) => ({ ...prev, financialSettings: true }));
+    setValidationErrors((prev) => ({ ...prev, financialSettings: undefined }));
+
     try {
-      // TODO: Implement save logic
-      // await saveFinancialSettings(formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("financialSettings");
-      alert("Financial Settings saved successfully!");
+      const formData = new FormData(e.currentTarget);
+      const result = await saveFinancialSettings(
+        userId,
+        formData,
+        showFinancialSettings
+      );
+
+      if (result.success) {
+        clearSectionChanges("financialSettings");
+        toast.success("Financial Settings saved successfully!");
+      } else {
+        if (result.errors) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            financialSettings: result.errors,
+          }));
+        }
+        toast.error("Validation failed");
+      }
     } catch (error) {
-      alert("Failed to save Financial Settings");
+      console.error("Error saving financial settings:", error);
+      toast.error("Failed to save Financial Settings");
     } finally {
       setIsSaving((prev) => ({ ...prev, financialSettings: false }));
     }
@@ -131,15 +278,32 @@ export default function Settings() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!userId) {
+      toast.error("User not loaded");
+      return;
+    }
     setIsSaving((prev) => ({ ...prev, quoteSettings: true }));
+    setValidationErrors((prev) => ({ ...prev, quoteSettings: undefined }));
+
     try {
-      // TODO: Implement save logic
-      // await saveQuoteSettings(formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("quoteSettings");
-      alert("Quote Settings saved successfully!");
+      const formData = new FormData(e.currentTarget);
+      const result = await saveQuoteSettings(userId, formData);
+
+      if (result.success) {
+        clearSectionChanges("quoteSettings");
+        toast.success("Quote Settings saved successfully!");
+      } else {
+        if (result.errors) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            quoteSettings: result.errors,
+          }));
+        }
+        toast.error("Validation failed");
+      }
     } catch (error) {
-      alert("Failed to save Quote Settings");
+      console.error("Error saving quote settings:", error);
+      toast.error("Failed to save Quote Settings");
     } finally {
       setIsSaving((prev) => ({ ...prev, quoteSettings: false }));
     }
@@ -149,15 +313,36 @@ export default function Settings() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!userId) {
+      toast.error("User not loaded");
+      return;
+    }
     setIsSaving((prev) => ({ ...prev, invoiceSettings: true }));
+    setValidationErrors((prev) => ({ ...prev, invoiceSettings: undefined }));
+
     try {
-      // TODO: Implement save logic
-      // await saveInvoiceSettings(formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("invoiceSettings");
-      alert("Invoice Settings saved successfully!");
+      const formData = new FormData(e.currentTarget);
+      const result = await saveInvoiceSettings(
+        userId,
+        formData,
+        showBankDetails
+      );
+
+      if (result.success) {
+        clearSectionChanges("invoiceSettings");
+        toast.success("Invoice Settings saved successfully!");
+      } else {
+        if (result.errors) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            invoiceSettings: result.errors,
+          }));
+        }
+        toast.error("Validation failed");
+      }
     } catch (error) {
-      alert("Failed to save Invoice Settings");
+      console.error("Error saving invoice settings:", error);
+      toast.error("Failed to save Invoice Settings");
     } finally {
       setIsSaving((prev) => ({ ...prev, invoiceSettings: false }));
     }
@@ -167,15 +352,33 @@ export default function Settings() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!userId) {
+      toast.error("User not loaded");
+      return;
+    }
     setIsSaving((prev) => ({ ...prev, templateSettings: true }));
+    setValidationErrors((prev) => ({ ...prev, templateSettings: undefined }));
+
     try {
-      // TODO: Implement save logic
-      // await saveTemplateSettings({ selectedTemplateId: selectedTemplate });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      clearSectionChanges("templateSettings");
-      alert("Template Selection saved successfully!");
+      const formData = new FormData(e.currentTarget);
+      formData.set("selectedTemplateId", selectedTemplate);
+      const result = await saveTemplateSettings(userId, formData);
+
+      if (result.success) {
+        clearSectionChanges("templateSettings");
+        toast.success("Template Selection saved successfully!");
+      } else {
+        if (result.errors) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            templateSettings: result.errors,
+          }));
+        }
+        toast.error("Validation failed");
+      }
     } catch (error) {
-      alert("Failed to save Template Selection");
+      console.error("Error saving template settings:", error);
+      toast.error("Failed to save Template Selection");
     } finally {
       setIsSaving((prev) => ({ ...prev, templateSettings: false }));
     }
@@ -188,22 +391,32 @@ export default function Settings() {
         {/* Settings Cards - Left Side */}
         <div className="flex-1 space-y-8 max-w-[820px] order-2 md:order-1">
           <BusinessProfileSection
+            key={`business-${initialData.businessProfile?.id || "empty"}`}
             isSaving={isSaving.businessProfile}
             hasUnsavedChanges={hasUnsavedChanges.businessProfile}
             onSave={handleSaveBusinessProfile}
             onMarkChanged={() => markSectionChanged("businessProfile")}
+            validationErrors={validationErrors.businessProfile}
+            initialData={initialData.businessProfile}
           />
 
           <FinancialSettingsSection
+            key={`financial-${initialData.userSettings?.id || "empty"}`}
             isSaving={isSaving.financialSettings}
             hasUnsavedChanges={hasUnsavedChanges.financialSettings}
             onSave={handleSaveFinancialSettings}
             onMarkChanged={() => markSectionChanged("financialSettings")}
             showFinancialSettings={showFinancialSettings}
             setShowFinancialSettings={setShowFinancialSettings}
+            validationErrors={validationErrors.financialSettings}
+            initialData={{
+              businessProfile: initialData.businessProfile,
+              userSettings: initialData.userSettings,
+            }}
           />
 
           <BrandSettingsSection
+            key={`brand-${initialData.userSettings?.id || "empty"}`}
             isSaving={isSaving.brandSettings}
             hasUnsavedChanges={hasUnsavedChanges.brandSettings}
             onSave={handleSaveBrandSettings}
@@ -213,18 +426,24 @@ export default function Settings() {
             logoPreview={logoPreview}
             onLogoSelect={handleLogoSelect}
             onLogoRemove={handleRemoveLogo}
+            validationErrors={validationErrors.brandSettings}
+            initialData={initialData.userSettings}
           />
 
           <QuoteSettingsSection
+            key={`quote-${initialData.userSettings?.id || "empty"}`}
             isSaving={isSaving.quoteSettings}
             hasUnsavedChanges={hasUnsavedChanges.quoteSettings}
             onSave={handleSaveQuoteSettings}
             onMarkChanged={() => markSectionChanged("quoteSettings")}
             removeQuotePoweredBy={removeQuotePoweredBy}
             setRemoveQuotePoweredBy={setRemoveQuotePoweredBy}
+            validationErrors={validationErrors.quoteSettings}
+            initialData={initialData.userSettings}
           />
 
           <InvoiceSettingsSection
+            key={`invoice-${initialData.userSettings?.id || "empty"}`}
             isSaving={isSaving.invoiceSettings}
             hasUnsavedChanges={hasUnsavedChanges.invoiceSettings}
             onSave={handleSaveInvoiceSettings}
@@ -233,9 +452,15 @@ export default function Settings() {
             setShowBankDetails={setShowBankDetails}
             removeInvoicePoweredBy={removeInvoicePoweredBy}
             setRemoveInvoicePoweredBy={setRemoveInvoicePoweredBy}
+            validationErrors={validationErrors.invoiceSettings}
+            initialData={{
+              businessProfile: initialData.businessProfile,
+              userSettings: initialData.userSettings,
+            }}
           />
 
           <TemplateSelectionSection
+            key={`template-${initialData.userSettings?.id || "empty"}`}
             isSaving={isSaving.templateSettings}
             hasUnsavedChanges={hasUnsavedChanges.templateSettings}
             onSave={handleSaveTemplateSettings}
@@ -243,6 +468,8 @@ export default function Settings() {
             selectedTemplate={selectedTemplate}
             setSelectedTemplate={setSelectedTemplate}
             templates={templates}
+            validationErrors={validationErrors.templateSettings}
+            initialData={initialData.userSettings}
           />
         </div>
 

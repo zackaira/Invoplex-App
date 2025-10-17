@@ -7,6 +7,11 @@ import { ClientSelect } from "../../modals/clients";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDocumentHeader } from "../../hooks";
+import {
+  ClientLogoDisplay,
+  BusinessInfoDisplay,
+  ClientInfoDisplay,
+} from "../../shared";
 
 export function ClassicHeader({
   document,
@@ -16,6 +21,7 @@ export function ClassicHeader({
   onOpenProjectModal,
   onOpenClientModal,
   onOpenBusinessInfoModal,
+  onOpenClientInfoModal,
   businessInfoVisibility = {
     businessName: true,
     personalName: false,
@@ -24,6 +30,12 @@ export function ClassicHeader({
     website: true,
     taxId: false,
     address: false,
+  },
+  clientInfoVisibility = {
+    name: true,
+    contact: true,
+    address: true,
+    email: true,
   },
   businessSettings,
 }: TemplateHeaderProps) {
@@ -41,22 +53,7 @@ export function ClassicHeader({
     <div className="border-b border-gray-200 pb-6">
       <div className="flex justify-between items-center mb-16">
         {/* Company Logo or Business Name */}
-        <div className="flex-shrink-0">
-          {businessSettings?.logo ? (
-            <img
-              src={businessSettings.logo}
-              alt={businessSettings.businessName}
-              className="w-32 h-32 object-contain"
-            />
-          ) : (
-            <h2
-              className="text-3xl font-bold"
-              style={{ color: businessSettings?.brandColor || "#000000" }}
-            >
-              {businessSettings?.businessName || "Your Business"}
-            </h2>
-          )}
-        </div>
+        <ClientLogoDisplay businessSettings={businessSettings} />
 
         {/* Title and Document Info */}
         <div className="text-right">
@@ -100,48 +97,10 @@ export function ClassicHeader({
             )}
           </div>
           <div className="text-gray-900">
-            {businessInfoVisibility.businessName &&
-              businessSettings?.businessName && (
-                <p className="font-semibold">{businessSettings.businessName}</p>
-              )}
-            {businessInfoVisibility.personalName &&
-              businessSettings?.personalName && (
-                <p className="text-sm text-gray-700 mt-1">
-                  {businessSettings.personalName}
-                </p>
-              )}
-            <div className="text-sm text-gray-600 mt-1">
-              {businessInfoVisibility.email && businessSettings?.email && (
-                <p>{businessSettings.email}</p>
-              )}
-              {businessInfoVisibility.phone && businessSettings?.phone && (
-                <p>{businessSettings.phone}</p>
-              )}
-              {businessInfoVisibility.website && businessSettings?.website && (
-                <p>{businessSettings.website}</p>
-              )}
-              {businessInfoVisibility.taxId && businessSettings?.taxId && (
-                <p>Tax ID: {businessSettings.taxId}</p>
-              )}
-              {businessInfoVisibility.address && businessSettings?.address && (
-                <>
-                  <p>{businessSettings.address}</p>
-                  {(businessSettings.city ||
-                    businessSettings.state ||
-                    businessSettings.zipCode) && (
-                    <p>
-                      {[
-                        businessSettings.city,
-                        businessSettings.state,
-                        businessSettings.zipCode,
-                      ]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
+            <BusinessInfoDisplay
+              businessSettings={businessSettings}
+              businessInfoVisibility={businessInfoVisibility}
+            />
           </div>
         </div>
 
@@ -152,39 +111,30 @@ export function ClassicHeader({
               {type === "QUOTE" ? "Quote For" : "Bill To"}
             </h3>
             {isEditable && (
-              <ClientSelect
-                value={selectedClientId}
-                onChange={handleClientChange}
-                onCreateNew={onOpenClientModal}
-                className="text-xs h-6 !text-gray-600 hover:!bg-gray-100 hover:!text-gray-900"
-                align="center"
-              />
+              <>
+                <ClientSelect
+                  value={selectedClientId}
+                  onChange={handleClientChange}
+                  onCreateNew={onOpenClientModal}
+                  className="text-xs h-6 !text-gray-600 hover:!bg-gray-100 hover:!text-gray-900"
+                  align="center"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 !text-invoplex hover:!bg-gray-100 hover:!text-gray-900"
+                  onClick={onOpenClientInfoModal}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </>
             )}
           </div>
           <div className="text-gray-900">
-            <p className="font-semibold">{displayClient.name}</p>
-            {"contact" in displayClient && displayClient.contact && (
-              <p className="text-sm text-gray-700 mt-1">
-                Attn: {displayClient.contact}
-              </p>
-            )}
-            <div className="text-sm text-gray-600 mt-1">
-              {displayClient.address && <p>{displayClient.address}</p>}
-              {(displayClient.city ||
-                displayClient.state ||
-                displayClient.zipCode) && (
-                <p>
-                  {[
-                    displayClient.city,
-                    displayClient.state,
-                    displayClient.zipCode,
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                </p>
-              )}
-              {displayClient.email && <p>{displayClient.email}</p>}
-            </div>
+            <ClientInfoDisplay
+              client={displayClient}
+              visibility={clientInfoVisibility}
+            />
           </div>
         </div>
       </div>

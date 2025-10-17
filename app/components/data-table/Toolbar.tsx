@@ -9,7 +9,6 @@ import {
   PencilIcon,
   PlusIcon,
   Trash,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -64,10 +63,6 @@ export function DataTableToolbar<TData>({
     onStatusChange?.(newStatuses);
   };
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-
-  const clearStatusFilters = () => {
-    onStatusChange?.([]);
-  };
 
   const dateFilterOptions = React.useMemo(() => {
     return getDateFilterOptions(fiscalYearSettings);

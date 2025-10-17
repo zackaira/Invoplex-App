@@ -66,6 +66,24 @@ export interface BusinessInfoVisibility {
 }
 
 /**
+ * Controls which client information fields are visible in templates
+ *
+ * This interface allows users to customize which client details appear
+ * in the document header (e.g., show email but hide contact).
+ *
+ * Used by:
+ * - TemplateHeaderProps
+ * - ClientInfoVisibilityModal
+ * - ClientInfoDisplay component
+ */
+export interface ClientInfoVisibility {
+  name: boolean;
+  contact: boolean;
+  address: boolean;
+  email: boolean;
+}
+
+/**
  * Business settings from the database
  *
  * This interface contains the actual business profile data including
@@ -121,7 +139,9 @@ export interface TemplateProps {
   onOpenProjectModal?: () => void;
   onOpenClientModal?: () => void;
   onOpenBusinessInfoModal?: () => void;
+  onOpenClientInfoModal?: () => void;
   businessInfoVisibility?: BusinessInfoVisibility;
+  clientInfoVisibility?: ClientInfoVisibility;
   businessSettings?: BusinessSettings;
 }
 
@@ -144,7 +164,9 @@ export interface TemplateHeaderProps {
   onOpenProjectModal?: () => void;
   onOpenClientModal?: () => void;
   onOpenBusinessInfoModal?: () => void;
+  onOpenClientInfoModal?: () => void;
   businessInfoVisibility?: BusinessInfoVisibility;
+  clientInfoVisibility?: ClientInfoVisibility;
   businessSettings?: BusinessSettings;
 }
 

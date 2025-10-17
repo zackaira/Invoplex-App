@@ -6,7 +6,7 @@
  * The main orchestrator for document rendering. This component handles:
  * - Loading and rendering the selected template
  * - Managing document edit/view mode
- * - Coordinating all modals (projects, clients, business info)
+ * - Coordinating all modals (projects, clients, business info, client info)
  * - Managing document state and updates
  *
  * This is the primary entry point for displaying documents (quotes/invoices)
@@ -22,6 +22,8 @@ import { useState } from "react";
 import {
   DocumentWithRelations,
   BusinessSettings,
+  BusinessInfoVisibility,
+  ClientInfoVisibility,
 } from "@/app/components/documents/types";
 import { getTemplate } from "@/app/components/documents/registry";
 import { DocumentViewBar } from "./bars/ViewBar";
@@ -30,8 +32,8 @@ import { CreateProjectModal } from "./modals/projects";
 import { AddClientModal } from "./modals/clients";
 import {
   BusinessInfoVisibilityModal,
-  BusinessInfoVisibility,
-} from "./modals/BusinessInfoVisibilityModal";
+  ClientInfoVisibilityModal,
+} from "./modals";
 
 /**
  * TemplateRenderer Component
@@ -45,7 +47,7 @@ import {
  * @param isEditable - Whether the document is in edit mode
  * @param onUpdate - Callback when document data changes
  * @param onTemplateChange - Callback when template is switched
- * @param businessSettings - Business profile settings (name, logo, brandColor)
+ * @param businessSettings - Business profile settings (name, logo, brandColor, etc.)
  */
 export function TemplateRenderer({
   document,
@@ -81,6 +83,9 @@ export function TemplateRenderer({
   // Controls whether the business info visibility modal is open
   const [isBusinessInfoModalOpen, setIsBusinessInfoModalOpen] = useState(false);
 
+  // Controls whether the client info visibility modal is open
+  const [isClientInfoModalOpen, setIsClientInfoModalOpen] = useState(false);
+
   // =========================================================================
   // BUSINESS INFO VISIBILITY STATE
   // =========================================================================
@@ -96,6 +101,20 @@ export function TemplateRenderer({
       website: true,
       taxId: false,
       address: false,
+    });
+
+  // =========================================================================
+  // CLIENT INFO VISIBILITY STATE
+  // =========================================================================
+
+  // Controls which client information fields are visible in the template
+  // Users can customize this through the ClientInfoVisibilityModal
+  const [clientInfoVisibility, setClientInfoVisibility] =
+    useState<ClientInfoVisibility>({
+      name: true,
+      contact: true,
+      address: true,
+      email: true,
     });
 
   // =========================================================================
@@ -157,7 +176,9 @@ export function TemplateRenderer({
             onOpenProjectModal={() => setIsProjectModalOpen(true)}
             onOpenClientModal={() => setIsClientModalOpen(true)}
             onOpenBusinessInfoModal={() => setIsBusinessInfoModalOpen(true)}
+            onOpenClientInfoModal={() => setIsClientInfoModalOpen(true)}
             businessInfoVisibility={businessInfoVisibility}
+            clientInfoVisibility={clientInfoVisibility}
             businessSettings={businessSettings}
           />
         </div>
@@ -182,6 +203,13 @@ export function TemplateRenderer({
         onOpenChange={setIsBusinessInfoModalOpen}
         visibility={businessInfoVisibility}
         onVisibilityChange={setBusinessInfoVisibility}
+      />
+
+      <ClientInfoVisibilityModal
+        open={isClientInfoModalOpen}
+        onOpenChange={setIsClientInfoModalOpen}
+        visibility={clientInfoVisibility}
+        onVisibilityChange={setClientInfoVisibility}
       />
     </>
   );

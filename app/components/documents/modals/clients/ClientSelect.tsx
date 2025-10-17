@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, PencilIcon, Plus } from "lucide-react";
+import { Check, Users, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -94,7 +94,7 @@ export function ClientSelect({
           className={cn("h-6 w-6", className)}
         >
           <span className="!text-invoplex">
-            <PencilIcon className="h-4 w-4" />
+            <Users className="h-4 w-4" />
           </span>
         </Button>
       </PopoverTrigger>

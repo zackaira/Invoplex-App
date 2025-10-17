@@ -7,6 +7,7 @@
  *
  * Modals include:
  * - BusinessInfoVisibilityModal: Control which business info fields are visible
+ * - ClientInfoVisibilityModal: Control which client info fields are visible
  * - Client modals: Add/edit clients
  * - Project modals: Create/manage projects
  *
@@ -15,6 +16,9 @@
 
 export { BusinessInfoVisibilityModal } from "./BusinessInfoVisibilityModal";
 // Note: BusinessInfoVisibility type is exported from ../types.ts
+
+export { ClientInfoVisibilityModal } from "./ClientInfoVisibilityModal";
+// Note: ClientInfoVisibility type is exported from ../types.ts
 
 export { AddClientModal, ClientSelect } from "./clients";
 export { CreateProjectModal, ProjectSelect } from "./projects";

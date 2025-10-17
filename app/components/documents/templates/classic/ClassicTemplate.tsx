@@ -13,7 +13,9 @@ export function ClassicTemplate({
   onOpenProjectModal,
   onOpenClientModal,
   onOpenBusinessInfoModal,
+  onOpenClientInfoModal,
   businessInfoVisibility,
+  clientInfoVisibility,
   businessSettings,
 }: TemplateProps) {
   return (
@@ -26,7 +28,9 @@ export function ClassicTemplate({
         onOpenProjectModal={onOpenProjectModal}
         onOpenClientModal={onOpenClientModal}
         onOpenBusinessInfoModal={onOpenBusinessInfoModal}
+        onOpenClientInfoModal={onOpenClientInfoModal}
         businessInfoVisibility={businessInfoVisibility}
+        clientInfoVisibility={clientInfoVisibility}
         businessSettings={businessSettings}
       />
 

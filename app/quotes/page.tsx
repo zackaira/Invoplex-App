@@ -1,4 +1,4 @@
-import { getQuotesByUserId } from "@/lib/actions";
+import { getQuotesByUserId, getUserSettings } from "@/lib/actions";
 import { DataTable } from "@/components/ui/data-table";
 import type { StatusFilterOption } from "@/components/ui/data-table";
 import { columns } from "./columns";
@@ -13,7 +13,12 @@ const quoteStatusOptions: StatusFilterOption[] = [
 
 export default async function Quotes() {
   // TODO: Replace with actual user ID from authentication
-  const quotes = await getQuotesByUserId("cmgexy4630002r7qfecfve8hq");
+  const userId = "cmgexy4630002r7qfecfve8hq";
+
+  const [quotes, userSettings] = await Promise.all([
+    getQuotesByUserId(userId),
+    getUserSettings(userId),
+  ]);
 
   // Transform the data to match our Quote type
   const transformedQuotes = quotes.map((quote) => ({
@@ -37,6 +42,15 @@ export default async function Quotes() {
         filterPlaceholder="Filter by client name..."
         statusFilterColumn="status"
         statusFilterOptions={quoteStatusOptions}
+        dateFilterColumn="createdAt"
+        fiscalYearSettings={
+          userSettings
+            ? {
+                fiscalYearStartMonth: userSettings.fiscalYearStartMonth,
+                fiscalYearStartDay: userSettings.fiscalYearStartDay,
+              }
+            : undefined
+        }
       />
     </div>
   );

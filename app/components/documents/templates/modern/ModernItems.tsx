@@ -1,6 +1,6 @@
 "use client";
 
-import { TemplateItemsProps } from "../types";
+import { TemplateItemsProps } from "../../types";
 import { BaseItemsTable, ItemsTableStyles } from "../../items/BaseTable";
 
 /**

@@ -3,6 +3,7 @@
 import { ModeToggle } from "@/app/components/layout/top-nav/ModeToggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
+import { AppNotifications } from "./AppNotifications";
 
 function getPageTitle(pathname: string): string {
   // Remove trailing slash if present
@@ -62,7 +63,9 @@ export default function TopNav() {
       <h1 className="flex items-center gap-6 flex-1">{pageTitle}</h1>
 
       {/* Right side - User avatar */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
+        <AppNotifications />
+
         <ModeToggle />
       </div>
     </header>

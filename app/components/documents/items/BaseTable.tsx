@@ -1,6 +1,6 @@
 "use client";
 
-import { DocumentWithRelations } from "../templates/types";
+import { DocumentWithRelations } from "../types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,9 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Save } from "lucide-react";
 import { DocumentItemsTable } from "./ItemsTable";
-import { useDocumentItems } from "./hooks/useDocumentItems";
 import { ProductSelect } from "./ProductSelect";
 import { SaveItemModal } from "./SaveItemModal";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 import { useItemsManager } from "./hooks/useItemsManager";
 
 /**
@@ -59,20 +59,21 @@ export function BaseItemsTable({
   onUpdate,
   styles,
 }: BaseItemsTableProps) {
-  const { addItem } = useDocumentItems(document, onUpdate);
   const {
     saveModalOpen,
     setSaveModalOpen,
     modalMode,
     selectedItem,
     hasAnyQuantityColumn,
+    saveConfirmOpen,
+    setSaveConfirmOpen,
     handleSelectProduct,
     handleOpenSaveModal,
+    handleConfirmSave,
     handleHasQuantityColumnChange,
-    handleOpenNewTypeModal,
+    handleOpenAddModal,
     handleSaveItem,
-    handleCreateBlankProduct,
-    handleCreateBlankService,
+    handleDeleteItem,
   } = useItemsManager(document, onUpdate);
 
   const gridCols = hasAnyQuantityColumn
@@ -121,8 +122,6 @@ export function BaseItemsTable({
                           handleOpenSaveModal(
                             item.id,
                             item.itemType || "Product",
-                            item.description,
-                            item.unitPrice.toString(),
                             item.hasQuantityColumn ?? false
                           )
                         }
@@ -205,7 +204,7 @@ export function BaseItemsTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={onRemove}
+                        onClick={() => handleDeleteItem(item.id)}
                         className="h-8 w-8 text-gray-900 bg-transparent! hover:text-red-600"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -223,10 +222,7 @@ export function BaseItemsTable({
           <div className={styles.footerClassName}>
             <ProductSelect
               onSelect={handleSelectProduct}
-              onCreateNew={addItem}
-              onCreateBlankProduct={handleCreateBlankProduct}
-              onCreateBlankService={handleCreateBlankService}
-              onOpenNewTypeModal={handleOpenNewTypeModal}
+              onOpenAddModal={handleOpenAddModal}
               trigger={
                 <Button
                   variant="outline"
@@ -250,10 +246,18 @@ export function BaseItemsTable({
         mode={modalMode}
         onHasQuantityColumnChange={handleHasQuantityColumnChange}
         initialType={selectedItem?.type || ""}
-        initialDescription={selectedItem?.description || ""}
-        initialUnitPrice={selectedItem?.unitPrice || "0"}
         initialHasQuantityColumn={selectedItem?.hasQuantityColumn ?? false}
-        currency={document.currency}
+      />
+
+      {/* Save Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={saveConfirmOpen}
+        onClose={() => setSaveConfirmOpen(false)}
+        onConfirm={handleConfirmSave}
+        title="Save Item to Database"
+        description="Do you want to save this item to the database for future use?"
+        confirmText="Save Item"
+        cancelText="Cancel"
       />
     </>
   );

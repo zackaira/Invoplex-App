@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllTemplates } from "@/app/components/documents/templates/registry";
+import { getAllTemplates } from "@/app/components/documents/registry";
 import { BusinessProfileSection } from "./components/BusinessProfileSection";
 import { BrandSettingsSection } from "./components/BrandSettingsSection";
 import { FinancialSettingsSection } from "./components/FinancialSettingsSection";
@@ -9,6 +9,7 @@ import { QuoteSettingsSection } from "./components/QuoteSettingsSection";
 import { InvoiceSettingsSection } from "./components/InvoiceSettingsSection";
 import { TemplateSelectionSection } from "./components/TemplateSelectionSection";
 import { SettingsNavigationSidebar } from "./components/SettingsNavigationSidebar";
+import { SettingsLoading } from "./loading";
 import { toast } from "@/lib/toast";
 import {
   getUserSettings,
@@ -84,7 +85,6 @@ export default function Settings() {
     async function loadUserData() {
       try {
         // TODO: Replace with actual user session from authentication
-        // TODO: CHECK that loading.tsx is working while waiting for the data to load
         // Hardcoded user ID for development (Zack Viljoen)
         const hardcodedUserId = "cmgexy4630002r7qfecfve8hq";
         setUserId(hardcodedUserId);
@@ -130,6 +130,8 @@ export default function Settings() {
       } catch (error) {
         console.error("Error loading user data:", error);
         toast.error("Failed to load settings");
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -383,6 +385,11 @@ export default function Settings() {
       setIsSaving((prev) => ({ ...prev, templateSettings: false }));
     }
   };
+
+  // Show loading state while data is being fetched
+  if (isLoading) {
+    return <SettingsLoading />;
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">

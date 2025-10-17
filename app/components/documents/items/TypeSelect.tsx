@@ -64,10 +64,10 @@ export function TypeSelect({ value, onChange, className }: TypeSelectProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[320px] p-0" align="center">
+      <PopoverContent className="w-[340px] p-0" align="center">
         <Command>
           <CommandInput
-            placeholder="Search or add type..."
+            placeholder="Search or Enter a New Type..."
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 const input = e.currentTarget.value;

@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function SettingsLoading() {
+export function SettingsLoading() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Two Column Layout */}
@@ -113,3 +113,5 @@ export default function SettingsLoading() {
     </div>
   );
 }
+
+export default SettingsLoading;

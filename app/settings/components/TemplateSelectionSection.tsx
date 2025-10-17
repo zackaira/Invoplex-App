@@ -1,7 +1,7 @@
 import { Palette } from "lucide-react";
 import { SettingsSection } from "@/app/components/settings";
 import { TemplateCarousel } from "./TemplateCarousel";
-import type { Template } from "@/app/components/documents/templates/types";
+import type { Template } from "@/app/components/documents/types";
 import type { ValidationError } from "@/lib/validation";
 
 interface TemplateSelectionSectionProps {

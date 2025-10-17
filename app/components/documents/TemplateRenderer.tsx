@@ -1,17 +1,48 @@
+/**
+ * ============================================================================
+ * TEMPLATE RENDERER
+ * ============================================================================
+ *
+ * The main orchestrator for document rendering. This component handles:
+ * - Loading and rendering the selected template
+ * - Managing document edit/view mode
+ * - Coordinating all modals (projects, clients, business info)
+ * - Managing document state and updates
+ *
+ * This is the primary entry point for displaying documents (quotes/invoices)
+ * in the application.
+ *
+ * Location: /app/components/documents/TemplateRenderer.tsx
+ * Used by: Quote pages, invoice pages, document preview pages
+ */
+
 "use client";
 
 import { useState } from "react";
-import { DocumentWithRelations } from "@/app/components/documents/templates/types";
-import { getTemplate } from "@/app/components/documents/templates/registry";
-import { DocumentViewBar } from "./ViewBar";
-import { DocumentEditBar } from "./EditBar";
-import { CreateProjectModal } from "./projects";
-import { AddClientModal } from "./clients";
+import { DocumentWithRelations } from "@/app/components/documents/types";
+import { getTemplate } from "@/app/components/documents/registry";
+import { DocumentViewBar } from "./bars/ViewBar";
+import { DocumentEditBar } from "./bars/EditBar";
+import { CreateProjectModal } from "./modals/projects";
+import { AddClientModal } from "./modals/clients";
 import {
   BusinessInfoVisibilityModal,
   BusinessInfoVisibility,
-} from "./BusinessInfoVisibilityModal";
+} from "./modals/BusinessInfoVisibilityModal";
 
+/**
+ * TemplateRenderer Component
+ *
+ * Renders a document using the specified template and manages all document-related
+ * interactions and modals.
+ *
+ * @param document - The document data to render
+ * @param type - Whether this is a QUOTE or INVOICE
+ * @param templateId - The template to use (defaults to "classic")
+ * @param isEditable - Whether the document is in edit mode
+ * @param onUpdate - Callback when document data changes
+ * @param onTemplateChange - Callback when template is switched
+ */
 export function TemplateRenderer({
   document,
   type,
@@ -27,15 +58,29 @@ export function TemplateRenderer({
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
   onTemplateChange?: (templateId: string) => void;
 }) {
+  // Load the selected template from the registry
   const template = getTemplate(templateId);
   const TemplateComponent = template.component;
 
-  // Modal states
+  // =========================================================================
+  // MODAL STATE MANAGEMENT
+  // =========================================================================
+
+  // Controls whether the project creation modal is open
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
+  // Controls whether the client creation modal is open
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+
+  // Controls whether the business info visibility modal is open
   const [isBusinessInfoModalOpen, setIsBusinessInfoModalOpen] = useState(false);
 
-  // Business info visibility state
+  // =========================================================================
+  // BUSINESS INFO VISIBILITY STATE
+  // =========================================================================
+
+  // Controls which business information fields are visible in the template
+  // Users can customize this through the BusinessInfoVisibilityModal
   const [businessInfoVisibility, setBusinessInfoVisibility] =
     useState<BusinessInfoVisibility>({
       businessName: true,
@@ -47,7 +92,14 @@ export function TemplateRenderer({
       address: false,
     });
 
-  // Handlers
+  // =========================================================================
+  // MODAL HANDLERS
+  // =========================================================================
+
+  /**
+   * Handles project creation
+   * TODO: Integrate with backend API once ready
+   */
   const handleCreateProject = (project: {
     title: string;
     description: string;
@@ -58,6 +110,10 @@ export function TemplateRenderer({
     // After creation, set the new project as selected
   };
 
+  /**
+   * Handles client creation
+   * TODO: Integrate with backend API once ready
+   */
   const handleAddClient = (client: {
     company: string;
     contactName: string;

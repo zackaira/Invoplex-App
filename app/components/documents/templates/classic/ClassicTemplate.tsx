@@ -1,6 +1,6 @@
 "use client";
 
-import { TemplateProps } from "../types";
+import { TemplateProps } from "../../types";
 import { ClassicHeader } from "./ClassicHeader";
 import { ClassicItems } from "./ClassicItems";
 import { ClassicFooter } from "./ClassicFooter";

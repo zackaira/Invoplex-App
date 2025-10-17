@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DocumentWithRelations } from "../../templates/types";
+import { DocumentWithRelations } from "../../types";
 import { Decimal } from "@/app/generated/prisma/runtime/library";
 
 type DocumentItem = DocumentWithRelations["items"][number];
@@ -25,8 +25,14 @@ export function useItemsManager(
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<{
     type: string;
-    description: string;
-    unitPrice: string;
+    hasQuantityColumn: boolean;
+  } | null>(null);
+
+  // Confirmation dialog states
+  const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
+  const [pendingSaveData, setPendingSaveData] = useState<{
+    itemId: string;
+    itemType: string;
     hasQuantityColumn: boolean;
   } | null>(null);
 
@@ -68,17 +74,25 @@ export function useItemsManager(
   const handleOpenSaveModal = (
     itemId: string,
     itemType: string,
-    description: string,
-    unitPrice: string,
     hasQuantityColumn: boolean
   ) => {
-    setModalMode("save");
-    setSelectedItemId(itemId);
-    setSelectedItem({
-      type: itemType,
-      description,
-      unitPrice,
+    // Store the data and show confirmation dialog
+    setPendingSaveData({
+      itemId,
+      itemType,
       hasQuantityColumn,
+    });
+    setSaveConfirmOpen(true);
+  };
+
+  const handleConfirmSave = () => {
+    if (!pendingSaveData) return;
+
+    setModalMode("save");
+    setSelectedItemId(pendingSaveData.itemId);
+    setSelectedItem({
+      type: pendingSaveData.itemType,
+      hasQuantityColumn: pendingSaveData.hasQuantityColumn,
     });
     setSaveModalOpen(true);
   };
@@ -93,12 +107,10 @@ export function useItemsManager(
     onUpdate?.({ items: updatedItems });
   };
 
-  const handleOpenNewTypeModal = () => {
+  const handleOpenAddModal = () => {
     setModalMode("add");
     setSelectedItem({
-      type: "",
-      description: "",
-      unitPrice: "0",
+      type: "Product",
       hasQuantityColumn: false,
     });
     setSaveModalOpen(true);
@@ -106,17 +118,12 @@ export function useItemsManager(
 
   const handleSaveItem = (data: {
     itemType: string;
-    description: string;
-    unitPrice: string;
     hasQuantityColumn: boolean;
   }) => {
     if (modalMode === "add") {
       // Add new item to the document
       const newItem = createNewItem({
         itemType: data.itemType,
-        description: data.description,
-        unitPrice: data.unitPrice as unknown as Decimal,
-        amount: data.unitPrice as unknown as Decimal,
         hasQuantityColumn: data.hasQuantityColumn,
       });
       onUpdate?.({ items: [...document.items, newItem] });
@@ -127,14 +134,9 @@ export function useItemsManager(
     }
   };
 
-  const handleCreateBlankProduct = () => {
-    const newItem = createNewItem({ itemType: "Product" });
-    onUpdate?.({ items: [...document.items, newItem] });
-  };
-
-  const handleCreateBlankService = () => {
-    const newItem = createNewItem({ itemType: "Service" });
-    onUpdate?.({ items: [...document.items, newItem] });
+  const handleDeleteItem = (itemId: string) => {
+    const updatedItems = document.items.filter((item) => item.id !== itemId);
+    onUpdate?.({ items: updatedItems });
   };
 
   return {
@@ -144,14 +146,16 @@ export function useItemsManager(
     modalMode,
     selectedItem,
     hasAnyQuantityColumn,
+    saveConfirmOpen,
+    setSaveConfirmOpen,
 
     // Handlers
     handleSelectProduct,
     handleOpenSaveModal,
+    handleConfirmSave,
     handleHasQuantityColumnChange,
-    handleOpenNewTypeModal,
+    handleOpenAddModal,
     handleSaveItem,
-    handleCreateBlankProduct,
-    handleCreateBlankService,
+    handleDeleteItem,
   };
 }

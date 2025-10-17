@@ -1,10 +1,26 @@
+/**
+ * ============================================================================
+ * DOCUMENT EDIT BAR
+ * ============================================================================
+ *
+ * Action bar displayed when editing a document.
+ *
+ * Features:
+ * - Back navigation
+ * - Template selector (switch between different template designs)
+ * - Save button
+ *
+ * Location: /app/components/documents/bars/EditBar.tsx
+ * Used by: TemplateRenderer (when isEditable = true)
+ */
+
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { DocumentWithRelations } from "./templates/types";
+import { DocumentWithRelations } from "../types";
 import {
   Select,
   SelectContent,
@@ -12,8 +28,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAllTemplates } from "./templates/registry";
+import { getAllTemplates } from "../registry";
 
+/**
+ * DocumentEditBar Component
+ *
+ * Displays controls for editing a document, including template selection
+ * and save functionality.
+ *
+ * @param document - The document being edited
+ * @param templateId - Currently selected template ID
+ * @param onTemplateChange - Callback when template is changed
+ */
 export function DocumentEditBar({
   document,
   templateId = "classic",
@@ -27,6 +53,10 @@ export function DocumentEditBar({
   const [isSaving, setIsSaving] = useState(false);
   const templates = getAllTemplates();
 
+  /**
+   * Saves the document to the database
+   * TODO: Implement actual save functionality
+   */
   const handleSave = async () => {
     setIsSaving(true);
     try {

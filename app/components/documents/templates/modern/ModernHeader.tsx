@@ -1,12 +1,12 @@
 "use client";
 
-import { TemplateHeaderProps } from "../types";
+import { TemplateHeaderProps } from "../../types";
 import { SettingsDatePicker } from "@/app/components/settings";
-import { ProjectSelect } from "../../projects";
-import { ClientSelect } from "../../clients";
+import { ProjectSelect } from "../../modals/projects";
+import { ClientSelect } from "../../modals/clients";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDocumentHeader } from "../hooks";
+import { useDocumentHeader } from "../../hooks";
 
 export function ModernHeader({
   document,

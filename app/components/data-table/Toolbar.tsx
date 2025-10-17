@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import { Table } from "@tanstack/react-table";
-import { Download, Filter, PencilIcon, PlusIcon, Trash, X } from "lucide-react";
+import {
+  CalendarDays,
+  Download,
+  Filter,
+  PencilIcon,
+  PlusIcon,
+  Trash,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +22,11 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { TooltipWrapper } from "@/app/components/ui/TooltipWrapper";
+import {
+  DateFilterValue,
+  FiscalYearSettings,
+  getDateFilterOptions,
+} from "@/lib/date-utils";
 
 export interface StatusFilterOption {
   value: string;
@@ -28,6 +41,9 @@ interface DataTableToolbarProps<TData> {
   statusFilterOptions?: StatusFilterOption[];
   selectedStatuses?: string[];
   onStatusChange?: (statuses: string[]) => void;
+  selectedDateFilter?: DateFilterValue;
+  onDateFilterChange?: (filter: DateFilterValue) => void;
+  fiscalYearSettings?: FiscalYearSettings;
 }
 
 export function DataTableToolbar<TData>({
@@ -37,6 +53,9 @@ export function DataTableToolbar<TData>({
   statusFilterOptions = [],
   selectedStatuses = [],
   onStatusChange,
+  selectedDateFilter = "last_3_months",
+  onDateFilterChange,
+  fiscalYearSettings = { fiscalYearStartMonth: 3, fiscalYearStartDay: 1 },
 }: DataTableToolbarProps<TData>) {
   const toggleStatus = (status: string) => {
     const newStatuses = selectedStatuses.includes(status)
@@ -49,6 +68,17 @@ export function DataTableToolbar<TData>({
   const clearStatusFilters = () => {
     onStatusChange?.([]);
   };
+
+  const dateFilterOptions = React.useMemo(() => {
+    return getDateFilterOptions(fiscalYearSettings);
+  }, [fiscalYearSettings]);
+
+  const currentDateFilterLabel = React.useMemo(() => {
+    return (
+      dateFilterOptions.find((opt) => opt.value === selectedDateFilter)
+        ?.label || "Filter by date"
+    );
+  }, [selectedDateFilter, dateFilterOptions]);
 
   return (
     <div className="flex items-center gap-2 pl-6 pr-4 py-6">
@@ -67,51 +97,67 @@ export function DataTableToolbar<TData>({
         />
       )}
 
+      {/* Date Range Filter */}
+      {onDateFilterChange && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="border-dashed">
+              <CalendarDays className="h-4 w-4" />
+              {currentDateFilterLabel}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px] p-0" align="start">
+            <div className="space-y-1 p-2">
+              {dateFilterOptions.map((option) => {
+                const isSelected = selectedDateFilter === option.value;
+                return (
+                  <Button
+                    key={option.value}
+                    variant={isSelected ? "secondary" : "ghost"}
+                    size="sm"
+                    className="w-full justify-start h-9"
+                    onClick={() => onDateFilterChange(option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
+
       {/* Status */}
       {statusFilterOptions.length > 0 && (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="border-dashed">
-              <Filter className="mr-2 h-4 w-4" />
+              <Filter className="h-4 w-4" />
               Status
               {selectedStatuses.length > 0 && (
-                <>
-                  <div className="mx-2 h-4 w-[1px] bg-border" />
-                  <Badge
-                    variant="secondary"
-                    className="rounded-sm px-1 font-normal"
-                  >
-                    {selectedStatuses.length}
-                  </Badge>
-                </>
+                <Badge
+                  variant="secondary"
+                  className="rounded-sm px-1 font-normal"
+                >
+                  {selectedStatuses.length}
+                </Badge>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[250px] p-0" align="start">
-            <div className="space-y-2 p-4">
-              <div className="flex items-center justify-between">
+          <PopoverContent className="w-[180px] p-0" align="start">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between pt-4 px-5">
                 <p className="text-sm font-medium">Filter by status</p>
-                {selectedStatuses.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 px-2"
-                    onClick={clearStatusFilters}
-                  >
-                    Clear
-                    <X className="ml-1 h-3 w-3" />
-                  </Button>
-                )}
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-1 p-2">
                 {statusFilterOptions.map((option) => {
                   const isSelected = selectedStatuses.includes(option.value);
                   return (
                     <Button
                       key={option.value}
-                      variant={isSelected ? "default" : "outline"}
+                      variant={isSelected ? "default" : "ghost"}
                       size="sm"
-                      className="h-8"
+                      className="w-full justify-start h-9"
                       onClick={() => toggleStatus(option.value)}
                     >
                       {option.label}

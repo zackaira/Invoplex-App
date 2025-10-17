@@ -98,15 +98,9 @@ export function ClientSelect({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-[300px] p-0 !bg-white !border-gray-300 !text-gray-900"
-        align={align}
-      >
-        <Command className="!bg-white !text-gray-900">
-          <CommandInput
-            placeholder="Search Clients..."
-            className="h-9 !border-gray-200 !text-gray-900 placeholder:!text-gray-400"
-          />
+      <PopoverContent className="w-[300px] p-0" align={align}>
+        <Command>
+          <CommandInput placeholder="Search Clients..." className="h-9" />
           <CommandList>
             <CommandEmpty>No client found.</CommandEmpty>
             <CommandGroup>
@@ -120,13 +114,9 @@ export function ClientSelect({
                   }}
                 >
                   <div className="flex flex-col flex-1">
-                    <span className="font-medium !text-gray-900">
-                      {client.name}
-                    </span>
+                    <span className="font-medium">{client.name}</span>
                     {client.email && (
-                      <span className="text-xs !text-gray-500">
-                        {client.email}
-                      </span>
+                      <span className="text-xs">{client.email}</span>
                     )}
                   </div>
                   <Check

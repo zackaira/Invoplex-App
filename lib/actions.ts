@@ -92,3 +92,17 @@ export const getDocumentById = async (
 
   return serializeDocument(document);
 };
+
+export const getUserSettings = async (userId: string) => {
+  const settings = await prisma.userSettings.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      fiscalYearStartMonth: true,
+      fiscalYearStartDay: true,
+    },
+  });
+
+  return settings;
+};

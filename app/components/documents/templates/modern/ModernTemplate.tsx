@@ -1,6 +1,6 @@
 "use client";
 
-import { TemplateProps } from "../types";
+import { TemplateProps } from "../../types";
 import { ModernHeader } from "./ModernHeader";
 import { ModernItems } from "./ModernItems";
 import { ModernFooter } from "./ModernFooter";

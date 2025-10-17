@@ -7,7 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { getAllTemplates } from "@/app/components/documents/templates/registry";
+import { getAllTemplates } from "@/app/components/documents/registry";
 import { TemplateCarouselItem } from "./TemplateCarouselItem";
 
 interface TemplateCarouselProps {

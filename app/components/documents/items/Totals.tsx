@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { DocumentWithRelations } from "../templates/types";
+import { DocumentWithRelations } from "../types";
 import { useDocumentCalculations } from "./hooks/useCalculations";
 
 export interface TotalsRenderProps {

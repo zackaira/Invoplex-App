@@ -10,32 +10,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-} from "@/components/ui/input-group";
 import { Switch } from "@/components/ui/switch";
 import { TypeSelect } from "./TypeSelect";
 
 interface SaveItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: {
-    itemType: string;
-    description: string;
-    unitPrice: string;
-    hasQuantityColumn: boolean;
-  }) => void;
+  onSave: (data: { itemType: string; hasQuantityColumn: boolean }) => void;
   mode?: "add" | "save"; // "add" = add to list, "save" = save to database
   onHasQuantityColumnChange?: (value: boolean) => void; // Real-time update for save mode
   initialType?: string;
-  initialDescription?: string;
-  initialUnitPrice?: string;
   initialHasQuantityColumn?: boolean;
-  currency?: string;
 }
 
 export function SaveItemModal({
@@ -45,14 +30,9 @@ export function SaveItemModal({
   mode = "add",
   onHasQuantityColumnChange,
   initialType = "Product",
-  initialDescription = "",
-  initialUnitPrice = "0",
   initialHasQuantityColumn = false,
-  currency = "USD",
 }: SaveItemModalProps) {
   const [itemType, setItemType] = useState(initialType);
-  const [description, setDescription] = useState(initialDescription);
-  const [unitPrice, setUnitPrice] = useState(initialUnitPrice);
   const [hasQuantityColumn, setHasQuantityColumn] = useState(
     initialHasQuantityColumn
   );
@@ -61,20 +41,12 @@ export function SaveItemModal({
   useEffect(() => {
     if (isOpen) {
       setItemType(initialType);
-      setDescription(initialDescription);
-      setUnitPrice(initialUnitPrice);
       setHasQuantityColumn(initialHasQuantityColumn);
     }
-  }, [
-    isOpen,
-    initialType,
-    initialDescription,
-    initialUnitPrice,
-    initialHasQuantityColumn,
-  ]);
+  }, [isOpen, initialType, initialHasQuantityColumn]);
 
   const handleSave = () => {
-    onSave({ itemType, description, unitPrice, hasQuantityColumn });
+    onSave({ itemType, hasQuantityColumn });
     onClose();
   };
 
@@ -87,16 +59,16 @@ export function SaveItemModal({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {mode === "save" ? "Save Item to Database" : "Add New Item"}
+            {mode === "save" ? "Save Item to Database" : "Add a New Line Item"}
           </DialogTitle>
           <DialogDescription>
             {mode === "save"
               ? "Save this item as a reusable product or service for future quotes."
-              : "Add a new line item to your quote."}
+              : "Create a new line item for your quote."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-8 pt-4 pb-6">
           {/* Item Type */}
           <div>
             <label className="block text-sm font-medium mb-2">Type</label>
@@ -105,37 +77,6 @@ export function SaveItemModal({
               onChange={setItemType}
               className="w-full"
             />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Description
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter item description"
-              className="w-full min-h-[100px] resize-y"
-            />
-          </div>
-
-          {/* Unit Price */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Unit Price</label>
-            <InputGroup className="w-full">
-              <InputGroupAddon align="inline-start">
-                <InputGroupText className="text-xs">{currency}</InputGroupText>
-              </InputGroupAddon>
-              <InputGroupInput
-                type="number"
-                step="0.01"
-                value={unitPrice}
-                onChange={(e) => setUnitPrice(e.target.value)}
-                className="ps-12"
-                placeholder="0.00"
-              />
-            </InputGroup>
           </div>
 
           {/* Has Quantity Column Toggle */}

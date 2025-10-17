@@ -29,10 +29,7 @@ interface Product {
 
 interface ProductSelectProps {
   onSelect: (product: Product) => void;
-  onCreateNew: () => void;
-  onCreateBlankProduct: () => void;
-  onCreateBlankService: () => void;
-  onOpenNewTypeModal: () => void;
+  onOpenAddModal: () => void;
   trigger?: React.ReactNode;
   className?: string;
 }
@@ -71,10 +68,7 @@ const mockProducts: Product[] = [
 
 export function ProductSelect({
   onSelect,
-  onCreateNew,
-  onCreateBlankProduct,
-  onCreateBlankService,
-  onOpenNewTypeModal,
+  onOpenAddModal,
   trigger,
   className,
 }: ProductSelectProps) {
@@ -85,23 +79,8 @@ export function ProductSelect({
     setOpen(false);
   };
 
-  const handleCreateNew = () => {
-    onCreateNew();
-    setOpen(false);
-  };
-
-  const handleCreateBlankProduct = () => {
-    onCreateBlankProduct();
-    setOpen(false);
-  };
-
-  const handleCreateBlankService = () => {
-    onCreateBlankService();
-    setOpen(false);
-  };
-
-  const handleOpenNewTypeModal = () => {
-    onOpenNewTypeModal();
+  const handleOpenAddModal = () => {
+    onOpenAddModal();
     setOpen(false);
   };
 
@@ -125,28 +104,14 @@ export function ProductSelect({
               </div>
             </CommandEmpty>
 
-            {/* Create blank options */}
+            {/* Add New Item Option */}
             <CommandGroup>
               <CommandItem
-                onSelect={handleCreateBlankProduct}
+                onSelect={handleOpenAddModal}
                 className="cursor-pointer"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                <span>Add blank product</span>
-              </CommandItem>
-              <CommandItem
-                onSelect={handleCreateBlankService}
-                className="cursor-pointer"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                <span>Add blank service</span>
-              </CommandItem>
-              <CommandItem
-                onSelect={handleOpenNewTypeModal}
-                className="cursor-pointer"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                <span>Add new type</span>
+                <span>Add New Product, Service or Custom Type</span>
               </CommandItem>
             </CommandGroup>
 

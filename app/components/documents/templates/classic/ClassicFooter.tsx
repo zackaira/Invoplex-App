@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { TemplateFooterProps } from "../types";
+import { TemplateFooterProps } from "../../types";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

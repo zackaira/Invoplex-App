@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Template } from "@/app/components/documents/templates/types";
+import { Template } from "@/app/components/documents/types";
 
 interface TemplateCarouselItemProps {
   template: Template;

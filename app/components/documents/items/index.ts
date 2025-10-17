@@ -11,6 +11,8 @@ export type { DocumentItemsTableProps, ItemRowRenderProps } from "./ItemsTable";
 export { DocumentTotals } from "./Totals";
 export type { DocumentTotalsProps, TotalsRenderProps } from "./Totals";
 
+export { ConfirmationDialog } from "./ConfirmationDialog";
+
 export { useDocumentCalculations } from "./hooks/useCalculations";
 export { useDocumentItems } from "./hooks/useDocumentItems";
 

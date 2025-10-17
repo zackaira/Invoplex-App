@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { TemplateRenderer } from "@/app/components/documents/TemplateRenderer";
-import { DocumentWithRelations } from "@/app/components/documents/templates/types";
+import { DocumentWithRelations } from "@/app/components/documents/types";
 import { useRouter } from "next/navigation";
 import { getDocumentById } from "@/lib/actions";
 

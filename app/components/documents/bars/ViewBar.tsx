@@ -1,3 +1,21 @@
+/**
+ * ============================================================================
+ * DOCUMENT VIEW BAR
+ * ============================================================================
+ *
+ * Action bar displayed when viewing a document (not in edit mode).
+ *
+ * Features:
+ * - Back navigation
+ * - PDF preview and download
+ * - Mark as accepted
+ * - Edit document
+ * - Document actions (duplicate, convert, send, archive, delete)
+ *
+ * Location: /app/components/documents/bars/ViewBar.tsx
+ * Used by: TemplateRenderer (when isEditable = false)
+ */
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -18,7 +36,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { DocumentWithRelations } from "./templates/types";
+import { DocumentWithRelations } from "../types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +45,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+/**
+ * DocumentViewBar Component
+ *
+ * Displays action buttons for viewing and managing a document.
+ *
+ * @param document - The document being viewed
+ */
 export function DocumentViewBar({
   document,
 }: {
@@ -34,32 +59,49 @@ export function DocumentViewBar({
 }) {
   const router = useRouter();
 
+  // =========================================================================
+  // ACTION HANDLERS
+  // =========================================================================
+
+  /** Creates a duplicate copy of the document */
   const handleDuplicate = () => {
     console.log("Duplicate quote");
+    // TODO: Implement duplicate functionality
   };
 
+  /** Converts a quote to an invoice */
   const handleConvertToInvoice = () => {
     console.log("Convert to invoice");
+    // TODO: Implement conversion functionality
   };
 
+  /** Sends the document to the client via email */
   const handleSendToClient = () => {
     console.log("Send to client");
+    // TODO: Implement email sending functionality
   };
 
+  /** Downloads the document as PDF */
   const handleDownloadPDF = () => {
     console.log("Download PDF");
+    // TODO: Implement PDF generation and download
   };
 
+  /** Opens the browser print dialog */
   const handlePrint = () => {
     window.print();
   };
 
+  /** Archives the document */
   const handleArchive = () => {
     console.log("Archive quote");
+    // TODO: Implement archive functionality
   };
 
+  /** Deletes the document */
   const handleDelete = () => {
     console.log("Delete quote");
+    // TODO: Implement delete functionality with confirmation
   };
 
   return (

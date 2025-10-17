@@ -1,5 +1,6 @@
 import { TemplateRenderer } from "@/app/components/documents/TemplateRenderer";
 import { getDocumentById } from "@/lib/actions";
+import { getUserSettings } from "@/lib/actions/settings";
 import { notFound, redirect } from "next/navigation";
 
 export default async function QuotePage({
@@ -20,9 +21,38 @@ export default async function QuotePage({
     return notFound();
   }
 
+  // Fetch business settings for the user
+  // TODO: Replace with actual user ID from authentication
+  const userId = "cmgexy4630002r7qfecfve8hq";
+  const settingsResult = await getUserSettings(userId);
+  const businessProfile = settingsResult?.data?.businessProfile;
+
+  const businessSettings = businessProfile
+    ? {
+        personalName: businessProfile.personalName,
+        businessName: businessProfile.businessName,
+        email: businessProfile.email,
+        phone: businessProfile.phone,
+        website: businessProfile.website,
+        logo: businessProfile.logo,
+        address: businessProfile.address,
+        city: businessProfile.city,
+        state: businessProfile.state,
+        zipCode: businessProfile.zipCode,
+        country: businessProfile.country,
+        taxId: businessProfile.taxId,
+        registrationNumber: businessProfile.registrationNumber,
+        brandColor: businessProfile.brandColor,
+      }
+    : undefined;
+
   return (
     <div className="relative">
-      <TemplateRenderer document={document} type="QUOTE" />
+      <TemplateRenderer
+        document={document}
+        type="QUOTE"
+        businessSettings={businessSettings}
+      />
     </div>
   );
 }

@@ -25,6 +25,7 @@ export function ModernHeader({
     taxId: false,
     address: false,
   },
+  businessSettings,
 }: TemplateHeaderProps) {
   // Use the shared hook for all business logic
   const {
@@ -39,11 +40,22 @@ export function ModernHeader({
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-t-lg">
       <div className="flex justify-between items-start mb-6">
-        {/* Company Logo */}
+        {/* Company Logo or Business Name */}
         <div className="flex-shrink-0">
-          <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center text-white/60 text-sm">
-            Company Logo
-          </div>
+          {businessSettings?.logo ? (
+            <img
+              src={businessSettings.logo}
+              alt={businessSettings.businessName}
+              className="w-32 h-32 object-contain"
+            />
+          ) : (
+            <h2
+              className="text-3xl font-bold"
+              style={{ color: businessSettings?.brandColor || "#FFFFFF" }}
+            >
+              {businessSettings?.businessName || "Your Business"}
+            </h2>
+          )}
         </div>
 
         {/* Title and Document Info */}
@@ -84,21 +96,47 @@ export function ModernHeader({
             )}
           </div>
           <div>
-            {businessInfoVisibility.businessName && (
-              <p className="font-semibold text-lg">Your Business Name</p>
-            )}
-            {businessInfoVisibility.personalName && (
-              <p className="text-sm opacity-90 mt-1">John Doe</p>
-            )}
+            {businessInfoVisibility.businessName &&
+              businessSettings?.businessName && (
+                <p className="font-semibold text-lg">
+                  {businessSettings.businessName}
+                </p>
+              )}
+            {businessInfoVisibility.personalName &&
+              businessSettings?.personalName && (
+                <p className="text-sm opacity-90 mt-1">
+                  {businessSettings.personalName}
+                </p>
+              )}
             <div className="text-sm opacity-90 mt-1">
-              {businessInfoVisibility.email && <p>email@business.com</p>}
-              {businessInfoVisibility.phone && <p>+1 (555) 123-4567</p>}
-              {businessInfoVisibility.website && <p>www.yourbusiness.com</p>}
-              {businessInfoVisibility.taxId && <p>Tax ID: 12-3456789</p>}
-              {businessInfoVisibility.address && (
+              {businessInfoVisibility.email && businessSettings?.email && (
+                <p>{businessSettings.email}</p>
+              )}
+              {businessInfoVisibility.phone && businessSettings?.phone && (
+                <p>{businessSettings.phone}</p>
+              )}
+              {businessInfoVisibility.website && businessSettings?.website && (
+                <p>{businessSettings.website}</p>
+              )}
+              {businessInfoVisibility.taxId && businessSettings?.taxId && (
+                <p>Tax ID: {businessSettings.taxId}</p>
+              )}
+              {businessInfoVisibility.address && businessSettings?.address && (
                 <>
-                  <p>123 Business Street</p>
-                  <p>City, State 12345</p>
+                  <p>{businessSettings.address}</p>
+                  {(businessSettings.city ||
+                    businessSettings.state ||
+                    businessSettings.zipCode) && (
+                    <p>
+                      {[
+                        businessSettings.city,
+                        businessSettings.state,
+                        businessSettings.zipCode,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  )}
                 </>
               )}
             </div>

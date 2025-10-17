@@ -2,9 +2,13 @@
 
 import { use, useEffect, useState } from "react";
 import { TemplateRenderer } from "@/app/components/documents/TemplateRenderer";
-import { DocumentWithRelations } from "@/app/components/documents/types";
+import {
+  DocumentWithRelations,
+  BusinessSettings,
+} from "@/app/components/documents/types";
 import { useRouter } from "next/navigation";
 import { getDocumentById } from "@/lib/actions";
+import { getUserSettings } from "@/lib/actions/settings";
 
 // Helper function to create an empty new quote
 function createEmptyQuote(): DocumentWithRelations {
@@ -73,6 +77,7 @@ export default function EditQuotePage({
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [templateId, setTemplateId] = useState("classic");
+  const [businessSettings, setBusinessSettings] = useState<BusinessSettings>();
 
   useEffect(() => {
     async function fetchDocument() {
@@ -93,6 +98,38 @@ export default function EditQuotePage({
     }
     fetchDocument();
   }, [id]);
+
+  useEffect(() => {
+    async function fetchBusinessSettings() {
+      try {
+        // TODO: Replace with actual user ID from authentication
+        const userId = "cmgexy4630002r7qfecfve8hq";
+        const settingsResult = await getUserSettings(userId);
+        const businessProfile = settingsResult?.data?.businessProfile;
+        if (businessProfile) {
+          setBusinessSettings({
+            personalName: businessProfile.personalName,
+            businessName: businessProfile.businessName,
+            email: businessProfile.email,
+            phone: businessProfile.phone,
+            website: businessProfile.website,
+            logo: businessProfile.logo,
+            address: businessProfile.address,
+            city: businessProfile.city,
+            state: businessProfile.state,
+            zipCode: businessProfile.zipCode,
+            country: businessProfile.country,
+            taxId: businessProfile.taxId,
+            registrationNumber: businessProfile.registrationNumber,
+            brandColor: businessProfile.brandColor,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch business settings:", error);
+      }
+    }
+    fetchBusinessSettings();
+  }, []);
 
   const handleUpdate = (updates: Partial<DocumentWithRelations>) => {
     setDocument((prev) => {
@@ -138,6 +175,7 @@ export default function EditQuotePage({
         isEditable={true}
         onUpdate={handleUpdate}
         onTemplateChange={setTemplateId}
+        businessSettings={businessSettings}
       />
     </div>
   );

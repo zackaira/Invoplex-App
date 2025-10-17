@@ -66,6 +66,33 @@ export interface BusinessInfoVisibility {
 }
 
 /**
+ * Business settings from the database
+ *
+ * This interface contains the actual business profile data including
+ * branding elements like logo and brand color.
+ *
+ * Used by:
+ * - TemplateProps
+ * - TemplateHeaderProps
+ */
+export interface BusinessSettings {
+  personalName?: string | null;
+  businessName: string;
+  email?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  logo?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zipCode?: string | null;
+  country?: string | null;
+  taxId?: string | null;
+  registrationNumber?: string | null;
+  brandColor?: string | null;
+}
+
+/**
  * ============================================================================
  * TEMPLATE COMPONENT PROPS
  * ============================================================================
@@ -95,6 +122,7 @@ export interface TemplateProps {
   onOpenClientModal?: () => void;
   onOpenBusinessInfoModal?: () => void;
   businessInfoVisibility?: BusinessInfoVisibility;
+  businessSettings?: BusinessSettings;
 }
 
 /**
@@ -117,6 +145,7 @@ export interface TemplateHeaderProps {
   onOpenClientModal?: () => void;
   onOpenBusinessInfoModal?: () => void;
   businessInfoVisibility?: BusinessInfoVisibility;
+  businessSettings?: BusinessSettings;
 }
 
 /**

@@ -19,7 +19,10 @@
 "use client";
 
 import { useState } from "react";
-import { DocumentWithRelations } from "@/app/components/documents/types";
+import {
+  DocumentWithRelations,
+  BusinessSettings,
+} from "@/app/components/documents/types";
 import { getTemplate } from "@/app/components/documents/registry";
 import { DocumentViewBar } from "./bars/ViewBar";
 import { DocumentEditBar } from "./bars/EditBar";
@@ -42,6 +45,7 @@ import {
  * @param isEditable - Whether the document is in edit mode
  * @param onUpdate - Callback when document data changes
  * @param onTemplateChange - Callback when template is switched
+ * @param businessSettings - Business profile settings (name, logo, brandColor)
  */
 export function TemplateRenderer({
   document,
@@ -50,6 +54,7 @@ export function TemplateRenderer({
   isEditable = false,
   onUpdate,
   onTemplateChange,
+  businessSettings,
 }: {
   document: DocumentWithRelations;
   type: "QUOTE" | "INVOICE";
@@ -57,6 +62,7 @@ export function TemplateRenderer({
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
   onTemplateChange?: (templateId: string) => void;
+  businessSettings?: BusinessSettings;
 }) {
   // Load the selected template from the registry
   const template = getTemplate(templateId);
@@ -152,6 +158,7 @@ export function TemplateRenderer({
             onOpenClientModal={() => setIsClientModalOpen(true)}
             onOpenBusinessInfoModal={() => setIsBusinessInfoModalOpen(true)}
             businessInfoVisibility={businessInfoVisibility}
+            businessSettings={businessSettings}
           />
         </div>
       </div>

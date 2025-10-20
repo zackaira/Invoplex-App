@@ -1,23 +1,44 @@
-import currencyCodes from "currency-codes";
 import countries from "world-countries";
+
+/**
+ * Manual currency list with codes, names, and symbols
+ */
+const SUPPORTED_CURRENCIES = [
+  { code: "AUD", name: "Australian Dollar", symbol: "A$" },
+  { code: "CAD", name: "Canadian Dollar", symbol: "C$" },
+  { code: "EUR", name: "Euro", symbol: "€" },
+  { code: "GBP", name: "British Pound", symbol: "£" },
+  { code: "HKD", name: "Hong Kong Dollar", symbol: "HK$" },
+  { code: "IDR", name: "Indonesian Rupiah", symbol: "Rp" },
+  { code: "NAD", name: "Namibian Dollar", symbol: "N$" },
+  { code: "NOK", name: "Norwegian Krone", symbol: "kr" },
+  { code: "NZD", name: "New Zealand Dollar", symbol: "NZ$" },
+  { code: "PHP", name: "Philippine Peso", symbol: "₱" },
+  { code: "SGD", name: "Singapore Dollar", symbol: "S$" },
+  { code: "CHF", name: "Swiss Franc", symbol: "CHF" },
+  { code: "THB", name: "Thai Baht", symbol: "฿" },
+  { code: "USD", name: "US Dollar", symbol: "$" },
+  { code: "ZAR", name: "South African Rand", symbol: "R" },
+  { code: "ZWG", name: "Zimbabwe Gold", symbol: "ZiG" },
+];
+
+/**
+ * Get currency symbol from code
+ */
+function getCurrencySymbol(code: string): string {
+  const currency = SUPPORTED_CURRENCIES.find((c) => c.code === code);
+  return currency?.symbol || "$";
+}
 
 /**
  * Get all available currencies with their codes and names
  */
 export function getCurrencyOptions() {
-  const allCurrencies = currencyCodes.data;
-
-  return allCurrencies
-    .map((currency) => ({
-      value: currency.code,
-      label: `${currency.code} - ${currency.currency}`,
-      keywords: [
-        currency.code.toLowerCase(),
-        currency.currency.toLowerCase(),
-        ...(currency.countries || []).map((c: string) => c.toLowerCase()),
-      ],
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  return SUPPORTED_CURRENCIES.map((currency) => ({
+    value: currency.code,
+    label: `${currency.code} - ${currency.name}`,
+    keywords: [currency.code.toLowerCase(), currency.name.toLowerCase()],
+  }));
 }
 
 /**
@@ -36,8 +57,8 @@ export function getCountryOptions() {
  * Get currency name from code
  */
 export function getCurrencyName(code: string): string {
-  const currency = currencyCodes.code(code);
-  return currency ? currency.currency : code;
+  const currency = SUPPORTED_CURRENCIES.find((c) => c.code === code);
+  return currency?.name || code;
 }
 
 /**
@@ -76,4 +97,39 @@ export function getFiscalYearDayOptions() {
     value: String(i + 1),
     label: String(i + 1),
   }));
+}
+
+/**
+ * Get currency display format options with examples based on selected currency
+ */
+export function getCurrencyDisplayFormatOptions(currencyCode: string = "USD") {
+  const symbol = getCurrencySymbol(currencyCode);
+  const amount = "100";
+
+  return [
+    {
+      value: "symbol_before",
+      label: `Symbol Before - ${symbol}${amount}`,
+    },
+    {
+      value: "symbol_after",
+      label: `Symbol After - ${amount}${symbol}`,
+    },
+    {
+      value: "symbol_before_space",
+      label: `Symbol Before with Space - ${symbol} ${amount}`,
+    },
+    {
+      value: "symbol_after_space",
+      label: `Symbol After with Space - ${amount} ${symbol}`,
+    },
+    {
+      value: "code_before",
+      label: `Code Before - ${currencyCode} ${amount}`,
+    },
+    {
+      value: "code_after",
+      label: `Code After - ${amount} ${currencyCode}`,
+    },
+  ];
 }

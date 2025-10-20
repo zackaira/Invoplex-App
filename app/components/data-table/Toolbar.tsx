@@ -87,7 +87,7 @@ export function DataTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn(filterColumn)?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-[280px]"
           name="search filter"
         />
       )}

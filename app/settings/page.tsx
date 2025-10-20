@@ -110,20 +110,12 @@ export default function Settings() {
             if (userSettings.selectedTemplateId) {
               setSelectedTemplate(userSettings.selectedTemplateId);
             }
-            // Check if bank details exist to determine if they should be shown
-            if (
-              userSettings.bankName ||
-              userSettings.accountName ||
-              userSettings.accountNumber
-            ) {
-              setShowBankDetails(true);
+            // Load switch states from database
+            if (userSettings.showBankDetails !== undefined) {
+              setShowBankDetails(userSettings.showBankDetails);
             }
-            // Check if tax rate is set to determine if tax settings should be shown
-            if (
-              userSettings.defaultTaxRate &&
-              parseFloat(userSettings.defaultTaxRate.toString()) > 0
-            ) {
-              setShowFinancialSettings(true);
+            if (userSettings.showTaxSettings !== undefined) {
+              setShowFinancialSettings(userSettings.showTaxSettings);
             }
           }
         }
@@ -250,23 +242,44 @@ export default function Settings() {
 
     try {
       const formData = new FormData(e.currentTarget);
+
+      // Debug: Log form data in browser console
+      console.log("=== FINANCIAL SETTINGS FORM DATA ===");
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      console.log("showFinancialSettings:", showFinancialSettings);
+      console.log("====================================");
+
       const result = await saveFinancialSettings(
         userId,
         formData,
         showFinancialSettings
       );
 
+      console.log("=== SAVE RESULT ===");
+      console.log("Result:", result);
+      console.log("===================");
+
       if (result.success) {
         clearSectionChanges("financialSettings");
         toast.success("Financial Settings saved successfully!");
       } else {
         if (result.errors) {
+          console.error("❌ VALIDATION ERRORS:", result.errors);
           setValidationErrors((prev) => ({
             ...prev,
             financialSettings: result.errors,
           }));
+          // Show first error in toast
+          const firstError = result.errors[0];
+          toast.error(
+            `Validation failed: ${firstError?.message || "Unknown error"}`
+          );
+        } else {
+          console.error("❌ Validation failed with no error details");
+          toast.error("Validation failed");
         }
-        toast.error("Validation failed");
       }
     } catch (error) {
       console.error("Error saving financial settings:", error);

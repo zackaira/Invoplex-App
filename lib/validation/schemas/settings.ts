@@ -181,13 +181,17 @@ const baseFinancialSettingsSchema = z.object({
     .union([z.string(), z.null()])
     .transform((val) => val || "")
     .pipe(z.string().min(1, "Currency is required")),
+  currencyDisplayFormat: z
+    .union([z.string(), z.null()])
+    .transform((val) => val || "symbol_before")
+    .optional(),
   fiscalYearStartMonth: z
     .union([z.string(), z.null()])
     .transform((val) => val || "3")
     .refine(
       (val) => {
         const num = parseInt(val, 10);
-        return num >= 1 && num <= 12;
+        return !isNaN(num) && num >= 1 && num <= 12;
       },
       { message: "Month must be between 1 and 12" }
     ),
@@ -197,7 +201,7 @@ const baseFinancialSettingsSchema = z.object({
     .refine(
       (val) => {
         const num = parseInt(val, 10);
-        return num >= 1 && num <= 31;
+        return !isNaN(num) && num >= 1 && num <= 31;
       },
       { message: "Day must be between 1 and 31" }
     ),
@@ -208,12 +212,21 @@ const baseFinancialSettingsSchema = z.object({
 });
 
 /**
- * Financial settings with optional tax rate
+ * Financial settings with required tax fields
  */
 const financialSettingsWithTaxSchema = baseFinancialSettingsSchema.extend({
+  taxName: z
+    .union([z.string(), z.null()])
+    .transform((val) => val || "")
+    .pipe(
+      z.string().min(1, "Tax name is required when tax settings are enabled")
+    ),
   defaultTaxRate: z
     .union([z.string(), z.null()])
-    .transform((val) => val || "0")
+    .transform((val) => val || "")
+    .pipe(
+      z.string().min(1, "Tax rate is required when tax settings are enabled")
+    )
     .refine(
       (val) => {
         const num = parseFloat(val);

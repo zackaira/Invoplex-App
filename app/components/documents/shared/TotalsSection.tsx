@@ -43,7 +43,11 @@ export function TotalsSection({
       isEditable={isEditable}
       onUpdate={onUpdate}
       render={({ document, isEditable, onTaxUpdate, onDiscountUpdate }) => (
-        <div className="w-full max-w-sm space-y-2">
+        <div
+          className={`w-full space-y-2 text-gray-600 ${
+            !isEditable ? "max-w-[300px]" : "max-w-[388px]"
+          }`}
+        >
           <div className="flex justify-between text-sm items-center">
             <div className="flex items-center gap-2">
               {isEditable && (
@@ -62,20 +66,25 @@ export function TotalsSection({
               <div className="flex items-center gap-2">
                 {isEditable && (
                   <div className="flex items-center gap-1 w-[80px]">
-                    <span className="text-xs text-gray-500">
+                    <span
+                      className={`text-xs ${
+                        showDiscount ? "text-black" : "text-gray-500"
+                      }`}
+                    >
                       {showDiscount ? "On" : "Off"}
                     </span>
                     <Switch
                       checked={showDiscount}
                       onCheckedChange={setShowDiscount}
-                      className="data-[state=checked]:bg-invoplex scale-75"
+                      className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                     />
                   </div>
                 )}
-                <span className={showDiscount ? "" : "text-gray-300"}>
+                <span className={`${showDiscount ? "" : "text-gray-400"}`}>
                   Discount
                 </span>
               </div>
+
               {showDiscount && (
                 <>
                   {isEditable ? (
@@ -150,17 +159,23 @@ export function TotalsSection({
               <div className="flex items-center gap-2">
                 {isEditable && (
                   <div className="flex items-center gap-1 w-[80px]">
-                    <span className="text-xs text-gray-500">
+                    <span
+                      className={`text-xs ${
+                        showTax ? "text-black" : "text-gray-500"
+                      }`}
+                    >
                       {showTax ? "On" : "Off"}
                     </span>
                     <Switch
                       checked={showTax}
                       onCheckedChange={setShowTax}
-                      className="data-[state=checked]:bg-invoplex scale-75"
+                      className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                     />
                   </div>
                 )}
-                <span className={showTax ? "" : "text-gray-300"}>Tax</span>
+
+                <span className={`${showTax ? "" : "text-gray-400"}`}>Tax</span>
+
                 {isEditable && showTax && (
                   <>
                     <Input
@@ -175,11 +190,10 @@ export function TotalsSection({
                   </>
                 )}
                 {!isEditable && showTax && (
-                  <span className="text-gray-600">
-                    ({document.taxRate.toString()}%)
-                  </span>
+                  <span>({document.taxRate.toString()}%)</span>
                 )}
               </div>
+
               {showTax && (
                 <span className="font-medium text-gray-900">
                   {document.currency} {document.taxAmount.toString()}
@@ -191,34 +205,14 @@ export function TotalsSection({
           <Separator className="bg-gray-200" />
 
           <div className="flex justify-between text-lg font-bold text-gray-900">
+            {isEditable && (
+              <div className="flex items-center gap-1 w-[90px]"></div>
+            )}
             <span>Total</span>
-            <span>
+            <span className="flex-1 text-right">
               {document.currency} {document.total.toString()}
             </span>
           </div>
-
-          {/* Invoice specific totals */}
-          {type === "INVOICE" && (
-            <>
-              {Number(document.amountPaid) > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Amount Paid</span>
-                  <span className="font-medium text-green-600">
-                    {document.currency} {document.amountPaid.toString()}
-                  </span>
-                </div>
-              )}
-
-              {Number(document.amountDue) > 0 && (
-                <div className="flex justify-between text-lg font-bold text-primary">
-                  <span>Amount Due</span>
-                  <span>
-                    {document.currency} {document.amountDue.toString()}
-                  </span>
-                </div>
-              )}
-            </>
-          )}
         </div>
       )}
     />

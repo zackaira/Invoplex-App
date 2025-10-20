@@ -86,6 +86,16 @@ export function SettingsLogoUpload({
     <div className="space-y-2">
       <SettingsLabel htmlFor={uploadId} label={label} />
 
+      {/* Hidden input always present for accessibility */}
+      <Input
+        id={uploadId}
+        name={uploadId}
+        type="file"
+        accept={accept}
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       {!preview ? (
         <label
           htmlFor={uploadId}
@@ -116,14 +126,6 @@ export function SettingsLogoUpload({
 
             {helperText && <SettingsHelperText text={helperText} />}
           </div>
-          <Input
-            id={uploadId}
-            name={uploadId}
-            type="file"
-            accept={accept}
-            className="hidden"
-            onChange={handleFileChange}
-          />
         </label>
       ) : (
         <div className="relative w-full border-2 border-dashed border-primary/30 rounded-lg p-4 bg-muted/10">

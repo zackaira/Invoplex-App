@@ -43,13 +43,17 @@ export function ClassicFooter({
               </h3>
               {isEditable && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">
+                  <span
+                    className={`text-xs ${
+                      showNotes ? "text-black" : "text-gray-500"
+                    }`}
+                  >
                     {showNotes ? "On" : "Off"}
                   </span>
                   <Switch
                     checked={showNotes}
                     onCheckedChange={setShowNotes}
-                    className="data-[state=checked]:bg-invoplex scale-75"
+                    className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                   />
                 </div>
               )}
@@ -88,13 +92,17 @@ export function ClassicFooter({
               </h3>
               {isEditable && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">
+                  <span
+                    className={`text-xs ${
+                      showTerms ? "text-black" : "text-gray-500"
+                    }`}
+                  >
                     {showTerms ? "On" : "Off"}
                   </span>
                   <Switch
                     checked={showTerms}
                     onCheckedChange={setShowTerms}
-                    className="data-[state=checked]:bg-invoplex scale-75"
+                    className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                   />
                 </div>
               )}

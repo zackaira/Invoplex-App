@@ -131,7 +131,10 @@ export function InvoiceSettingsSection({
         label="Remove Powered by Invoplex"
         helperText="Remove the Powered by Invoplex text from the invoice footer"
         checked={removeInvoicePoweredBy}
-        onCheckedChange={setRemoveInvoicePoweredBy}
+        onCheckedChange={(checked) => {
+          setRemoveInvoicePoweredBy(checked);
+          onMarkChanged();
+        }}
         name="removeInvoicePoweredBy"
       />
 
@@ -147,7 +150,10 @@ export function InvoiceSettingsSection({
           <SettingsSwitch
             label="Enable Bank Details"
             checked={showBankDetails}
-            onCheckedChange={setShowBankDetails}
+            onCheckedChange={(checked) => {
+              setShowBankDetails(checked);
+              onMarkChanged();
+            }}
             name="showBankDetails"
           />
         </div>

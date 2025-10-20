@@ -120,7 +120,10 @@ export function QuoteSettingsSection({
         label="Remove Powered by Invoplex"
         helperText="Remove the Powered by Invoplex text from the quote footer"
         checked={removeQuotePoweredBy}
-        onCheckedChange={setRemoveQuotePoweredBy}
+        onCheckedChange={(checked) => {
+          setRemoveQuotePoweredBy(checked);
+          onMarkChanged();
+        }}
         name="removeQuotePoweredBy"
       />
     </SettingsSection>

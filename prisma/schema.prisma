@@ -131,14 +131,18 @@ model UserSettings {
   
   // Tax & Currency
   defaultTaxRate        Decimal @db.Decimal(5, 2) @default(0)
+  taxName               String  @default("Tax")
+  showTaxSettings       Boolean @default(false)
   defaultCurrency       String  @default("USD")
-  fiscalYearStartMonth  Int     @default(3)   // 1-12, month when fiscal year starts
-  fiscalYearStartDay    Int     @default(1)   // 1-31, day when fiscal year starts
+  currencyDisplayFormat String  @default("symbol_before")
+  fiscalYearStartMonth  Int     @default(3) // 1-12, month when fiscal year starts
+  fiscalYearStartDay    Int     @default(1) // 1-31, day when fiscal year starts
   
   // Template selection
   selectedTemplateId    String  @default("classic")
   
   // Bank details for invoices
+  showBankDetails       Boolean @default(false)
   bankName              String?
   accountName           String?
   accountNumber         String?
@@ -147,7 +151,7 @@ model UserSettings {
   swiftCode             String?
 
   // Dashboard Theme Color
-  dashboardPrimaryColor String  @default("#571cf9")  // Main accent - bg auto-generated
+  dashboardPrimaryColor String  @default("#571cf9") // Main accent
   
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

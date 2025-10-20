@@ -238,19 +238,30 @@ export async function saveFinancialSettings(
   showTaxSettings: boolean
 ): Promise<ActionResult> {
   try {
+    console.log("🔧 saveFinancialSettings called");
+    console.log("  userId:", userId);
+    console.log("  showTaxSettings:", showTaxSettings);
+
     const data = {
       defaultCurrency: formData.get("defaultCurrency") as string,
+      currencyDisplayFormat: formData.get("currencyDisplayFormat") as string,
       fiscalYearStartMonth: formData.get("fiscalYearStartMonth") as string,
       fiscalYearStartDay: formData.get("fiscalYearStartDay") as string,
       taxId: formData.get("taxId") as string,
       ...(showTaxSettings && {
+        taxName: formData.get("taxName") as string,
         defaultTaxRate: formData.get("defaultTaxRate") as string,
       }),
     };
 
+    console.log("  Extracted data:", data);
+
     const schema = getFinancialSettingsSchema(showTaxSettings);
     const validation = zodAdapter.validate(schema, data);
     if (!validation.success) {
+      console.error("Financial settings validation failed:", validation.errors);
+      console.error("Data received:", data);
+      console.error("Show tax settings:", showTaxSettings);
       return {
         success: false,
         message: "Validation failed",
@@ -277,22 +288,28 @@ export async function saveFinancialSettings(
       where: { userId },
       update: {
         defaultCurrency: validData.defaultCurrency,
+        currencyDisplayFormat:
+          validData.currencyDisplayFormat || "symbol_before",
         fiscalYearStartMonth: parseInt(validData.fiscalYearStartMonth, 10),
         fiscalYearStartDay: parseInt(validData.fiscalYearStartDay, 10),
-        ...(showTaxSettings &&
-          validData.defaultTaxRate && {
-            defaultTaxRate: parseFloat(validData.defaultTaxRate),
-          }),
+        showTaxSettings: showTaxSettings,
+        ...(showTaxSettings && {
+          taxName: validData.taxName,
+          defaultTaxRate: parseFloat(validData.defaultTaxRate),
+        }),
       },
       create: {
         userId,
         defaultCurrency: validData.defaultCurrency,
+        currencyDisplayFormat:
+          validData.currencyDisplayFormat || "symbol_before",
         fiscalYearStartMonth: parseInt(validData.fiscalYearStartMonth, 10),
         fiscalYearStartDay: parseInt(validData.fiscalYearStartDay, 10),
-        ...(showTaxSettings &&
-          validData.defaultTaxRate && {
-            defaultTaxRate: parseFloat(validData.defaultTaxRate),
-          }),
+        showTaxSettings: showTaxSettings,
+        ...(showTaxSettings && {
+          taxName: validData.taxName,
+          defaultTaxRate: parseFloat(validData.defaultTaxRate),
+        }),
       },
     });
 
@@ -301,10 +318,27 @@ export async function saveFinancialSettings(
       message: "Financial settings saved successfully",
     };
   } catch (error) {
-    console.error("Error saving financial settings:", error);
+    console.error("❌ Error saving financial settings:", error);
+    console.error(
+      "Error details:",
+      error instanceof Error ? error.message : error
+    );
+    console.error(
+      "Stack trace:",
+      error instanceof Error ? error.stack : "No stack trace"
+    );
     return {
       success: false,
-      message: "Failed to save financial settings",
+      message: `Failed to save financial settings: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+      errors: [
+        {
+          path: ["_error"],
+          message:
+            error instanceof Error ? error.message : "Unknown error occurred",
+        },
+      ],
     };
   }
 }
@@ -416,6 +450,7 @@ export async function saveInvoiceSettings(
         invoiceDefaultDueDays: parseInt(validData.invoiceDefaultDueDays, 10),
         invoiceDefaultTerms: validData.invoiceDefaultTerms || null,
         invoiceDefaultNotes: validData.invoiceDefaultNotes || null,
+        showBankDetails: showBankDetails,
         ...(showBankDetails && {
           bankName: validData.bankName || null,
           accountName: validData.accountName || null,
@@ -433,6 +468,7 @@ export async function saveInvoiceSettings(
         invoiceDefaultDueDays: parseInt(validData.invoiceDefaultDueDays, 10),
         invoiceDefaultTerms: validData.invoiceDefaultTerms || null,
         invoiceDefaultNotes: validData.invoiceDefaultNotes || null,
+        showBankDetails: showBankDetails,
         ...(showBankDetails && {
           bankName: validData.bankName || null,
           accountName: validData.accountName || null,

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Receipt } from "lucide-react";
 import {
   SettingsSection,
@@ -8,6 +9,7 @@ import {
 } from "@/app/components/settings";
 import {
   getCurrencyOptions,
+  getCurrencyDisplayFormatOptions,
   getFiscalYearMonthOptions,
   getFiscalYearDayOptions,
 } from "@/lib/data-utils";
@@ -37,6 +39,11 @@ export function FinancialSettingsSection({
   validationErrors,
   initialData,
 }: FinancialSettingsSectionProps) {
+  // Track selected currency for dynamic display format examples
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(
+    initialData?.userSettings?.defaultCurrency || "USD"
+  );
+
   // Helper to get error for a specific field
   const getFieldError = (fieldName: string): string | undefined => {
     if (!validationErrors) return undefined;
@@ -64,11 +71,29 @@ export function FinancialSettingsSection({
         name="defaultCurrency"
         defaultValue={initialData?.userSettings?.defaultCurrency || "USD"}
         options={getCurrencyOptions()}
-        onValueChange={onMarkChanged}
+        onValueChange={(value) => {
+          setSelectedCurrency(value);
+          onMarkChanged();
+        }}
         placeholder="Select currency..."
         searchPlaceholder="Search currency..."
         required
         error={getFieldError("defaultCurrency")}
+        helperText="Only certain currencies are currently supported"
+      />
+
+      <SettingsCombobox
+        label="Currency Display Format"
+        name="currencyDisplayFormat"
+        defaultValue={
+          initialData?.userSettings?.currencyDisplayFormat || "symbol_before"
+        }
+        options={getCurrencyDisplayFormatOptions(selectedCurrency)}
+        onValueChange={onMarkChanged}
+        placeholder="Select format..."
+        searchPlaceholder="Search format..."
+        helperText="Choose how currency symbols are displayed in your documents"
+        error={getFieldError("currencyDisplayFormat")}
       />
 
       <SettingsGrid columns={2}>
@@ -83,6 +108,7 @@ export function FinancialSettingsSection({
           placeholder="Select month..."
           searchPlaceholder="Search month..."
           helperText="Month when your fiscal/tax year begins"
+          required
           error={getFieldError("fiscalYearStartMonth")}
         />
         <SettingsCombobox
@@ -96,6 +122,7 @@ export function FinancialSettingsSection({
           placeholder="Select day..."
           searchPlaceholder="Search day..."
           helperText="Day when your fiscal/tax year begins"
+          required
           error={getFieldError("fiscalYearStartDay")}
         />
       </SettingsGrid>
@@ -115,33 +142,49 @@ export function FinancialSettingsSection({
           <h4 className="text-sm font-semibold mb-1">Taxes</h4>
           <p className="text-xs text-muted-foreground">
             {showFinancialSettings
-              ? "Configure tax ID and default tax rates for Quotes and Invoices"
+              ? "Configure default tax rates for Quotes and Invoices"
               : "Enable and configure tax for Quotes and Invoices"}
           </p>
         </div>
         <SettingsSwitch
           label="Enable Tax Settings"
           checked={showFinancialSettings}
-          onCheckedChange={setShowFinancialSettings}
+          onCheckedChange={(checked) => {
+            setShowFinancialSettings(checked);
+            onMarkChanged();
+          }}
           name="showTaxSettings"
         />
       </div>
 
       {showFinancialSettings && (
-        <SettingsInput
-          label="Default Tax Rate (%)"
-          name="defaultTaxRate"
-          type="number"
-          step="0.01"
-          placeholder="0.00"
-          defaultValue={
-            initialData?.userSettings?.defaultTaxRate?.toString() || "0.00"
-          }
-          min="0"
-          max="100"
-          onChange={onMarkChanged}
-          error={getFieldError("defaultTaxRate")}
-        />
+        <SettingsGrid columns={2}>
+          <SettingsInput
+            label="Tax Name"
+            name="taxName"
+            placeholder="e.g., VAT, GST, Sales Tax"
+            defaultValue={initialData?.userSettings?.taxName || "Tax"}
+            onChange={onMarkChanged}
+            required
+            error={getFieldError("taxName")}
+          />
+
+          <SettingsInput
+            label="Tax Rate (%)"
+            name="defaultTaxRate"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            defaultValue={
+              initialData?.userSettings?.defaultTaxRate?.toString() || "0.00"
+            }
+            min="0"
+            max="100"
+            onChange={onMarkChanged}
+            required
+            error={getFieldError("defaultTaxRate")}
+          />
+        </SettingsGrid>
       )}
     </SettingsSection>
   );

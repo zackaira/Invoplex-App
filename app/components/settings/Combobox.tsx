@@ -60,7 +60,8 @@ export function SettingsCombobox({
   const currentValue = value !== undefined ? value : internalValue;
 
   const handleSelect = (selectedValue: string) => {
-    const newValue = selectedValue === currentValue ? "" : selectedValue;
+    // Always set the selected value, don't toggle to empty
+    const newValue = selectedValue;
     if (value === undefined) {
       setInternalValue(newValue);
     }

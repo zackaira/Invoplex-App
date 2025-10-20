@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SettingsSwitch } from "@/app/components/settings";
+import { TooltipWrapper } from "../../ui/TooltipWrapper";
 
 export interface BusinessInfoVisibility {
   businessName: boolean;
@@ -70,7 +71,7 @@ export function BusinessInfoVisibilityModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-6">
           <SettingsSwitch
             label="Business Name"
             checked={localVisibility.businessName}
@@ -115,12 +116,25 @@ export function BusinessInfoVisibilityModal({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={handleApply}>
-            Apply
-          </Button>
+          <div className="flex w-full flex-row justify-between items-center">
+            <TooltipWrapper tooltip="Save this display for all quotes">
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-xs text-gray-500"
+              >
+                Save Display
+              </Button>
+            </TooltipWrapper>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleApply}>
+                Apply
+              </Button>
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

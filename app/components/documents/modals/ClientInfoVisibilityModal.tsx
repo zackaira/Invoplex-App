@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { SettingsSwitch } from "@/app/components/settings";
 import { ClientInfoVisibility } from "../types";
+import { TooltipWrapper } from "@/app/components/ui/TooltipWrapper";
 
 export interface ClientInfoVisibilityModalProps {
   open: boolean;
@@ -88,12 +89,25 @@ export function ClientInfoVisibilityModal({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={handleApply}>
-            Apply
-          </Button>
+          <div className="flex w-full flex-row justify-between items-center">
+            <TooltipWrapper tooltip="Save this display for all quotes">
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-xs text-gray-500"
+              >
+                Save Display
+              </Button>
+            </TooltipWrapper>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleApply}>
+                Apply
+              </Button>
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

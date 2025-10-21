@@ -39,6 +39,8 @@ interface DataTableProps<TData, TValue> {
   statusFilterOptions?: StatusFilterOption[];
   dateFilterColumn?: string;
   fiscalYearSettings?: FiscalYearSettings;
+  documentType?: "quote" | "invoice";
+  newDocumentRoute?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +52,8 @@ export function DataTable<TData, TValue>({
   statusFilterOptions = [],
   dateFilterColumn,
   fiscalYearSettings = { fiscalYearStartMonth: 3, fiscalYearStartDay: 1 },
+  documentType = "quote",
+  newDocumentRoute,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -165,6 +169,8 @@ export function DataTable<TData, TValue>({
         selectedDateFilter={dateFilter}
         onDateFilterChange={dateFilterColumn ? setDateFilter : undefined}
         fiscalYearSettings={fiscalYearSettings}
+        documentType={documentType}
+        newDocumentRoute={newDocumentRoute}
       />
       <div className="overflow-hidden">
         <Table>

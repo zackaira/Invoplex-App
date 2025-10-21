@@ -39,6 +39,7 @@ export function ModernItems({
   document,
   isEditable = false,
   onUpdate,
+  businessSettings,
 }: TemplateItemsProps) {
   return (
     <BaseItemsTable
@@ -46,6 +47,7 @@ export function ModernItems({
       isEditable={isEditable}
       onUpdate={onUpdate}
       styles={modernStyles}
+      businessSettings={businessSettings}
     />
   );
 }

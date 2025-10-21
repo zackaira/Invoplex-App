@@ -11,10 +11,15 @@ export function ModernFooter({
   type,
   isEditable = false,
   onUpdate,
+  businessSettings,
 }: TemplateFooterProps) {
   // Track whether to show notes and terms sections
-  const [showNotes, setShowNotes] = useState(!!document.notes);
-  const [showTerms, setShowTerms] = useState(!!document.terms);
+  const [showNotes, setShowNotes] = useState(
+    (document as any).showNotes ?? !!document.notes
+  );
+  const [showTerms, setShowTerms] = useState(
+    (document as any).showTerms ?? !!document.terms
+  );
   return (
     <div>
       {/* Totals Section with Modern Gradient Background */}
@@ -26,6 +31,7 @@ export function ModernFooter({
             type={type}
             isEditable={isEditable}
             onUpdate={onUpdate}
+            businessSettings={businessSettings}
           />
         </div>
       </div>
@@ -49,7 +55,10 @@ export function ModernFooter({
                   </span>
                   <Switch
                     checked={showNotes}
-                    onCheckedChange={setShowNotes}
+                    onCheckedChange={(checked) => {
+                      setShowNotes(checked);
+                      onUpdate?.({ showNotes: checked } as any);
+                    }}
                     className="data-[state=checked]:bg-yellow-600 scale-75"
                   />
                 </div>
@@ -59,10 +68,13 @@ export function ModernFooter({
               <>
                 {isEditable ? (
                   <Textarea
+                    id="document-notes"
+                    name="document-notes"
                     value={document.notes || ""}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                       onUpdate?.({ notes: e.target.value })
                     }
+                    autoResize
                     placeholder="Add notes for your client..."
                     className="!bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                     rows={4}
@@ -94,7 +106,10 @@ export function ModernFooter({
                   </span>
                   <Switch
                     checked={showTerms}
-                    onCheckedChange={setShowTerms}
+                    onCheckedChange={(checked) => {
+                      setShowTerms(checked);
+                      onUpdate?.({ showTerms: checked } as any);
+                    }}
                     className="data-[state=checked]:bg-blue-600 scale-75"
                   />
                 </div>
@@ -104,10 +119,13 @@ export function ModernFooter({
               <>
                 {isEditable ? (
                   <Textarea
+                    id="document-terms"
+                    name="document-terms"
                     value={document.terms || ""}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                       onUpdate?.({ terms: e.target.value })
                     }
+                    autoResize
                     placeholder="Add terms and conditions..."
                     className="!bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                     rows={4}

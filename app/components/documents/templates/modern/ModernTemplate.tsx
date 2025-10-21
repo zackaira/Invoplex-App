@@ -40,6 +40,7 @@ export function ModernTemplate({
             document={document}
             isEditable={isEditable}
             onUpdate={onUpdate}
+            businessSettings={businessSettings}
           />
         </div>
 
@@ -48,6 +49,7 @@ export function ModernTemplate({
           type={type}
           isEditable={isEditable}
           onUpdate={onUpdate}
+          businessSettings={businessSettings}
         />
       </div>
     </>

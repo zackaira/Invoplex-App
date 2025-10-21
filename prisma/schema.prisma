@@ -153,6 +153,10 @@ model UserSettings {
   // Dashboard Theme Color
   dashboardPrimaryColor String  @default("#571cf9") // Main accent
   
+  // Default Display Settings for new documents
+  defaultBusinessFieldsToShow String? @db.Text // JSON array of business fields to show by default
+  defaultClientFieldsToShow   String? @db.Text // JSON array of client fields to show by default
+  
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
@@ -267,6 +271,18 @@ model Document {
   terms           String?        @db.Text
   internalNotes   String?        @db.Text // Private notes, not shown to client
   
+  // Display Settings - Control what information is shown on the document
+  showDiscount    Boolean        @default(false)
+  showTax         Boolean        @default(true)
+  showNotes       Boolean        @default(true)
+  showTerms       Boolean        @default(true)
+  
+  // Business Information Display - Which business fields to show
+  businessFieldsToShow String?    @db.Text // JSON array of field names
+  
+  // Client Information Display - Which client fields to show
+  clientFieldsToShow   String?    @db.Text // JSON array of field names
+  
   // Line items and payments
   items           DocumentItem[]
   payments        Payment[]
@@ -295,6 +311,7 @@ model DocumentItem {
   unitPrice          Decimal  @db.Decimal(12, 2)
   amount             Decimal  @db.Decimal(12, 2) // quantity * unitPrice
   hasQuantityColumn  Boolean  @default(false) // Whether to show quantity column for this item
+  sourceProductId    String?  // Optional reference to the saved product this item came from
   
   order              Int      // For sorting line items
   
@@ -331,25 +348,29 @@ model Payment {
 // PRODUCT/SERVICE CATALOG
 // ============================================
 
-// Optional: Pre-save common products/services for quick adding to quotes/invoices
-// Saves time by not having to re-type descriptions and prices every time
+// Stores reusable products and services that users explicitly save
+// These can be quickly added to quotes/invoices
 model Product {
-  id          String      @id @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  name        String
-  description String?     @db.Text
-  unitPrice   Decimal     @db.Decimal(12, 2)
-  type        ProductType @default(SERVICE)
+  name        String   // Product/Service name
+  description String?  @db.Text // Detailed description
+  unitPrice   Decimal  @db.Decimal(12, 2) // Default price
+  type        String   @default("Product") // Product, Service, or custom type
+  hasQuantityColumn Boolean @default(false) // Whether this item has a quantity column
   
-  isActive    Boolean     @default(true)
+  isActive    Boolean  @default(true) // Can be deactivated instead of deleted
   
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   
   @@index([userId])
+  @@index([type])
+  @@index([isActive])
 }
+
 
 // ============================================
 // ENUMS
@@ -390,10 +411,4 @@ enum PaymentMethod {
   PAYPAL
   STRIPE
   OTHER
-}
-
-// Type of product/service being sold
-enum ProductType {
-  PRODUCT
-  SERVICE
 }

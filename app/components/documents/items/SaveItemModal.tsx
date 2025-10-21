@@ -11,14 +11,15 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { TypeSelect } from "./TypeSelect";
 
 interface SaveItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { itemType: string; hasQuantityColumn: boolean }) => void;
-  mode?: "add" | "save"; // "add" = add to list, "save" = save to database
-  onHasQuantityColumnChange?: (value: boolean) => void; // Real-time update for save mode
+  onAdd: (data: { itemType: string; hasQuantityColumn: boolean }) => void;
+  userId: string;
   initialType?: string;
   initialHasQuantityColumn?: boolean;
 }
@@ -26,9 +27,8 @@ interface SaveItemModalProps {
 export function SaveItemModal({
   isOpen,
   onClose,
-  onSave,
-  mode = "add",
-  onHasQuantityColumnChange,
+  onAdd,
+  userId,
   initialType = "Product",
   initialHasQuantityColumn = false,
 }: SaveItemModalProps) {
@@ -45,8 +45,8 @@ export function SaveItemModal({
     }
   }, [isOpen, initialType, initialHasQuantityColumn]);
 
-  const handleSave = () => {
-    onSave({ itemType, hasQuantityColumn });
+  const handleAdd = () => {
+    onAdd({ itemType, hasQuantityColumn });
     onClose();
   };
 
@@ -56,41 +56,44 @@ export function SaveItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>
-            {mode === "save" ? "Save Item to Database" : "Add a New Line Item"}
-          </DialogTitle>
+          <DialogTitle>Add a New Line Item</DialogTitle>
           <DialogDescription>
-            {mode === "save"
-              ? "Save this item as a reusable product or service for future quotes."
-              : "Create a new line item for your quote."}
+            Choose the type of item and whether it has a quantity column.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-8 pt-4 pb-6">
+        <div className="space-y-6 pt-4 pb-6">
           {/* Item Type */}
           <div>
-            <label className="block text-sm font-medium mb-2">Type</label>
+            <label
+              htmlFor="item-type"
+              className="block text-sm font-medium mb-2"
+            >
+              Type
+            </label>
             <TypeSelect
+              id="item-type"
               value={itemType}
               onChange={setItemType}
+              userId={userId}
               className="w-full"
             />
           </div>
 
           {/* Has Quantity Column Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Has Quantity Column</label>
+            <label
+              htmlFor="has-quantity-column"
+              className="text-sm font-medium"
+            >
+              Has Quantity Column
+            </label>
             <Switch
+              id="has-quantity-column"
               checked={hasQuantityColumn}
-              onCheckedChange={(checked) => {
-                setHasQuantityColumn(checked);
-                // In save mode, update the line item in real-time
-                if (mode === "save" && onHasQuantityColumnChange) {
-                  onHasQuantityColumnChange(checked);
-                }
-              }}
+              onCheckedChange={setHasQuantityColumn}
             />
           </div>
         </div>
@@ -100,9 +103,7 @@ export function SaveItemModal({
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>
-            {mode === "save" ? "Save Item" : "Add Item"}
-          </Button>
+          <Button onClick={handleAdd}>Add Item</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

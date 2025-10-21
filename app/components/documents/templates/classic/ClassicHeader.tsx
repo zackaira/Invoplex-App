@@ -12,6 +12,7 @@ import {
   BusinessInfoDisplay,
   ClientInfoDisplay,
 } from "../../shared";
+import { TooltipWrapper } from "@/app/components/ui/TooltipWrapper";
 
 export function ClassicHeader({
   document,
@@ -58,7 +59,9 @@ export function ClassicHeader({
         {/* Title and Document Info */}
         <div className="text-right">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {type === "QUOTE" ? "Quote" : "Invoice"}
+            {type === "QUOTE"
+              ? businessSettings?.quoteTitle || "QUOTE"
+              : businessSettings?.invoiceTitle || "INVOICE"}
           </h1>
           <p className="text-lg text-gray-600 mb-3">
             {document.documentNumber}
@@ -86,14 +89,16 @@ export function ClassicHeader({
               From
             </h3>
             {isEditable && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 !text-invoplex hover:!bg-gray-100 hover:!text-gray-900"
-                onClick={onOpenBusinessInfoModal}
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
+              <TooltipWrapper tooltip="Edit Info to display" side="top">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 !text-invoplex hover:!bg-gray-100 hover:!text-gray-900"
+                  onClick={onOpenBusinessInfoModal}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipWrapper>
             )}
           </div>
           <div className="text-gray-900">
@@ -113,20 +118,24 @@ export function ClassicHeader({
             {isEditable && (
               <>
                 <ClientSelect
+                  userId={document.userId}
                   value={selectedClientId}
                   onChange={handleClientChange}
                   onCreateNew={onOpenClientModal}
                   className="text-xs h-6 !text-gray-600 hover:!bg-gray-100 hover:!text-gray-900"
                   align="center"
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 !text-invoplex hover:!bg-gray-100 hover:!text-gray-900"
-                  onClick={onOpenClientInfoModal}
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
+
+                <TooltipWrapper tooltip="Edit Info to display" side="top">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 !text-invoplex hover:!bg-gray-100 hover:!text-gray-900"
+                    onClick={onOpenClientInfoModal}
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </TooltipWrapper>
               </>
             )}
           </div>

@@ -38,6 +38,7 @@ export function ClassicItems({
   document,
   isEditable = false,
   onUpdate,
+  businessSettings,
 }: TemplateItemsProps) {
   return (
     <BaseItemsTable
@@ -45,6 +46,7 @@ export function ClassicItems({
       isEditable={isEditable}
       onUpdate={onUpdate}
       styles={classicStyles}
+      businessSettings={businessSettings}
     />
   );
 }

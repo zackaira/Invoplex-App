@@ -28,6 +28,7 @@ export interface BusinessInfoVisibilityModalProps {
   onOpenChange: (open: boolean) => void;
   visibility: BusinessInfoVisibility;
   onVisibilityChange: (visibility: BusinessInfoVisibility) => void;
+  onSaveAsDefault?: (visibility: BusinessInfoVisibility) => void;
 }
 
 export function BusinessInfoVisibilityModal({
@@ -35,6 +36,7 @@ export function BusinessInfoVisibilityModal({
   onOpenChange,
   visibility,
   onVisibilityChange,
+  onSaveAsDefault,
 }: BusinessInfoVisibilityModalProps) {
   const [localVisibility, setLocalVisibility] =
     React.useState<BusinessInfoVisibility>(visibility);
@@ -59,6 +61,12 @@ export function BusinessInfoVisibilityModal({
   const handleCancel = () => {
     setLocalVisibility(visibility); // Reset to original values
     onOpenChange(false);
+  };
+
+  const handleSaveAsDefault = () => {
+    if (onSaveAsDefault) {
+      onSaveAsDefault(localVisibility);
+    }
   };
 
   return (
@@ -117,11 +125,12 @@ export function BusinessInfoVisibilityModal({
 
         <DialogFooter>
           <div className="flex w-full flex-row justify-between items-center">
-            <TooltipWrapper tooltip="Save this display for all quotes">
+            <TooltipWrapper tooltip="Save this display as default for all new quotes">
               <Button
                 type="button"
                 variant="ghost"
                 className="text-xs text-gray-500"
+                onClick={handleSaveAsDefault}
               >
                 Save Display
               </Button>

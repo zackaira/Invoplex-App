@@ -11,21 +11,28 @@ export function ClassicFooter({
   type,
   isEditable = false,
   onUpdate,
+  businessSettings,
 }: TemplateFooterProps) {
   // Track whether to show notes and terms sections
-  const [showNotes, setShowNotes] = useState(!!document.notes);
-  const [showTerms, setShowTerms] = useState(!!document.terms);
+  const [showNotes, setShowNotes] = useState(
+    (document as any).showNotes ?? !!document.notes
+  );
+  const [showTerms, setShowTerms] = useState(
+    (document as any).showTerms ?? !!document.terms
+  );
 
   return (
     <div>
       {/* Totals Section */}
-      <div className="flex justify-between items-end mb-10">
+      <div className="flex justify-between items-end mb-20">
         <BrandingSection />
+
         <TotalsSection
           document={document}
           type={type}
           isEditable={isEditable}
           onUpdate={onUpdate}
+          businessSettings={businessSettings}
         />
       </div>
 
@@ -52,7 +59,10 @@ export function ClassicFooter({
                   </span>
                   <Switch
                     checked={showNotes}
-                    onCheckedChange={setShowNotes}
+                    onCheckedChange={(checked) => {
+                      setShowNotes(checked);
+                      onUpdate?.({ showNotes: checked } as any);
+                    }}
                     className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                   />
                 </div>
@@ -62,10 +72,13 @@ export function ClassicFooter({
               <>
                 {isEditable ? (
                   <Textarea
+                    id="document-notes"
+                    name="document-notes"
                     value={document.notes || ""}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                       onUpdate?.({ notes: e.target.value })
                     }
+                    autoResize
                     placeholder="Add notes for your client..."
                     className="text-sm !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                     rows={3}
@@ -101,7 +114,10 @@ export function ClassicFooter({
                   </span>
                   <Switch
                     checked={showTerms}
-                    onCheckedChange={setShowTerms}
+                    onCheckedChange={(checked) => {
+                      setShowTerms(checked);
+                      onUpdate?.({ showTerms: checked } as any);
+                    }}
                     className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                   />
                 </div>
@@ -111,10 +127,13 @@ export function ClassicFooter({
               <>
                 {isEditable ? (
                   <Textarea
+                    id="document-terms"
+                    name="document-terms"
                     value={document.terms || ""}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                       onUpdate?.({ terms: e.target.value })
                     }
+                    autoResize
                     placeholder="Add terms and conditions..."
                     className="text-sm !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                     rows={3}

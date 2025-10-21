@@ -7,11 +7,23 @@ import {
   BusinessSettings,
 } from "@/app/components/documents/types";
 import { useRouter } from "next/navigation";
-import { getDocumentById } from "@/lib/actions";
-import { getUserSettings } from "@/lib/actions/settings";
+import {
+  getDocumentById,
+  createDocument,
+  updateDocument,
+  getUserSettings,
+} from "@/lib/actions";
+import { toast } from "sonner";
 
-// Helper function to create an empty new quote
-function createEmptyQuote(): DocumentWithRelations {
+// Helper function to create an empty new quote with default settings
+function createEmptyQuote(
+  defaultNotes?: string | null,
+  defaultTerms?: string | null,
+  defaultCurrency?: string,
+  defaultTaxRate?: number,
+  defaultBusinessFieldsToShow?: string | null,
+  defaultClientFieldsToShow?: string | null
+): DocumentWithRelations {
   const now = new Date();
   const validUntil = new Date();
   validUntil.setDate(validUntil.getDate() + 30); // 30 days validity
@@ -35,7 +47,7 @@ function createEmptyQuote(): DocumentWithRelations {
       state: null,
       zipCode: null,
       country: null,
-      currency: "USD",
+      currency: defaultCurrency || "USD",
       taxId: null,
       createdAt: now,
       updatedAt: now,
@@ -48,17 +60,40 @@ function createEmptyQuote(): DocumentWithRelations {
     convertedAt: null,
     convertedToId: null,
     convertedFromId: null,
-    currency: "USD",
+    currency: defaultCurrency || "USD",
     subtotal: "0.00",
-    taxRate: "0.00",
+    taxRate: String(defaultTaxRate || 0),
     taxAmount: "0.00",
     discount: "0.00",
     total: "0.00",
     amountPaid: "0.00",
     amountDue: "0.00",
-    notes: null,
-    terms: null,
+    notes: defaultNotes,
+    terms: defaultTerms,
     internalNotes: null,
+    showDiscount: false,
+    showTax: true,
+    showNotes: true,
+    showTerms: true,
+    businessFieldsToShow:
+      defaultBusinessFieldsToShow ||
+      JSON.stringify({
+        businessName: true,
+        personalName: false,
+        email: true,
+        phone: true,
+        website: true,
+        taxId: false,
+        address: false,
+      }),
+    clientFieldsToShow:
+      defaultClientFieldsToShow ||
+      JSON.stringify({
+        name: true,
+        contact: true,
+        address: true,
+        email: true,
+      }),
     items: [],
     payments: [],
     createdAt: now,
@@ -83,8 +118,24 @@ export default function EditQuotePage({
     async function fetchDocument() {
       try {
         if (id === "new") {
-          // Create a new empty quote
-          setDocument(createEmptyQuote());
+          // Fetch user settings to get defaults for new quote
+          const userId = "cmgexy4630002r7qfecfve8hq";
+          const settingsResult = await getUserSettings(userId);
+          const userSettings = settingsResult?.data?.userSettings;
+
+          // Create a new empty quote with default settings
+          setDocument(
+            createEmptyQuote(
+              userSettings?.quoteDefaultNotes,
+              userSettings?.quoteDefaultTerms,
+              userSettings?.defaultCurrency,
+              userSettings?.defaultTaxRate
+                ? Number(userSettings.defaultTaxRate)
+                : undefined,
+              userSettings?.defaultBusinessFieldsToShow,
+              userSettings?.defaultClientFieldsToShow
+            )
+          );
         } else {
           // Fetch existing quote
           const doc = await getDocumentById(id, "QUOTE");
@@ -106,8 +157,11 @@ export default function EditQuotePage({
         const userId = "cmgexy4630002r7qfecfve8hq";
         const settingsResult = await getUserSettings(userId);
         const businessProfile = settingsResult?.data?.businessProfile;
-        if (businessProfile) {
+        const userSettings = settingsResult?.data?.userSettings;
+
+        if (businessProfile && userSettings) {
           setBusinessSettings({
+            // Business Profile fields
             personalName: businessProfile.personalName,
             businessName: businessProfile.businessName,
             email: businessProfile.email,
@@ -122,6 +176,18 @@ export default function EditQuotePage({
             taxId: businessProfile.taxId,
             registrationNumber: businessProfile.registrationNumber,
             brandColor: businessProfile.brandColor,
+
+            // User Settings fields
+            quoteTitle: userSettings.quoteTitle,
+            invoiceTitle: userSettings.invoiceTitle,
+            defaultCurrency: userSettings.defaultCurrency,
+            currencyDisplayFormat: userSettings.currencyDisplayFormat,
+            taxName: userSettings.taxName,
+            defaultTaxRate: Number(userSettings.defaultTaxRate),
+            quoteDefaultNotes: userSettings.quoteDefaultNotes,
+            quoteDefaultTerms: userSettings.quoteDefaultTerms,
+            invoiceDefaultNotes: userSettings.invoiceDefaultNotes,
+            invoiceDefaultTerms: userSettings.invoiceDefaultTerms,
           });
         }
       } catch (error) {
@@ -139,20 +205,109 @@ export default function EditQuotePage({
   };
 
   const handleSave = async () => {
+    if (!document) return;
+
+    // Validate required fields
+    if (!document.clientId || document.clientId === "") {
+      toast.error("Please select a client");
+      return;
+    }
+
+    if (!document.items || document.items.length === 0) {
+      toast.error("Please add at least one item");
+      return;
+    }
+
     setIsSaving(true);
     try {
       if (id === "new") {
-        // TODO: Implement create new document in database
-        // const newDoc = await createDocument(document);
-        // router.push(`/quote/${newDoc.id}`);
-        console.log("Creating new quote:", document);
+        // Create new quote
+        const newDoc = await createDocument({
+          userId: document.userId,
+          documentNumber: document.documentNumber,
+          type: "QUOTE",
+          status: document.status,
+          clientId: document.clientId,
+          contactId: document.contactId,
+          issueDate: new Date(document.issueDate),
+          dueDate: document.dueDate ? new Date(document.dueDate) : null,
+          validUntil: document.validUntil
+            ? new Date(document.validUntil)
+            : null,
+          currency: document.currency,
+          subtotal: document.subtotal.toString(),
+          taxRate: document.taxRate.toString(),
+          taxAmount: document.taxAmount.toString(),
+          discount: document.discount.toString(),
+          total: document.total.toString(),
+          amountPaid: document.amountPaid?.toString(),
+          amountDue: document.amountDue?.toString(),
+          notes: document.notes,
+          terms: document.terms,
+          internalNotes: document.internalNotes,
+          showDiscount: (document as any).showDiscount,
+          showTax: (document as any).showTax,
+          showNotes: (document as any).showNotes,
+          showTerms: (document as any).showTerms,
+          businessFieldsToShow: (document as any).businessFieldsToShow,
+          clientFieldsToShow: (document as any).clientFieldsToShow,
+          items: document.items.map((item, index) => ({
+            itemType: item.itemType || "Product",
+            description: item.description,
+            quantity: item.quantity.toString(),
+            unitPrice: item.unitPrice.toString(),
+            amount: item.amount.toString(),
+            hasQuantityColumn: item.hasQuantityColumn ?? false,
+            order: index,
+          })),
+        });
+        toast.success("Quote created successfully!");
+        router.push(`/quote/${newDoc.id}`);
       } else {
-        // TODO: Implement update existing document
-        // await updateDocument(document);
+        // Update existing quote
+        await updateDocument(id, {
+          documentNumber: document.documentNumber,
+          status: document.status,
+          clientId: document.clientId,
+          contactId: document.contactId,
+          issueDate: new Date(document.issueDate),
+          dueDate: document.dueDate ? new Date(document.dueDate) : null,
+          validUntil: document.validUntil
+            ? new Date(document.validUntil)
+            : null,
+          currency: document.currency,
+          subtotal: document.subtotal.toString(),
+          taxRate: document.taxRate.toString(),
+          taxAmount: document.taxAmount.toString(),
+          discount: document.discount.toString(),
+          total: document.total.toString(),
+          amountPaid: document.amountPaid?.toString(),
+          amountDue: document.amountDue?.toString(),
+          notes: document.notes,
+          terms: document.terms,
+          internalNotes: document.internalNotes,
+          showDiscount: (document as any).showDiscount,
+          showTax: (document as any).showTax,
+          showNotes: (document as any).showNotes,
+          showTerms: (document as any).showTerms,
+          businessFieldsToShow: (document as any).businessFieldsToShow,
+          clientFieldsToShow: (document as any).clientFieldsToShow,
+          items: document.items.map((item, index) => ({
+            itemType: item.itemType || "Product",
+            description: item.description,
+            quantity: item.quantity.toString(),
+            unitPrice: item.unitPrice.toString(),
+            amount: item.amount.toString(),
+            hasQuantityColumn: item.hasQuantityColumn ?? false,
+            order: index,
+          })),
+        });
+        toast.success("Quote updated successfully!");
         router.push(`/quote/${id}`);
       }
     } catch (error) {
       console.error("Failed to save:", error);
+      toast.error("Failed to save quote. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -175,6 +330,8 @@ export default function EditQuotePage({
         isEditable={true}
         onUpdate={handleUpdate}
         onTemplateChange={setTemplateId}
+        onSave={handleSave}
+        isSaving={isSaving}
         businessSettings={businessSettings}
       />
     </div>

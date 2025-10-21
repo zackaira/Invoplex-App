@@ -43,6 +43,8 @@ interface DataTableToolbarProps<TData> {
   selectedDateFilter?: DateFilterValue;
   onDateFilterChange?: (filter: DateFilterValue) => void;
   fiscalYearSettings?: FiscalYearSettings;
+  documentType?: "quote" | "invoice";
+  newDocumentRoute?: string;
 }
 
 export function DataTableToolbar<TData>({
@@ -55,6 +57,8 @@ export function DataTableToolbar<TData>({
   selectedDateFilter = "last_3_months",
   onDateFilterChange,
   fiscalYearSettings = { fiscalYearStartMonth: 3, fiscalYearStartDay: 1 },
+  documentType = "quote",
+  newDocumentRoute,
 }: DataTableToolbarProps<TData>) {
   const toggleStatus = (status: string) => {
     const newStatuses = selectedStatuses.includes(status)
@@ -63,6 +67,14 @@ export function DataTableToolbar<TData>({
     onStatusChange?.(newStatuses);
   };
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
+
+  // Get document type labels
+  const documentLabel = documentType === "invoice" ? "Invoice" : "Quote";
+  const documentLabelPlural =
+    documentType === "invoice" ? "Invoices" : "Quotes";
+  const defaultNewRoute =
+    documentType === "invoice" ? "/invoice/new/edit" : "/quote/new/edit";
+  const newRoute = newDocumentRoute || defaultNewRoute;
 
   const dateFilterOptions = React.useMemo(() => {
     return getDateFilterOptions(fiscalYearSettings);
@@ -171,7 +183,9 @@ export function DataTableToolbar<TData>({
           <>
             {/* delete icon */}
             <TooltipWrapper
-              tooltip={`Delete Quote${selectedCount > 1 ? "s" : ""}`}
+              tooltip={`Delete ${
+                selectedCount > 1 ? documentLabelPlural : documentLabel
+              }`}
               side="bottom"
             >
               <Button variant="outline">
@@ -194,7 +208,7 @@ export function DataTableToolbar<TData>({
 
             {/* edit icon */}
             {selectedCount === 1 && (
-              <TooltipWrapper tooltip="Edit Quote" side="bottom">
+              <TooltipWrapper tooltip={`Edit ${documentLabel}`} side="bottom">
                 <Button variant="outline">
                   <PencilIcon className="h-4 w-4" />
                 </Button>
@@ -203,11 +217,11 @@ export function DataTableToolbar<TData>({
           </>
         )}
 
-        {/* download icon */}
-        <Button variant="outline" title="New Quote" asChild>
-          <Link href="/quote/new/edit">
+        {/* New document button */}
+        <Button variant="outline" title={`New ${documentLabel}`} asChild>
+          <Link href={newRoute}>
             <PlusIcon className="h-4 w-4" />
-            New Quote
+            New {documentLabel}
           </Link>
         </Button>
       </div>

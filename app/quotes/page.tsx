@@ -51,6 +51,7 @@ export default async function Quotes() {
               }
             : undefined
         }
+        documentType="quote"
       />
     </div>
   );

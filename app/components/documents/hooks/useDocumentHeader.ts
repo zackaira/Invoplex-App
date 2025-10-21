@@ -19,9 +19,27 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DocumentWithRelations } from "@/app/components/documents/types";
-import { DUMMY_CLIENTS } from "../modals/clients";
+import { getClientsByUserId } from "@/lib/actions";
+
+interface Client {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  country: string | null;
+  currency: string;
+  taxId: string | null;
+  userId: string;
+  website: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface UseDocumentHeaderProps {
   document: DocumentWithRelations;
@@ -60,6 +78,24 @@ export function useDocumentHeader({
   const [selectedClientId, setSelectedClientId] = useState<string | undefined>(
     document.client?.id
   );
+
+  // Store fetched clients
+  const [clients, setClients] = useState<Client[]>([]);
+
+  // Fetch clients for this user
+  useEffect(() => {
+    if (document.userId) {
+      getClientsByUserId(document.userId)
+        .then((data) => {
+          if (data) {
+            setClients(data);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch clients:", error);
+        });
+    }
+  }, [document.userId]);
 
   /**
    * Handles issue date changes
@@ -108,9 +144,12 @@ export function useDocumentHeader({
 
     // Update document with full client object
     if (clientId && onUpdate) {
-      const selectedClient = DUMMY_CLIENTS.find((c) => c.id === clientId);
+      const selectedClient = clients.find((c) => c.id === clientId);
       if (selectedClient) {
-        onUpdate({ client: selectedClient as any });
+        onUpdate({
+          clientId: selectedClient.id,
+          client: selectedClient as any,
+        });
       }
     }
   };
@@ -120,7 +159,7 @@ export function useDocumentHeader({
    * Uses the selected client if available, otherwise falls back to document's client
    */
   const displayClient =
-    DUMMY_CLIENTS.find((c) => c.id === selectedClientId) || document.client;
+    clients.find((c) => c.id === selectedClientId) || document.client;
 
   // Return all state and handlers for use in template components
   return {

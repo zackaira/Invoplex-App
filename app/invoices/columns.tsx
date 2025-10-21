@@ -23,8 +23,8 @@ declare module "@tanstack/react-table" {
   }
 }
 
-// This type represents a quote with its client relationship
-export type Quote = {
+// This type represents an invoice with its client relationship
+export type Invoice = {
   id: string;
   documentNumber: string;
   status: string;
@@ -39,10 +39,10 @@ export type Quote = {
 const statusColors: Record<string, string> = {
   DRAFT: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100",
   SENT: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100",
-  APPROVED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100",
-  REJECTED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100",
-  CONVERTED:
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100",
+  PARTIAL:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100",
+  PAID: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100",
+  OVERDUE: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100",
   CANCELLED: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100",
 };
 
@@ -58,7 +58,7 @@ const columnOrder = [
 ];
 
 // Define all column definitions (order doesn't matter here)
-const columnDefinitions: ColumnDef<Quote>[] = [
+const columnDefinitions: ColumnDef<Invoice>[] = [
   {
     id: "select",
     meta: {
@@ -217,7 +217,7 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     cell: ({ row }) => {
       return (
         <Link
-          href={`/quote/${row.original.id}`}
+          href={`/invoice/${row.original.id}`}
           className="text-md font-medium cursor-pointer transition-colors py-4 group-hover/row:text-invoplex"
         >
           {row.original.client.name}
@@ -261,7 +261,7 @@ const columnDefinitions: ColumnDef<Quote>[] = [
     },
     enableHiding: false,
     cell: ({ row }) => {
-      const quote = row.original;
+      const invoice = row.original;
 
       return (
         <DropdownMenu>
@@ -273,10 +273,10 @@ const columnDefinitions: ColumnDef<Quote>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
-              <Link href={`/quote/${quote.id}/edit`}>Edit</Link>
+              <Link href={`/invoice/${invoice.id}/edit`}>Edit</Link>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => console.log("Duplicating Quote...")}
+              onClick={() => console.log("Duplicating Invoice...")}
             >
               Duplicate
             </DropdownMenuItem>
@@ -284,19 +284,23 @@ const columnDefinitions: ColumnDef<Quote>[] = [
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              onClick={() => console.log("Converting Quote to Invoice...")}
+              onClick={() => console.log("Recording Payment...")}
             >
-              Convert to invoice
+              Record payment
             </DropdownMenuItem>
 
             <DropdownMenuItem onClick={() => console.log("Downloading PDF...")}>
               Download PDF
             </DropdownMenuItem>
 
+            <DropdownMenuItem onClick={() => console.log("Sending Invoice...")}>
+              Send invoice
+            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
 
             <DropdownMenuItem className="text-destructive">
-              Delete quote
+              Delete invoice
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -306,7 +310,7 @@ const columnDefinitions: ColumnDef<Quote>[] = [
 ];
 
 // Helper function to get column identifier
-const getColumnId = (column: ColumnDef<Quote>): string => {
+const getColumnId = (column: ColumnDef<Invoice>): string => {
   if ("id" in column && column.id) return column.id;
   if ("accessorKey" in column && column.accessorKey)
     return column.accessorKey as string;
@@ -314,13 +318,13 @@ const getColumnId = (column: ColumnDef<Quote>): string => {
 };
 
 // Create a map of columns by their id/accessorKey
-const columnMap = new Map<string, ColumnDef<Quote>>();
+const columnMap = new Map<string, ColumnDef<Invoice>>();
 columnDefinitions.forEach((col) => {
   const id = getColumnId(col);
   if (id) columnMap.set(id, col);
 });
 
 // Reorder columns based on columnOrder array
-export const columns: ColumnDef<Quote>[] = columnOrder
+export const columns: ColumnDef<Invoice>[] = columnOrder
   .map((id) => columnMap.get(id))
-  .filter((col): col is ColumnDef<Quote> => col !== undefined);
+  .filter((col): col is ColumnDef<Invoice> => col !== undefined);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DocumentWithRelations } from "../types";
+import { DocumentWithRelations, BusinessSettings } from "../types";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -12,12 +12,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { DocumentTotals } from "../items/Totals";
+import { formatCurrency, formatCurrencyInput } from "@/lib/currency-utils";
 
 interface TotalsSectionProps {
   document: DocumentWithRelations;
   type: "QUOTE" | "INVOICE";
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  businessSettings?: BusinessSettings;
 }
 
 export function TotalsSection({
@@ -25,6 +27,7 @@ export function TotalsSection({
   type,
   isEditable = false,
   onUpdate,
+  businessSettings,
 }: TotalsSectionProps) {
   // Track whether to show discount and tax
   const [showDiscount, setShowDiscount] = useState(
@@ -35,6 +38,15 @@ export function TotalsSection({
   const [discountType, setDiscountType] = useState<"fixed" | "percentage">(
     "fixed"
   );
+
+  // Get tax name from settings or use default
+  const taxName = businessSettings?.taxName || "Tax";
+
+  // Get currency display preferences
+  const currencyCode = document.currency;
+  const displayFormat =
+    businessSettings?.currencyDisplayFormat || "symbol_before";
+  const currencySymbol = formatCurrencyInput(currencyCode, displayFormat);
 
   return (
     <DocumentTotals
@@ -57,7 +69,11 @@ export function TotalsSection({
             </div>
 
             <span className="font-medium">
-              {document.currency} {document.subtotal.toString()}
+              {formatCurrency(
+                document.subtotal.toString(),
+                currencyCode,
+                displayFormat
+              )}
             </span>
           </div>
 
@@ -90,9 +106,11 @@ export function TotalsSection({
                   {isEditable ? (
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-900">
-                        {discountType === "fixed" ? document.currency : ""}
+                        {discountType === "fixed" ? currencySymbol : ""}
                       </span>
                       <Input
+                        id="document-discount"
+                        name="document-discount"
                         type="number"
                         step="0.01"
                         value={document.discount.toString()}
@@ -144,9 +162,14 @@ export function TotalsSection({
                     </div>
                   ) : (
                     <span className="font-medium text-red-600">
-                      -{discountType === "fixed" ? document.currency : ""}{" "}
-                      {document.discount.toString()}
-                      {discountType === "percentage" ? "%" : ""}
+                      -
+                      {discountType === "fixed"
+                        ? formatCurrency(
+                            document.discount.toString(),
+                            currencyCode,
+                            displayFormat
+                          )
+                        : `${document.discount.toString()}%`}
                     </span>
                   )}
                 </>
@@ -174,11 +197,15 @@ export function TotalsSection({
                   </div>
                 )}
 
-                <span className={`${showTax ? "" : "text-gray-400"}`}>Tax</span>
+                <span className={`${showTax ? "" : "text-gray-400"}`}>
+                  {taxName}
+                </span>
 
                 {isEditable && showTax && (
                   <>
                     <Input
+                      id="document-tax-rate"
+                      name="document-tax-rate"
                       type="number"
                       step="0.01"
                       value={document.taxRate.toString()}
@@ -196,7 +223,11 @@ export function TotalsSection({
 
               {showTax && (
                 <span className="font-medium text-gray-900">
-                  {document.currency} {document.taxAmount.toString()}
+                  {formatCurrency(
+                    document.taxAmount.toString(),
+                    currencyCode,
+                    displayFormat
+                  )}
                 </span>
               )}
             </div>
@@ -210,7 +241,11 @@ export function TotalsSection({
             )}
             <span>Total</span>
             <span className="flex-1 text-right">
-              {document.currency} {document.total.toString()}
+              {formatCurrency(
+                document.total.toString(),
+                currencyCode,
+                displayFormat
+              )}
             </span>
           </div>
         </div>

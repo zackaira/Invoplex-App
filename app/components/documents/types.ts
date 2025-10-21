@@ -87,13 +87,15 @@ export interface ClientInfoVisibility {
  * Business settings from the database
  *
  * This interface contains the actual business profile data including
- * branding elements like logo and brand color.
+ * branding elements like logo and brand color, plus user settings for
+ * document defaults.
  *
  * Used by:
  * - TemplateProps
  * - TemplateHeaderProps
  */
 export interface BusinessSettings {
+  // Business Profile fields
   personalName?: string | null;
   businessName: string;
   email?: string | null;
@@ -108,6 +110,18 @@ export interface BusinessSettings {
   taxId?: string | null;
   registrationNumber?: string | null;
   brandColor?: string | null;
+
+  // User Settings fields for documents
+  quoteTitle?: string;
+  invoiceTitle?: string;
+  defaultCurrency?: string;
+  currencyDisplayFormat?: string;
+  taxName?: string;
+  defaultTaxRate?: number;
+  quoteDefaultNotes?: string | null;
+  quoteDefaultTerms?: string | null;
+  invoiceDefaultNotes?: string | null;
+  invoiceDefaultTerms?: string | null;
 }
 
 /**
@@ -185,6 +199,7 @@ export interface TemplateItemsProps {
   document: DocumentWithRelations;
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  businessSettings?: BusinessSettings;
 }
 
 /**
@@ -202,6 +217,7 @@ export interface TemplateFooterProps {
   type: "QUOTE" | "INVOICE";
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  businessSettings?: BusinessSettings;
 }
 
 /**

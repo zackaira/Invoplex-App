@@ -16,7 +16,6 @@
 
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -39,36 +38,24 @@ import { getAllTemplates } from "../registry";
  * @param document - The document being edited
  * @param templateId - Currently selected template ID
  * @param onTemplateChange - Callback when template is changed
+ * @param onSave - Callback when save button is clicked
+ * @param isSaving - Whether the document is currently being saved
  */
 export function DocumentEditBar({
   document,
   templateId = "classic",
   onTemplateChange,
+  onSave,
+  isSaving = false,
 }: {
   document: DocumentWithRelations;
   templateId?: string;
   onTemplateChange?: (templateId: string) => void;
+  onSave?: () => void;
+  isSaving?: boolean;
 }) {
   const router = useRouter();
-  const [isSaving, setIsSaving] = useState(false);
   const templates = getAllTemplates();
-
-  /**
-   * Saves the document to the database
-   * TODO: Implement actual save functionality
-   */
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      // TODO: Implement save to database
-      // await updateDocument(document);
-      router.push(`/quote/${document.id}`);
-    } catch (error) {
-      console.error("Failed to save:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   return (
     <>
@@ -100,7 +87,7 @@ export function DocumentEditBar({
       </div>
 
       <div className="flex items-center gap-4">
-        <Button onClick={handleSave} disabled={isSaving}>
+        <Button onClick={onSave} disabled={isSaving}>
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>

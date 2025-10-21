@@ -38,6 +38,7 @@ export function ClassicTemplate({
         document={document}
         isEditable={isEditable}
         onUpdate={onUpdate}
+        businessSettings={businessSettings}
       />
 
       <ClassicFooter
@@ -45,6 +46,7 @@ export function ClassicTemplate({
         type={type}
         isEditable={isEditable}
         onUpdate={onUpdate}
+        businessSettings={businessSettings}
       />
     </>
   );

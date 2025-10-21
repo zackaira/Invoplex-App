@@ -1,6 +1,6 @@
 "use client";
 
-import { DocumentWithRelations } from "../types";
+import { DocumentWithRelations, BusinessSettings } from "../types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -14,8 +14,10 @@ import { Plus, Trash2, Save } from "lucide-react";
 import { DocumentItemsTable } from "./ItemsTable";
 import { ProductSelect } from "./ProductSelect";
 import { SaveItemModal } from "./SaveItemModal";
-import { ConfirmationDialog } from "./ConfirmationDialog";
+import { ConfirmModal } from "./ConfirmModal";
 import { useItemsManager } from "./hooks/useItemsManager";
+import { formatCurrency, formatCurrencyInput } from "@/lib/currency-utils";
+import { TooltipWrapper } from "../../ui/TooltipWrapper";
 
 /**
  * Styling configuration for the items table
@@ -47,6 +49,7 @@ interface BaseItemsTableProps {
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
   styles: ItemsTableStyles;
+  businessSettings?: BusinessSettings;
 }
 
 /**
@@ -58,23 +61,32 @@ export function BaseItemsTable({
   isEditable = false,
   onUpdate,
   styles,
+  businessSettings,
 }: BaseItemsTableProps) {
+  // Get currency display preferences
+  const currencyCode = document.currency;
+  const displayFormat =
+    businessSettings?.currencyDisplayFormat || "symbol_before";
+  const currencySymbol = formatCurrencyInput(currencyCode, displayFormat);
   const {
-    saveModalOpen,
-    setSaveModalOpen,
-    modalMode,
-    selectedItem,
+    addModalOpen,
+    setAddModalOpen,
+    confirmSaveModalOpen,
+    setConfirmSaveModalOpen,
+    deleteModalOpen,
+    setDeleteModalOpen,
+    selectedItemForDelete,
+    selectedItemForSave,
+    isUpdatingExistingProduct,
     hasAnyQuantityColumn,
-    saveConfirmOpen,
-    setSaveConfirmOpen,
-    handleSelectProduct,
-    handleOpenSaveModal,
-    handleConfirmSave,
-    handleHasQuantityColumnChange,
     handleOpenAddModal,
-    handleSaveItem,
-    handleDeleteItem,
-  } = useItemsManager(document, onUpdate);
+    handleAddItem,
+    handleSelectProduct,
+    handleOpenConfirmSaveModal,
+    handleConfirmSaveItem,
+    handleOpenDeleteModal,
+    handleConfirmDeleteItem,
+  } = useItemsManager(document, document.userId, onUpdate);
 
   const gridCols = hasAnyQuantityColumn
     ? styles.headerGridColsWithQty
@@ -115,30 +127,29 @@ export function BaseItemsTable({
                       {item.itemType || "Product"}
                     </span>
                     {isEditable && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          handleOpenSaveModal(
-                            item.id,
-                            item.itemType || "Product",
-                            item.hasQuantityColumn ?? false
-                          )
-                        }
-                        className="h-6 w-6 text-gray-900 bg-transparent! hover:text-green-600"
-                      >
-                        <Save className="h-3 w-3" />
-                      </Button>
+                      <TooltipWrapper tooltip="Save this item" side="top">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenConfirmSaveModal(item.id)}
+                          className="h-6 w-6 text-gray-900 bg-transparent! hover:text-green-600"
+                        >
+                          <Save className="h-3 w-3" />
+                        </Button>
+                      </TooltipWrapper>
                     )}
                   </div>
                   <div className="flex items-center">
                     {isEditable ? (
                       <Textarea
+                        id={`item-description-${item.id}`}
+                        name={`item-description-${item.id}`}
                         value={item.description}
                         onChange={(e) =>
                           onUpdate("description", e.target.value)
                         }
-                        className="w-full min-h-[60px] resize-y !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
+                        autoResize
+                        className="w-full min-h-[60px] !bg-white !border-gray-300 !text-gray-900 placeholder:!text-gray-400"
                         placeholder="Item description"
                       />
                     ) : (
@@ -152,6 +163,8 @@ export function BaseItemsTable({
                       {showQuantity ? (
                         isEditable ? (
                           <Input
+                            id={`item-quantity-${item.id}`}
+                            name={`item-quantity-${item.id}`}
                             type="number"
                             step="1"
                             value={item.quantity.toString()}
@@ -175,10 +188,12 @@ export function BaseItemsTable({
                       <InputGroup className="w-28">
                         <InputGroupAddon align="inline-start">
                           <InputGroupText className="text-xs text-gray-600">
-                            {currency}
+                            {currencySymbol}
                           </InputGroupText>
                         </InputGroupAddon>
                         <InputGroupInput
+                          id={`item-unitPrice-${item.id}`}
+                          name={`item-unitPrice-${item.id}`}
                           type="number"
                           step="0.01"
                           value={item.unitPrice.toString()}
@@ -190,25 +205,35 @@ export function BaseItemsTable({
                       </InputGroup>
                     ) : (
                       <span className="text-gray-700">
-                        {currency} {item.unitPrice.toString()}
+                        {formatCurrency(
+                          item.unitPrice.toString(),
+                          currencyCode,
+                          displayFormat
+                        )}
                       </span>
                     )}
                   </div>
                   <div className="text-right flex items-center justify-end">
                     <span className="font-semibold text-gray-900">
-                      {currency} {item.amount.toString()}
+                      {formatCurrency(
+                        item.amount.toString(),
+                        currencyCode,
+                        displayFormat
+                      )}
                     </span>
                   </div>
                   {isEditable && (
                     <div className="flex items-center justify-end">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="h-8 w-8 text-gray-900 bg-transparent! hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <TooltipWrapper tooltip="Delete this item" side="top">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenDeleteModal(item.id)}
+                          className="h-8 w-8 text-gray-900 bg-transparent! hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipWrapper>
                     </div>
                   )}
                 </div>
@@ -221,7 +246,8 @@ export function BaseItemsTable({
         {isEditable && (
           <div className={styles.footerClassName}>
             <ProductSelect
-              onSelect={handleSelectProduct}
+              userId={document.userId}
+              onSelectProduct={handleSelectProduct}
               onOpenAddModal={handleOpenAddModal}
               trigger={
                 <Button
@@ -238,26 +264,39 @@ export function BaseItemsTable({
         )}
       </div>
 
-      {/* Save Item Modal */}
+      {/* Add Item Modal */}
       <SaveItemModal
-        isOpen={saveModalOpen}
-        onClose={() => setSaveModalOpen(false)}
-        onSave={handleSaveItem}
-        mode={modalMode}
-        onHasQuantityColumnChange={handleHasQuantityColumnChange}
-        initialType={selectedItem?.type || ""}
-        initialHasQuantityColumn={selectedItem?.hasQuantityColumn ?? false}
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onAdd={handleAddItem}
+        userId={document.userId}
       />
 
-      {/* Save Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={saveConfirmOpen}
-        onClose={() => setSaveConfirmOpen(false)}
-        onConfirm={handleConfirmSave}
-        title="Save Item to Database"
-        description="Do you want to save this item to the database for future use?"
-        confirmText="Save Item"
-        cancelText="Cancel"
+      {/* Confirm Save Item Modal */}
+      <ConfirmModal
+        isOpen={confirmSaveModalOpen}
+        onClose={() => setConfirmSaveModalOpen(false)}
+        onConfirm={handleConfirmSaveItem}
+        title={isUpdatingExistingProduct ? "Update Item" : "Save Item"}
+        description={
+          isUpdatingExistingProduct
+            ? "Are you sure you want to update this item in your Saved Items? The changes will be reflected in future uses."
+            : "Are you sure you want to save this item to your Saved Items? It will be available for use in future documents."
+        }
+        confirmButtonText={
+          isUpdatingExistingProduct ? "Update Item" : "Save Item"
+        }
+      />
+
+      {/* Delete Item Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDeleteItem}
+        title="Delete Item"
+        description="Are you sure you want to delete this item?"
+        confirmButtonText="Delete Item"
+        confirmButtonVariant="destructive"
       />
     </>
   );

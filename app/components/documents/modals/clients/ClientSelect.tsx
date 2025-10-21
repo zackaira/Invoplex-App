@@ -17,54 +17,22 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { TooltipWrapper } from "@/app/components/ui/TooltipWrapper";
+import { getClientsByUserId } from "@/lib/actions";
 
-// Dummy client data - will be replaced with real data later
-export const DUMMY_CLIENTS = [
-  {
-    id: "client-1",
-    name: "Acme Corporation",
-    contact: "John Doe",
-    email: "contact@acme.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Business St",
-    city: "New York",
-    state: "NY",
-    zipCode: "10001",
-  },
-  {
-    id: "client-2",
-    name: "TechStart Inc.",
-    contact: "Jane Smith",
-    email: "hello@techstart.com",
-    phone: "+1 (555) 234-5678",
-    address: "456 Innovation Ave",
-    city: "San Francisco",
-    state: "CA",
-    zipCode: "94102",
-  },
-  {
-    id: "client-3",
-    name: "Global Solutions Ltd.",
-    email: "info@globalsolutions.com",
-    phone: "+1 (555) 345-6789",
-    address: "789 Enterprise Blvd",
-    city: "Chicago",
-    state: "IL",
-    zipCode: "60601",
-  },
-  {
-    id: "client-4",
-    name: "Creative Agency Co.",
-    email: "team@creativeagency.com",
-    phone: "+1 (555) 456-7890",
-    address: "321 Design Way",
-    city: "Los Angeles",
-    state: "CA",
-    zipCode: "90001",
-  },
-];
+interface Client {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+}
 
 export interface ClientSelectProps {
+  userId: string;
   value?: string;
   onChange?: (clientId: string | undefined) => void;
   onCreateNew?: () => void;
@@ -73,6 +41,7 @@ export interface ClientSelectProps {
 }
 
 export function ClientSelect({
+  userId,
   value,
   onChange,
   onCreateNew,
@@ -80,54 +49,86 @@ export function ClientSelect({
   align = "center",
 }: ClientSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const [clients, setClients] = React.useState<Client[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
-  const selectedClient = DUMMY_CLIENTS.find((client) => client.id === value);
+  // Fetch clients when the popover opens
+  React.useEffect(() => {
+    if (open && clients.length === 0) {
+      setLoading(true);
+      getClientsByUserId(userId)
+        .then((data) => {
+          if (data) {
+            setClients(data);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch clients:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [open, userId, clients.length]);
+
+  const selectedClient = clients.find((client) => client.id === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          role="combobox"
-          aria-expanded={open}
-          className={cn("h-6 w-6", className)}
-        >
-          <span className="!text-invoplex">
-            <Users className="h-4 w-4" />
-          </span>
-        </Button>
-      </PopoverTrigger>
+      <TooltipWrapper tooltip="Select a Client" side="top">
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("h-6 w-6", className)}
+          >
+            <span className="!text-invoplex">
+              <Users className="h-4 w-4" />
+            </span>
+          </Button>
+        </PopoverTrigger>
+      </TooltipWrapper>
+
       <PopoverContent className="w-[300px] p-0" align={align}>
         <Command>
           <CommandInput placeholder="Search Clients..." className="h-9" />
           <CommandList>
-            <CommandEmpty>No client found.</CommandEmpty>
-            <CommandGroup>
-              {DUMMY_CLIENTS.map((client) => (
-                <CommandItem
-                  key={client.id}
-                  value={client.name}
-                  onSelect={() => {
-                    onChange?.(client.id);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex flex-col flex-1">
-                    <span className="font-medium">{client.name}</span>
-                    {client.email && (
-                      <span className="text-xs">{client.email}</span>
-                    )}
-                  </div>
-                  <Check
-                    className={cn(
-                      "ml-2 h-4 w-4",
-                      value === client.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {loading ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                Loading clients...
+              </div>
+            ) : (
+              <>
+                <CommandEmpty>No client found.</CommandEmpty>
+                <CommandGroup>
+                  {clients.map((client) => (
+                    <CommandItem
+                      key={client.id}
+                      value={client.name}
+                      onSelect={() => {
+                        onChange?.(client.id);
+                        setOpen(false);
+                      }}
+                    >
+                      <div className="flex flex-col flex-1">
+                        <span className="font-medium">{client.name}</span>
+                        {client.email && (
+                          <span className="text-xs">{client.email}</span>
+                        )}
+                      </div>
+                      <Check
+                        className={cn(
+                          "ml-2 h-4 w-4",
+                          value === client.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
             <CommandGroup>
               <CommandItem
                 onSelect={() => {

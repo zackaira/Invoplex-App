@@ -61,7 +61,9 @@ export function ModernHeader({
         {/* Title and Document Info */}
         <div className="text-right">
           <h1 className="text-5xl font-bold mb-2">
-            {type === "QUOTE" ? "Quote" : "Invoice"}
+            {type === "QUOTE"
+              ? businessSettings?.quoteTitle || "QUOTE"
+              : businessSettings?.invoiceTitle || "INVOICE"}
           </h1>
           <p className="text-xl opacity-90 mb-3">{document.documentNumber}</p>
 
@@ -110,6 +112,7 @@ export function ModernHeader({
             {isEditable && (
               <>
                 <ClientSelect
+                  userId={document.userId}
                   value={selectedClientId}
                   onChange={handleClientChange}
                   onCreateNew={onOpenClientModal}

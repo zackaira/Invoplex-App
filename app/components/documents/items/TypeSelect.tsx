@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Command,
   CommandEmpty,
@@ -8,6 +8,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -17,11 +18,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getSavedProducts } from "@/lib/actions";
 
 interface TypeSelectProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  id?: string;
+  userId: string;
 }
 
 const DEFAULT_TYPES = [
@@ -29,13 +33,57 @@ const DEFAULT_TYPES = [
   { value: "Service", label: "Service" },
 ];
 
-export function TypeSelect({ value, onChange, className }: TypeSelectProps) {
+export function TypeSelect({
+  value,
+  onChange,
+  className,
+  id,
+  userId,
+}: TypeSelectProps) {
   const [open, setOpen] = useState(false);
   const [customTypes, setCustomTypes] = useState<string[]>([]);
+  const [savedTypes, setSavedTypes] = useState<string[]>([]);
 
+  // Fetch saved product types when popover opens
+  useEffect(() => {
+    if (open) {
+      loadSavedTypes();
+    }
+  }, [open, userId]);
+
+  const loadSavedTypes = async () => {
+    try {
+      const products = await getSavedProducts(userId);
+      // Extract unique types from saved products
+      const uniqueTypes = Array.from(
+        new Set(
+          products
+            .map((p) => p.type)
+            .filter(
+              (type) =>
+                type &&
+                !DEFAULT_TYPES.some(
+                  (dt) => dt.value.toLowerCase() === type.toLowerCase()
+                )
+            )
+        )
+      );
+      setSavedTypes(uniqueTypes);
+    } catch (error) {
+      console.error("Error loading saved types:", error);
+    }
+  };
+
+  // Combine default, saved, and custom types
   const allTypes = [
     ...DEFAULT_TYPES,
-    ...customTypes.map((type) => ({ value: type, label: type })),
+    ...savedTypes.map((type) => ({ value: type, label: type })),
+    ...customTypes
+      .filter(
+        (type) =>
+          !savedTypes.some((st) => st.toLowerCase() === type.toLowerCase())
+      )
+      .map((type) => ({ value: type, label: type })),
   ];
 
   const handleSelect = (currentValue: string) => {
@@ -44,10 +92,18 @@ export function TypeSelect({ value, onChange, className }: TypeSelectProps) {
   };
 
   const handleCustomType = (searchValue: string) => {
-    if (searchValue && !allTypes.some((t) => t.value === searchValue)) {
-      setCustomTypes((prev) => [...prev, searchValue]);
-      onChange(searchValue);
-      setOpen(false);
+    const trimmedValue = searchValue.trim();
+    const allExistingTypes = [
+      ...DEFAULT_TYPES.map((t) => t.value.toLowerCase()),
+      ...customTypes.map((t) => t.toLowerCase()),
+    ];
+
+    if (
+      trimmedValue &&
+      !allExistingTypes.includes(trimmedValue.toLowerCase())
+    ) {
+      setCustomTypes((prev) => [...prev, trimmedValue]);
+      onChange(trimmedValue);
     }
   };
 
@@ -55,6 +111,7 @@ export function TypeSelect({ value, onChange, className }: TypeSelectProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -83,6 +140,7 @@ export function TypeSelect({ value, onChange, className }: TypeSelectProps) {
                 Press Enter to add custom type
               </div>
             </CommandEmpty>
+
             <CommandGroup>
               {allTypes.map((type) => (
                 <CommandItem

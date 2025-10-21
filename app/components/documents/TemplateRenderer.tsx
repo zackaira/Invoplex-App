@@ -34,6 +34,11 @@ import {
   BusinessInfoVisibilityModal,
   ClientInfoVisibilityModal,
 } from "./modals";
+import {
+  saveDefaultBusinessFieldsVisibility,
+  saveDefaultClientFieldsVisibility,
+} from "@/lib/actions";
+import { toast } from "sonner";
 
 /**
  * TemplateRenderer Component
@@ -47,6 +52,8 @@ import {
  * @param isEditable - Whether the document is in edit mode
  * @param onUpdate - Callback when document data changes
  * @param onTemplateChange - Callback when template is switched
+ * @param onSave - Callback when save button is clicked
+ * @param isSaving - Whether the document is currently being saved
  * @param businessSettings - Business profile settings (name, logo, brandColor, etc.)
  */
 export function TemplateRenderer({
@@ -56,6 +63,8 @@ export function TemplateRenderer({
   isEditable = false,
   onUpdate,
   onTemplateChange,
+  onSave,
+  isSaving = false,
   businessSettings,
 }: {
   document: DocumentWithRelations;
@@ -64,6 +73,8 @@ export function TemplateRenderer({
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
   onTemplateChange?: (templateId: string) => void;
+  onSave?: () => void;
+  isSaving?: boolean;
   businessSettings?: BusinessSettings;
 }) {
   // Load the selected template from the registry
@@ -92,15 +103,27 @@ export function TemplateRenderer({
 
   // Controls which business information fields are visible in the template
   // Users can customize this through the BusinessInfoVisibilityModal
+  // Initialize from document or use defaults
   const [businessInfoVisibility, setBusinessInfoVisibility] =
-    useState<BusinessInfoVisibility>({
-      businessName: true,
-      personalName: false,
-      email: true,
-      phone: true,
-      website: true,
-      taxId: false,
-      address: false,
+    useState<BusinessInfoVisibility>(() => {
+      const saved = (document as any).businessFieldsToShow;
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          return parsed;
+        } catch {
+          // Fall back to defaults if parsing fails
+        }
+      }
+      return {
+        businessName: true,
+        personalName: false,
+        email: true,
+        phone: true,
+        website: true,
+        taxId: false,
+        address: false,
+      };
     });
 
   // =========================================================================
@@ -109,12 +132,24 @@ export function TemplateRenderer({
 
   // Controls which client information fields are visible in the template
   // Users can customize this through the ClientInfoVisibilityModal
+  // Initialize from document or use defaults
   const [clientInfoVisibility, setClientInfoVisibility] =
-    useState<ClientInfoVisibility>({
-      name: true,
-      contact: true,
-      address: true,
-      email: true,
+    useState<ClientInfoVisibility>(() => {
+      const saved = (document as any).clientFieldsToShow;
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          return parsed;
+        } catch {
+          // Fall back to defaults if parsing fails
+        }
+      }
+      return {
+        name: true,
+        contact: true,
+        address: true,
+        email: true,
+      };
     });
 
   // =========================================================================
@@ -150,6 +185,72 @@ export function TemplateRenderer({
     // After creation, set the new client as selected
   };
 
+  /**
+   * Handles business info visibility changes
+   * Saves the visibility settings to the document
+   */
+  const handleBusinessVisibilityChange = (
+    visibility: BusinessInfoVisibility
+  ) => {
+    setBusinessInfoVisibility(visibility);
+    // Save to document if in edit mode
+    if (isEditable && onUpdate) {
+      onUpdate({
+        businessFieldsToShow: JSON.stringify(visibility),
+      } as any);
+    }
+  };
+
+  /**
+   * Handles client info visibility changes
+   * Saves the visibility settings to the document
+   */
+  const handleClientVisibilityChange = (visibility: ClientInfoVisibility) => {
+    setClientInfoVisibility(visibility);
+    // Save to document if in edit mode
+    if (isEditable && onUpdate) {
+      onUpdate({
+        clientFieldsToShow: JSON.stringify(visibility),
+      } as any);
+    }
+  };
+
+  /**
+   * Handles saving business visibility as default for all new quotes
+   */
+  const handleSaveBusinessAsDefault = async (
+    visibility: BusinessInfoVisibility
+  ) => {
+    try {
+      await saveDefaultBusinessFieldsVisibility(
+        document.userId,
+        JSON.stringify(visibility)
+      );
+      toast.success("Saved as default for new quotes");
+    } catch (error) {
+      console.error("Failed to save default:", error);
+      toast.error("Failed to save default");
+    }
+  };
+
+  /**
+   * Handles saving client visibility as default for all new quotes
+   */
+  const handleSaveClientAsDefault = async (
+    visibility: ClientInfoVisibility
+  ) => {
+    try {
+      await saveDefaultClientFieldsVisibility(
+        document.userId,
+        JSON.stringify(visibility)
+      );
+      toast.success("Saved as default for new quotes");
+    } catch (error) {
+      console.error("Failed to save default:", error);
+      toast.error("Failed to save default");
+    }
+  };
+
   return (
     <>
       <div className="bg-accent px-6 pt-12 pb-5">
@@ -159,6 +260,8 @@ export function TemplateRenderer({
               document={document}
               templateId={templateId}
               onTemplateChange={onTemplateChange}
+              onSave={onSave}
+              isSaving={isSaving}
             />
           ) : (
             <DocumentViewBar document={document} />
@@ -202,14 +305,16 @@ export function TemplateRenderer({
         open={isBusinessInfoModalOpen}
         onOpenChange={setIsBusinessInfoModalOpen}
         visibility={businessInfoVisibility}
-        onVisibilityChange={setBusinessInfoVisibility}
+        onVisibilityChange={handleBusinessVisibilityChange}
+        onSaveAsDefault={handleSaveBusinessAsDefault}
       />
 
       <ClientInfoVisibilityModal
         open={isClientInfoModalOpen}
         onOpenChange={setIsClientInfoModalOpen}
         visibility={clientInfoVisibility}
-        onVisibilityChange={setClientInfoVisibility}
+        onVisibilityChange={handleClientVisibilityChange}
+        onSaveAsDefault={handleSaveClientAsDefault}
       />
     </>
   );

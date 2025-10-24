@@ -16,7 +16,13 @@ interface QuoteSettingsSectionProps {
   removeQuotePoweredBy: boolean;
   setRemoveQuotePoweredBy: (value: boolean) => void;
   validationErrors?: ValidationError[];
-  initialData?: any;
+  initialData?: {
+    quotePrefix?: string;
+    nextQuoteNumber?: number;
+    validityPeriodDays?: number;
+    termsAndConditions?: string;
+    quoteNotes?: string;
+  };
 }
 
 export function QuoteSettingsSection({

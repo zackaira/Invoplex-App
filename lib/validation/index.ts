@@ -50,6 +50,7 @@ export {
   quoteSettingsSchema,
   getInvoiceSettingsSchema,
   templateSettingsSchema,
+  contactSchema,
 
   // TypeScript types inferred from schemas
   type BusinessProfileFormData,
@@ -58,4 +59,5 @@ export {
   type QuoteSettingsFormData,
   type InvoiceSettingsFormData,
   type TemplateSettingsFormData,
+  type ContactFormData,
 } from "./schemas/settings";

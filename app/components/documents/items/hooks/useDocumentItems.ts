@@ -1,4 +1,4 @@
-import { DocumentWithRelations } from "../../templates/types";
+import { DocumentWithRelations } from "../../types";
 import { useDocumentCalculations } from "./useCalculations";
 
 export function useDocumentItems(
@@ -10,14 +10,17 @@ export function useDocumentItems(
   const updateItem = (itemId: string, field: string, value: string) => {
     const updatedItems = document.items.map((item) => {
       if (item.id === itemId) {
-        const updates: any = { ...item, [field]: value };
+        const updates = { ...item, [field]: value } as typeof item;
 
         // Recalculate amount if quantity or unitPrice changes
         if (field === "quantity" || field === "unitPrice") {
           const qty = field === "quantity" ? value : item.quantity.toString();
           const price =
             field === "unitPrice" ? value : item.unitPrice.toString();
-          updates.amount = calculateItemAmount(qty, price);
+          updates.amount = calculateItemAmount(
+            qty,
+            price
+          ) as unknown as typeof item.amount;
         }
 
         return updates;
@@ -35,7 +38,7 @@ export function useDocumentItems(
     onUpdate?.({
       items: updatedItems,
       ...totals,
-    } as any);
+    } as unknown as Partial<DocumentWithRelations>);
   };
 
   const addItem = () => {
@@ -52,7 +55,9 @@ export function useDocumentItems(
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    onUpdate?.({ items: [...document.items, newItem] } as any);
+    onUpdate?.({
+      items: [...document.items, newItem],
+    } as unknown as Partial<DocumentWithRelations>);
   };
 
   const removeItem = (itemId: string) => {
@@ -67,7 +72,7 @@ export function useDocumentItems(
     onUpdate?.({
       items: updatedItems,
       ...totals,
-    } as any);
+    } as unknown as Partial<DocumentWithRelations>);
   };
 
   return {

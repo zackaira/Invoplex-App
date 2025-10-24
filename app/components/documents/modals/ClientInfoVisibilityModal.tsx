@@ -20,6 +20,16 @@ export interface ClientInfoVisibilityModalProps {
   visibility: ClientInfoVisibility;
   onVisibilityChange: (visibility: ClientInfoVisibility) => void;
   onSaveAsDefault?: (visibility: ClientInfoVisibility) => void;
+  client?: {
+    name?: string;
+    email?: string | null;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zipCode?: string | null;
+    country?: string | null;
+  };
+  contactName?: string | null;
 }
 
 export function ClientInfoVisibilityModal({
@@ -28,6 +38,8 @@ export function ClientInfoVisibilityModal({
   visibility,
   onVisibilityChange,
   onSaveAsDefault,
+  client,
+  contactName,
 }: ClientInfoVisibilityModalProps) {
   const [localVisibility, setLocalVisibility] =
     React.useState<ClientInfoVisibility>(visibility);
@@ -36,6 +48,17 @@ export function ClientInfoVisibilityModal({
   React.useEffect(() => {
     setLocalVisibility(visibility);
   }, [visibility]);
+
+  // Check if any client fields are available
+  const hasAnyFields =
+    client?.name ||
+    contactName ||
+    client?.address ||
+    client?.city ||
+    client?.state ||
+    client?.zipCode ||
+    client?.country ||
+    client?.email;
 
   const handleToggle = (field: keyof ClientInfoVisibility) => {
     setLocalVisibility((prev) => ({
@@ -71,29 +94,48 @@ export function ClientInfoVisibilityModal({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <SettingsSwitch
-            label="Client Name"
-            checked={localVisibility.name}
-            onCheckedChange={() => handleToggle("name")}
-          />
+          {!hasAnyFields && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No client information is available. Select a client to customize
+              what information appears on your documents.
+            </p>
+          )}
 
-          <SettingsSwitch
-            label="Contact Person"
-            checked={localVisibility.contact}
-            onCheckedChange={() => handleToggle("contact")}
-          />
+          {client?.name && (
+            <SettingsSwitch
+              label="Client Name"
+              checked={localVisibility.name}
+              onCheckedChange={() => handleToggle("name")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Address"
-            checked={localVisibility.address}
-            onCheckedChange={() => handleToggle("address")}
-          />
+          {contactName && (
+            <SettingsSwitch
+              label="Contact Person"
+              checked={localVisibility.contact}
+              onCheckedChange={() => handleToggle("contact")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Email"
-            checked={localVisibility.email}
-            onCheckedChange={() => handleToggle("email")}
-          />
+          {(client?.address ||
+            client?.city ||
+            client?.state ||
+            client?.zipCode ||
+            client?.country) && (
+            <SettingsSwitch
+              label="Address"
+              checked={localVisibility.address}
+              onCheckedChange={() => handleToggle("address")}
+            />
+          )}
+
+          {client?.email && (
+            <SettingsSwitch
+              label="Email"
+              checked={localVisibility.email}
+              onCheckedChange={() => handleToggle("email")}
+            />
+          )}
         </div>
 
         <DialogFooter>

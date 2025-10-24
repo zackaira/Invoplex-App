@@ -1,6 +1,6 @@
 import { getInvoicesByUserId, getUserSettings } from "@/lib/actions";
-import { DataTable } from "@/components/ui/data-table";
 import type { StatusFilterOption } from "@/components/ui/data-table";
+import { DataTableWrapper } from "@/app/components/data-table/DataTableWrapper";
 import { columns } from "./columns";
 
 const invoiceStatusOptions: StatusFilterOption[] = [
@@ -16,10 +16,15 @@ export default async function Invoices() {
   // TODO: Replace with actual user ID from authentication
   const userId = "cmgexy4630002r7qfecfve8hq";
 
-  const [invoices, userSettings] = await Promise.all([
+  const [invoices, settingsResult] = await Promise.all([
     getInvoicesByUserId(userId),
     getUserSettings(userId),
   ]);
+
+  const userSettings =
+    settingsResult?.success && settingsResult?.data
+      ? settingsResult.data.userSettings
+      : null;
 
   // Transform the data to match our Invoice type
   const transformedInvoices = invoices.map((invoice) => ({
@@ -36,7 +41,7 @@ export default async function Invoices() {
 
   return (
     <div className="group document-list invoices">
-      <DataTable
+      <DataTableWrapper
         columns={columns}
         data={transformedInvoices}
         filterColumn="client.name"

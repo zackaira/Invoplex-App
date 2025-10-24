@@ -13,7 +13,9 @@ interface TemplateSelectionSectionProps {
   setSelectedTemplate: (id: string) => void;
   templates: Template[];
   validationErrors?: ValidationError[];
-  initialData?: any;
+  initialData?: {
+    preferredTemplate?: string;
+  };
 }
 
 export function TemplateSelectionSection({

@@ -44,7 +44,7 @@ export function DocumentTotals({
     onUpdate?.({
       taxRate,
       ...totals,
-    } as any);
+    } as Partial<DocumentWithRelations>);
   };
 
   const updateDiscount = (discount: string) => {
@@ -58,7 +58,7 @@ export function DocumentTotals({
     onUpdate?.({
       discount,
       ...totals,
-    } as any);
+    } as Partial<DocumentWithRelations>);
   };
 
   return (

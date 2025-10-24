@@ -149,7 +149,7 @@ const columnDefinitions: ColumnDef<Invoice>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="p-0! hover:bg-transparent!"
           >
-            <ArrowUpDown className="mr-2 h-4 w-4 text-gray-400" />
+            <ArrowUpDown className="h-4 w-4 text-gray-400" />
             Created
           </Button>
         </div>
@@ -180,7 +180,7 @@ const columnDefinitions: ColumnDef<Invoice>[] = [
           className="p-0! hover:bg-transparent!"
         >
           No.
-          <ArrowUpDown className="ml-2 h-4 w-4 text-gray-400" />
+          <ArrowUpDown className="h-4 w-4 text-gray-400" />
         </Button>
       );
     },
@@ -210,7 +210,7 @@ const columnDefinitions: ColumnDef<Invoice>[] = [
           className="p-0! hover:bg-transparent!"
         >
           Client
-          <ArrowUpDown className="ml-2 h-4 w-4 text-gray-400" />
+          <ArrowUpDown className="h-4 w-4 text-gray-400" />
         </Button>
       );
     },

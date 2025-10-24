@@ -1,10 +1,37 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/app/generated/prisma";
+
+/**
+ * Document Actions
+ *
+ * Server actions for managing quotes and invoices
+ */
 
 // Helper to serialize Decimal objects to strings for client components
-function serializeDocument(document: any) {
+function serializeDocument(
+  document: {
+    subtotal: { toString: () => string };
+    taxRate: { toString: () => string };
+    taxAmount: { toString: () => string };
+    discount: { toString: () => string };
+    total: { toString: () => string };
+    amountPaid: { toString: () => string } | null;
+    amountDue: { toString: () => string } | null;
+    items?: Array<{
+      quantity: { toString: () => string };
+      unitPrice: { toString: () => string };
+      amount: { toString: () => string };
+      [key: string]: unknown;
+    }>;
+    payments?: Array<{
+      amount: { toString: () => string };
+      [key: string]: unknown;
+    }>;
+    [key: string]: unknown;
+  } | null
+) {
   if (!document) return null;
 
   return {
@@ -14,32 +41,20 @@ function serializeDocument(document: any) {
     taxAmount: document.taxAmount.toString(),
     discount: document.discount.toString(),
     total: document.total.toString(),
-    amountPaid: document.amountPaid.toString(),
-    amountDue: document.amountDue.toString(),
-    items: document.items?.map((item: any) => ({
+    amountPaid: document.amountPaid?.toString() ?? "0",
+    amountDue: document.amountDue?.toString() ?? "0",
+    items: document.items?.map((item) => ({
       ...item,
       quantity: item.quantity.toString(),
       unitPrice: item.unitPrice.toString(),
       amount: item.amount.toString(),
     })),
-    payments: document.payments?.map((payment: any) => ({
+    payments: document.payments?.map((payment) => ({
       ...payment,
       amount: payment.amount.toString(),
     })),
   };
 }
-
-export const getClientsByUserId = async (userId: string) => {
-  const clients = await prisma.client.findMany({
-    where: {
-      userId,
-    },
-  });
-
-  if (!clients) return null;
-
-  return clients;
-};
 
 export const getQuotesByUserId = async (userId: string) => {
   const quotes = await prisma.document.findMany({
@@ -98,6 +113,7 @@ export const getDocumentById = async (
     include: {
       client: true,
       contact: true,
+      project: true,
       items: {
         orderBy: {
           order: "asc",
@@ -114,47 +130,14 @@ export const getDocumentById = async (
   return serializeDocument(document);
 };
 
-export const getUserSettings = async (userId: string) => {
-  const userSettings = await prisma.userSettings.findUnique({
-    where: {
-      userId,
-    },
-  });
-
-  const businessProfile = await prisma.businessProfile.findUnique({
-    where: {
-      userId,
-    },
-  });
-
-  // Serialize Decimal values
-  const serializedSettings = userSettings
-    ? {
-        ...userSettings,
-        defaultTaxRate: userSettings.defaultTaxRate.toString(),
-      }
-    : null;
-
-  return {
-    success: true,
-    data: {
-      userSettings: serializedSettings,
-      businessProfile,
-    },
-  };
-};
-
-// ============================================
-// DOCUMENT MANAGEMENT (QUOTES & INVOICES)
-// ============================================
-
 export const createDocument = async (data: {
   userId: string;
-  documentNumber: string;
+  documentNumber?: string; // Optional - will be auto-generated if not provided
   type: "QUOTE" | "INVOICE";
   status: string;
   clientId: string;
   contactId?: string | null;
+  projectId?: string | null;
   issueDate: Date;
   dueDate?: Date | null;
   validUntil?: Date | null;
@@ -186,14 +169,59 @@ export const createDocument = async (data: {
     order: number;
   }>;
 }) => {
+  // Generate document number if not provided
+  let documentNumber = data.documentNumber;
+
+  if (!documentNumber || documentNumber === "DRAFT") {
+    // Get user settings to generate the document number
+    const userSettings = await prisma.userSettings.findUnique({
+      where: { userId: data.userId },
+    });
+
+    if (!userSettings) {
+      throw new Error("User settings not found");
+    }
+
+    if (data.type === "QUOTE") {
+      const nextNumber = userSettings.quoteNextNumber;
+      const prefix = userSettings.quotePrefix;
+      documentNumber = `${prefix}-${String(nextNumber).padStart(3, "0")}`;
+
+      // Increment the next number for future quotes
+      await prisma.userSettings.update({
+        where: { userId: data.userId },
+        data: { quoteNextNumber: nextNumber + 1 },
+      });
+    } else {
+      // INVOICE
+      const nextNumber = userSettings.invoiceNextNumber;
+      const prefix = userSettings.invoicePrefix;
+      documentNumber = `${prefix}-${String(nextNumber).padStart(3, "0")}`;
+
+      // Increment the next number for future invoices
+      await prisma.userSettings.update({
+        where: { userId: data.userId },
+        data: { invoiceNextNumber: nextNumber + 1 },
+      });
+    }
+  }
+
   const document = await prisma.document.create({
     data: {
       userId: data.userId,
-      documentNumber: data.documentNumber,
+      documentNumber: documentNumber,
       type: data.type,
-      status: data.status as any,
+      status: data.status as
+        | "DRAFT"
+        | "SENT"
+        | "APPROVED"
+        | "REJECTED"
+        | "PAID"
+        | "PARTIAL"
+        | "OVERDUE",
       clientId: data.clientId,
       contactId: data.contactId,
+      projectId: data.projectId,
       issueDate: data.issueDate,
       dueDate: data.dueDate,
       validUntil: data.validUntil,
@@ -230,6 +258,7 @@ export const createDocument = async (data: {
     include: {
       client: true,
       contact: true,
+      project: true,
       items: {
         orderBy: {
           order: "asc",
@@ -249,6 +278,7 @@ export const updateDocument = async (
     status?: string;
     clientId?: string;
     contactId?: string | null;
+    projectId?: string | null;
     issueDate?: Date;
     dueDate?: Date | null;
     validUntil?: Date | null;
@@ -297,9 +327,17 @@ export const updateDocument = async (
     },
     data: {
       documentNumber: data.documentNumber,
-      status: data.status as any,
+      status: data.status as
+        | "DRAFT"
+        | "SENT"
+        | "APPROVED"
+        | "REJECTED"
+        | "PAID"
+        | "PARTIAL"
+        | "OVERDUE",
       clientId: data.clientId,
       contactId: data.contactId,
+      projectId: data.projectId,
       issueDate: data.issueDate,
       dueDate: data.dueDate,
       validUntil: data.validUntil,
@@ -338,6 +376,7 @@ export const updateDocument = async (
     include: {
       client: true,
       contact: true,
+      project: true,
       items: {
         orderBy: {
           order: "asc",
@@ -358,6 +397,22 @@ export const deleteDocument = async (id: string) => {
   });
 
   return { success: true };
+};
+
+export const deleteDocuments = async (ids: string[]) => {
+  await prisma.document.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+
+  // Revalidate the quotes and invoices pages
+  revalidatePath("/quotes");
+  revalidatePath("/invoices");
+
+  return { success: true, count: ids.length };
 };
 
 // ============================================
@@ -390,136 +445,6 @@ export const saveDefaultClientFieldsVisibility = async (
     },
     data: {
       defaultClientFieldsToShow: visibility,
-    },
-  });
-
-  return { success: true };
-};
-
-// ============================================
-// SAVED PRODUCTS/SERVICES
-// ============================================
-
-/**
- * Get saved products for a user
- */
-export const getSavedProducts = async (userId: string) => {
-  const products = await prisma.product.findMany({
-    where: {
-      userId,
-      isActive: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  // Serialize Decimal values
-  return products.map((product) => ({
-    ...product,
-    unitPrice: product.unitPrice.toString(),
-  }));
-};
-
-/**
- * Save a product to the user's catalog
- * If productId is provided, update that specific product
- * Otherwise, if a product with the same name and type exists, update it
- * Otherwise, create a new product
- */
-export const saveProduct = async (data: {
-  userId: string;
-  productId?: string; // Optional: specific product ID to update
-  name: string;
-  description?: string;
-  unitPrice: string;
-  type: string;
-  hasQuantityColumn: boolean;
-}) => {
-  let product;
-
-  // If productId is provided, update that specific product
-  if (data.productId) {
-    try {
-      product = await prisma.product.update({
-        where: {
-          id: data.productId,
-          userId: data.userId, // Security: ensure user owns this product
-        },
-        data: {
-          name: data.name,
-          description: data.description || "",
-          unitPrice: data.unitPrice,
-          type: data.type,
-          hasQuantityColumn: data.hasQuantityColumn,
-        },
-      });
-    } catch (error) {
-      // If product not found or doesn't belong to user, create new one
-      product = await prisma.product.create({
-        data: {
-          userId: data.userId,
-          name: data.name,
-          description: data.description || "",
-          unitPrice: data.unitPrice,
-          type: data.type,
-          hasQuantityColumn: data.hasQuantityColumn,
-          isActive: true,
-        },
-      });
-    }
-  } else {
-    // Check if product with same name and type already exists
-    const existingProduct = await prisma.product.findFirst({
-      where: {
-        userId: data.userId,
-        name: data.name,
-        type: data.type,
-        isActive: true,
-      },
-    });
-
-    if (existingProduct) {
-      // Update existing product
-      product = await prisma.product.update({
-        where: {
-          id: existingProduct.id,
-        },
-        data: {
-          description: data.description || "",
-          unitPrice: data.unitPrice,
-          hasQuantityColumn: data.hasQuantityColumn,
-        },
-      });
-    } else {
-      // Create new product
-      product = await prisma.product.create({
-        data: {
-          userId: data.userId,
-          name: data.name,
-          description: data.description || "",
-          unitPrice: data.unitPrice,
-          type: data.type,
-          hasQuantityColumn: data.hasQuantityColumn,
-          isActive: true,
-        },
-      });
-    }
-  }
-
-  return {
-    ...product,
-    unitPrice: product.unitPrice.toString(),
-  };
-};
-
-/**
- * Delete a product from the user's catalog
- */
-export const deleteProduct = async (productId: string) => {
-  await prisma.product.delete({
-    where: {
-      id: productId,
     },
   });
 

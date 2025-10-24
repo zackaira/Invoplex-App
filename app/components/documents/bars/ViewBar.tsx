@@ -110,6 +110,7 @@ export function DocumentViewBar({
         <TooltipWrapper tooltip="Go back" side="bottom">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-5 w-5" />
+            <span className="sr-only">Back</span>
           </Button>
         </TooltipWrapper>
       </div>
@@ -125,6 +126,7 @@ export function DocumentViewBar({
               onClick={handleDownloadPDF}
             >
               <FileText className="h-4 w-4" />
+              <span className="sr-only">Preview PDF</span>
             </Button>
           </TooltipWrapper>
 
@@ -136,6 +138,7 @@ export function DocumentViewBar({
               onClick={handleDownloadPDF}
             >
               <DownloadCloud className="h-4 w-4" />
+              <span className="sr-only">Download PDF</span>
             </Button>
           </TooltipWrapper>
 
@@ -147,6 +150,7 @@ export function DocumentViewBar({
               onClick={() => {}}
             >
               <CheckCircle className="h-4 w-4" />
+              <span className="sr-only">Mark as accepted</span>
             </Button>
           </TooltipWrapper>
         </div>

@@ -3,7 +3,6 @@ import {
   DocumentType,
   DocumentStatus,
   PaymentMethod,
-  ProductType,
 } from "../app/generated/prisma";
 
 const prisma = new PrismaClient();
@@ -186,19 +185,40 @@ async function main() {
         "Project Manager",
       ];
 
+      let primaryContact = null;
+
       for (let c = 0; c < contactCount; c++) {
-        await prisma.contact.create({
+        const contactEmail = `contact${c + 1}@${client.name
+          .toLowerCase()
+          .replace(/\s+/g, "")}.com`;
+        const contactPhone = `+1 (555) ${300 + c}00-${6000 + c}`;
+
+        const contact = await prisma.contact.create({
           data: {
             clientId: client.id,
             name: `${
               firstNames[Math.floor(Math.random() * firstNames.length)]
             } ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
-            email: `contact${c + 1}@${client.name
-              .toLowerCase()
-              .replace(/\s+/g, "")}.com`,
-            phone: `+1 (555) ${300 + c}00-${6000 + c}`,
+            email: contactEmail,
+            phone: contactPhone,
             position: positions[Math.floor(Math.random() * positions.length)],
             isPrimary: c === 0,
+          },
+        });
+
+        // Store the first contact as primary
+        if (c === 0) {
+          primaryContact = contact;
+        }
+      }
+
+      // Update client with primary contact's email and phone
+      if (primaryContact) {
+        await prisma.client.update({
+          where: { id: client.id },
+          data: {
+            email: primaryContact.email,
+            phone: primaryContact.phone,
           },
         });
       }
@@ -212,61 +232,61 @@ async function main() {
         name: "Web Development",
         description: "Full-stack web application development",
         price: 150,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "Mobile App Development",
         description: "iOS and Android mobile applications",
         price: 175,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "UI/UX Design",
         description: "User interface and experience design services",
         price: 125,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "SEO Optimization",
         description: "Search engine optimization services",
         price: 100,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "Cloud Hosting",
         description: "Managed cloud hosting service (monthly)",
         price: 500,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "Database Setup",
         description: "Database design and implementation",
         price: 200,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "API Integration",
         description: "Third-party API integration services",
         price: 180,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "Code Review",
         description: "Professional code review and optimization",
         price: 90,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "Training Session",
         description: "Technical training and workshops",
         price: 250,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
       {
         name: "Maintenance Package",
         description: "Monthly maintenance and support",
         price: 400,
-        type: ProductType.SERVICE,
+        type: "Service",
       },
     ];
 

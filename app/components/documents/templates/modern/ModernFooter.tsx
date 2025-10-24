@@ -15,10 +15,12 @@ export function ModernFooter({
 }: TemplateFooterProps) {
   // Track whether to show notes and terms sections
   const [showNotes, setShowNotes] = useState(
-    (document as any).showNotes ?? !!document.notes
+    (document as typeof document & { showNotes?: boolean }).showNotes ??
+      !!document.notes
   );
   const [showTerms, setShowTerms] = useState(
-    (document as any).showTerms ?? !!document.terms
+    (document as typeof document & { showTerms?: boolean }).showTerms ??
+      !!document.terms
   );
   return (
     <div>
@@ -57,7 +59,9 @@ export function ModernFooter({
                     checked={showNotes}
                     onCheckedChange={(checked) => {
                       setShowNotes(checked);
-                      onUpdate?.({ showNotes: checked } as any);
+                      onUpdate?.({ showNotes: checked } as Parameters<
+                        NonNullable<typeof onUpdate>
+                      >[0]);
                     }}
                     className="data-[state=checked]:bg-yellow-600 scale-75"
                   />
@@ -108,7 +112,9 @@ export function ModernFooter({
                     checked={showTerms}
                     onCheckedChange={(checked) => {
                       setShowTerms(checked);
-                      onUpdate?.({ showTerms: checked } as any);
+                      onUpdate?.({ showTerms: checked } as Parameters<
+                        NonNullable<typeof onUpdate>
+                      >[0]);
                     }}
                     className="data-[state=checked]:bg-blue-600 scale-75"
                   />

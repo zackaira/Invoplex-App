@@ -22,7 +22,21 @@ interface BusinessProfileSectionProps {
   onSave: (e: React.FormEvent<HTMLFormElement>) => void;
   onMarkChanged: () => void;
   validationErrors?: ValidationError[];
-  initialData?: any;
+  initialData?: {
+    businessName?: string;
+    personalName?: string;
+    email?: string;
+    phone?: string;
+    website?: string;
+    taxId?: string;
+    address?: string;
+    address2?: string;
+    address3?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
 }
 
 export function BusinessProfileSection({

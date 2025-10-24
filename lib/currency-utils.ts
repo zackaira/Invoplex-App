@@ -51,12 +51,14 @@ export function getCurrencySymbol(currencyCode: string): string {
  *
  * @param amount - The amount to format (can be string, number, or Decimal)
  * @param currencyCode - The currency code (e.g., "USD", "EUR")
- * @param displayFormat - How to display the currency ("symbol_before", "symbol_after", "code_before", "code_after")
+ * @param displayFormat - How to display the currency ("symbol_before", "symbol_after", "symbol_before_space", "symbol_after_space", "code_before", "code_after")
  * @returns Formatted currency string
  *
  * Examples:
  * - formatCurrency(100, "USD", "symbol_before") => "$100.00"
- * - formatCurrency(100, "USD", "symbol_after") => "100.00 $"
+ * - formatCurrency(100, "USD", "symbol_after") => "100.00$"
+ * - formatCurrency(100, "USD", "symbol_before_space") => "$ 100.00"
+ * - formatCurrency(100, "USD", "symbol_after_space") => "100.00 $"
  * - formatCurrency(100, "USD", "code_before") => "USD 100.00"
  * - formatCurrency(100, "USD", "code_after") => "100.00 USD"
  */
@@ -73,7 +75,13 @@ export function formatCurrency(
 
   switch (displayFormat) {
     case "symbol_after":
+      return `${formattedAmount}${symbol}`;
+
+    case "symbol_after_space":
       return `${formattedAmount} ${symbol}`;
+
+    case "symbol_before_space":
+      return `${symbol} ${formattedAmount}`;
 
     case "code_before":
       return `${currencyCode} ${formattedAmount}`;

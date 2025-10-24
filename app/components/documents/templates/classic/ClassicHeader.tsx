@@ -39,16 +39,19 @@ export function ClassicHeader({
     email: true,
   },
   businessSettings,
+  projectsRefreshKey,
+  clientsRefreshKey,
 }: TemplateHeaderProps) {
   // Use the shared hook for all business logic
   const {
     selectedProjectId,
     selectedClientId,
     displayClient,
+    primaryContactName,
     handleIssueDateChange,
     handleProjectChange,
     handleClientChange,
-  } = useDocumentHeader({ document, type, onUpdate });
+  } = useDocumentHeader({ document, type, onUpdate, clientsRefreshKey });
 
   return (
     <div className="border-b border-gray-200 pb-6">
@@ -70,6 +73,7 @@ export function ClassicHeader({
           {/* Project Selection */}
           <div className="mt-2">
             <ProjectSelect
+              key={`projects-${projectsRefreshKey}`}
               value={selectedProjectId}
               onChange={handleProjectChange}
               onCreateNew={onOpenProjectModal}
@@ -97,6 +101,7 @@ export function ClassicHeader({
                   onClick={onOpenBusinessInfoModal}
                 >
                   <Settings className="h-4 w-4" />
+                  <span className="sr-only">Edit Info to display</span>
                 </Button>
               </TooltipWrapper>
             )}
@@ -118,6 +123,7 @@ export function ClassicHeader({
             {isEditable && (
               <>
                 <ClientSelect
+                  key={`clients-${clientsRefreshKey}`}
                   userId={document.userId}
                   value={selectedClientId}
                   onChange={handleClientChange}
@@ -134,6 +140,7 @@ export function ClassicHeader({
                     onClick={onOpenClientInfoModal}
                   >
                     <Settings className="h-4 w-4" />
+                    <span className="sr-only">Edit Info to display</span>
                   </Button>
                 </TooltipWrapper>
               </>
@@ -141,7 +148,10 @@ export function ClassicHeader({
           </div>
           <div className="text-gray-900">
             <ClientInfoDisplay
-              client={displayClient}
+              client={{
+                ...displayClient,
+                contact: primaryContactName,
+              }}
               visibility={clientInfoVisibility}
             />
           </div>

@@ -17,6 +17,8 @@ export function ClassicTemplate({
   businessInfoVisibility,
   clientInfoVisibility,
   businessSettings,
+  projectsRefreshKey,
+  clientsRefreshKey,
 }: TemplateProps) {
   return (
     <>
@@ -32,6 +34,8 @@ export function ClassicTemplate({
         businessInfoVisibility={businessInfoVisibility}
         clientInfoVisibility={clientInfoVisibility}
         businessSettings={businessSettings}
+        projectsRefreshKey={projectsRefreshKey}
+        clientsRefreshKey={clientsRefreshKey}
       />
 
       <ClassicItems

@@ -15,10 +15,12 @@ export function ClassicFooter({
 }: TemplateFooterProps) {
   // Track whether to show notes and terms sections
   const [showNotes, setShowNotes] = useState(
-    (document as any).showNotes ?? !!document.notes
+    (document as typeof document & { showNotes?: boolean }).showNotes ??
+      !!document.notes
   );
   const [showTerms, setShowTerms] = useState(
-    (document as any).showTerms ?? !!document.terms
+    (document as typeof document & { showTerms?: boolean }).showTerms ??
+      !!document.terms
   );
 
   return (
@@ -61,7 +63,9 @@ export function ClassicFooter({
                     checked={showNotes}
                     onCheckedChange={(checked) => {
                       setShowNotes(checked);
-                      onUpdate?.({ showNotes: checked } as any);
+                      onUpdate?.({ showNotes: checked } as Parameters<
+                        NonNullable<typeof onUpdate>
+                      >[0]);
                     }}
                     className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                   />
@@ -116,7 +120,9 @@ export function ClassicFooter({
                     checked={showTerms}
                     onCheckedChange={(checked) => {
                       setShowTerms(checked);
-                      onUpdate?.({ showTerms: checked } as any);
+                      onUpdate?.({ showTerms: checked } as Parameters<
+                        NonNullable<typeof onUpdate>
+                      >[0]);
                     }}
                     className="data-[state=checked]:!bg-black scale-75 !bg-gray-200 data-[state=unchecked]:!bg-gray-200 [&>span]:!bg-white"
                   />

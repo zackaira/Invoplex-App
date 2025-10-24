@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { TooltipWrapper } from "@/app/components/ui/TooltipWrapper";
+import Modal from "@/app/components/Modal";
 import {
   DateFilterValue,
   FiscalYearSettings,
@@ -45,6 +46,13 @@ interface DataTableToolbarProps<TData> {
   fiscalYearSettings?: FiscalYearSettings;
   documentType?: "quote" | "invoice";
   newDocumentRoute?: string;
+  onDelete?: (
+    ids: string[],
+    clearSelection: () => void
+  ) => void | Promise<void>;
+  statusColumn?: string;
+  clearSelection?: () => void;
+  isDeleting?: boolean;
 }
 
 export function DataTableToolbar<TData>({
@@ -59,7 +67,13 @@ export function DataTableToolbar<TData>({
   fiscalYearSettings = { fiscalYearStartMonth: 3, fiscalYearStartDay: 1 },
   documentType = "quote",
   newDocumentRoute,
+  onDelete,
+  statusColumn = "status",
+  clearSelection,
+  isDeleting = false,
 }: DataTableToolbarProps<TData>) {
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+
   const toggleStatus = (status: string) => {
     const newStatuses = selectedStatuses.includes(status)
       ? selectedStatuses.filter((s) => s !== status)
@@ -67,6 +81,51 @@ export function DataTableToolbar<TData>({
     onStatusChange?.(newStatuses);
   };
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+
+  // Get the edit route for single selected document
+  const editRoute = React.useMemo(() => {
+    if (selectedCount === 1) {
+      const row = selectedRows[0];
+      const id = (row.original as any).id;
+      return documentType === "invoice"
+        ? `/invoice/${id}/edit`
+        : `/quote/${id}/edit`;
+    }
+    return null;
+  }, [selectedCount, selectedRows, documentType]);
+
+  // Handle delete action
+  const handleDelete = async () => {
+    if (selectedCount > 0 && onDelete && clearSelection) {
+      const ids = selectedRows.map((row) => (row.original as any).id);
+      await onDelete(ids, clearSelection);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+  };
+
+  // Calculate status counts
+  const statusCounts = React.useMemo(() => {
+    const allRows = table.getCoreRowModel().rows;
+    const counts: Record<string, number> = {};
+
+    statusFilterOptions.forEach((option) => {
+      counts[option.value] = 0;
+    });
+
+    allRows.forEach((row) => {
+      const status = (row.original as any)[statusColumn];
+      if (status && counts.hasOwnProperty(status)) {
+        counts[status]++;
+      }
+    });
+
+    return counts;
+  }, [table, statusFilterOptions, statusColumn]);
 
   // Get document type labels
   const documentLabel = documentType === "invoice" ? "Invoice" : "Quote";
@@ -159,15 +218,22 @@ export function DataTableToolbar<TData>({
               <div className="space-y-1 p-2">
                 {statusFilterOptions.map((option) => {
                   const isSelected = selectedStatuses.includes(option.value);
+                  const count = statusCounts[option.value] || 0;
                   return (
                     <Button
                       key={option.value}
                       variant={isSelected ? "default" : "ghost"}
                       size="sm"
-                      className="w-full justify-start h-9"
+                      className="w-full justify-between h-9"
                       onClick={() => toggleStatus(option.value)}
                     >
-                      {option.label}
+                      <span>{option.label}</span>
+                      <Badge
+                        variant="secondary"
+                        className="rounded-sm px-1.5 font-normal ml-2"
+                      >
+                        {count}
+                      </Badge>
                     </Button>
                   );
                 })}
@@ -188,7 +254,7 @@ export function DataTableToolbar<TData>({
               }`}
               side="bottom"
             >
-              <Button variant="outline">
+              <Button variant="outline" onClick={openDeleteModal}>
                 <Trash className="h-4 w-4" />
               </Button>
             </TooltipWrapper>
@@ -207,10 +273,12 @@ export function DataTableToolbar<TData>({
             </TooltipWrapper>
 
             {/* edit icon */}
-            {selectedCount === 1 && (
+            {selectedCount === 1 && editRoute && (
               <TooltipWrapper tooltip={`Edit ${documentLabel}`} side="bottom">
-                <Button variant="outline">
-                  <PencilIcon className="h-4 w-4" />
+                <Button variant="outline" asChild>
+                  <Link href={editRoute}>
+                    <PencilIcon className="h-4 w-4" />
+                  </Link>
                 </Button>
               </TooltipWrapper>
             )}
@@ -225,6 +293,24 @@ export function DataTableToolbar<TData>({
           </Link>
         </Button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title={`Delete ${
+          selectedCount > 1 ? documentLabelPlural : documentLabel
+        }?`}
+        description={`Are you sure you want to delete ${
+          selectedCount > 1
+            ? `these ${selectedCount} ${documentLabelPlural.toLowerCase()}`
+            : `this ${documentLabel.toLowerCase()}`
+        }? This action cannot be undone.`}
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        onSubmit={handleDelete}
+        submitBtnText="Delete"
+        cancelBtnText="Cancel"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

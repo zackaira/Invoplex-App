@@ -37,6 +37,7 @@ import {
 import {
   saveDefaultBusinessFieldsVisibility,
   saveDefaultClientFieldsVisibility,
+  createClientWithContact,
 } from "@/lib/actions";
 import { toast } from "sonner";
 
@@ -52,6 +53,7 @@ import { toast } from "sonner";
  * @param isEditable - Whether the document is in edit mode
  * @param onUpdate - Callback when document data changes
  * @param onTemplateChange - Callback when template is switched
+ * @param onCurrencyChange - Callback when currency is changed
  * @param onSave - Callback when save button is clicked
  * @param isSaving - Whether the document is currently being saved
  * @param businessSettings - Business profile settings (name, logo, brandColor, etc.)
@@ -63,6 +65,7 @@ export function TemplateRenderer({
   isEditable = false,
   onUpdate,
   onTemplateChange,
+  onCurrencyChange,
   onSave,
   isSaving = false,
   businessSettings,
@@ -73,6 +76,7 @@ export function TemplateRenderer({
   isEditable?: boolean;
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
   onTemplateChange?: (templateId: string) => void;
+  onCurrencyChange?: (currency: string) => void;
   onSave?: () => void;
   isSaving?: boolean;
   businessSettings?: BusinessSettings;
@@ -91,6 +95,12 @@ export function TemplateRenderer({
   // Controls whether the client creation modal is open
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
 
+  // Counter to trigger project list refresh
+  const [projectsRefreshKey, setProjectsRefreshKey] = useState(0);
+
+  // Counter to trigger client list refresh
+  const [clientsRefreshKey, setClientsRefreshKey] = useState(0);
+
   // Controls whether the business info visibility modal is open
   const [isBusinessInfoModalOpen, setIsBusinessInfoModalOpen] = useState(false);
 
@@ -106,7 +116,9 @@ export function TemplateRenderer({
   // Initialize from document or use defaults
   const [businessInfoVisibility, setBusinessInfoVisibility] =
     useState<BusinessInfoVisibility>(() => {
-      const saved = (document as any).businessFieldsToShow;
+      const saved = (
+        document as DocumentWithRelations & { businessFieldsToShow?: string }
+      ).businessFieldsToShow;
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -135,7 +147,9 @@ export function TemplateRenderer({
   // Initialize from document or use defaults
   const [clientInfoVisibility, setClientInfoVisibility] =
     useState<ClientInfoVisibility>(() => {
-      const saved = (document as any).clientFieldsToShow;
+      const saved = (
+        document as DocumentWithRelations & { clientFieldsToShow?: string }
+      ).clientFieldsToShow;
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -161,28 +175,53 @@ export function TemplateRenderer({
    * TODO: Integrate with backend API once ready
    */
   const handleCreateProject = (project: {
+    id: string;
     title: string;
-    description: string;
+    description: string | null;
     clientId: string;
   }) => {
     console.log("Creating project:", project);
-    // TODO: Create project via API when backend is ready
-    // After creation, set the new project as selected
+    // Set the new project as selected
+    onUpdate?.({ projectId: project.id });
+    // Trigger refresh of projects list
+    setProjectsRefreshKey((prev) => prev + 1);
   };
 
   /**
    * Handles client creation
-   * TODO: Integrate with backend API once ready
+   * Creates a new client with a primary contact
    */
-  const handleAddClient = (client: {
+  const handleAddClient = async (client: {
     company: string;
     contactName: string;
     email: string;
     phone: string;
   }) => {
-    console.log("Adding client:", client);
-    // TODO: Create client via API when backend is ready
-    // After creation, set the new client as selected
+    try {
+      const { client: newClient } = await createClientWithContact({
+        userId: document.userId,
+        clientName: client.company,
+        contactName: client.contactName,
+        email: client.email,
+        phone: client.phone,
+      });
+
+      // Update the document with the new client
+      if (onUpdate) {
+        onUpdate({
+          clientId: newClient.id,
+          client: newClient,
+        } as Partial<DocumentWithRelations>);
+      }
+
+      // Trigger refresh of clients list
+      setClientsRefreshKey((prev) => prev + 1);
+
+      toast.success("Client created successfully");
+    } catch (error) {
+      console.error("Error creating client:", error);
+      toast.error("Failed to create client");
+    }
   };
 
   /**
@@ -197,7 +236,7 @@ export function TemplateRenderer({
     if (isEditable && onUpdate) {
       onUpdate({
         businessFieldsToShow: JSON.stringify(visibility),
-      } as any);
+      } as Partial<DocumentWithRelations>);
     }
   };
 
@@ -211,7 +250,7 @@ export function TemplateRenderer({
     if (isEditable && onUpdate) {
       onUpdate({
         clientFieldsToShow: JSON.stringify(visibility),
-      } as any);
+      } as Partial<DocumentWithRelations>);
     }
   };
 
@@ -260,6 +299,7 @@ export function TemplateRenderer({
               document={document}
               templateId={templateId}
               onTemplateChange={onTemplateChange}
+              onCurrencyChange={onCurrencyChange}
               onSave={onSave}
               isSaving={isSaving}
             />
@@ -283,6 +323,8 @@ export function TemplateRenderer({
             businessInfoVisibility={businessInfoVisibility}
             clientInfoVisibility={clientInfoVisibility}
             businessSettings={businessSettings}
+            projectsRefreshKey={projectsRefreshKey}
+            clientsRefreshKey={clientsRefreshKey}
           />
         </div>
       </div>
@@ -291,6 +333,7 @@ export function TemplateRenderer({
       <CreateProjectModal
         open={isProjectModalOpen}
         onOpenChange={setIsProjectModalOpen}
+        userId={document.userId}
         onSubmit={handleCreateProject}
         client={document.client}
       />
@@ -307,6 +350,7 @@ export function TemplateRenderer({
         visibility={businessInfoVisibility}
         onVisibilityChange={handleBusinessVisibilityChange}
         onSaveAsDefault={handleSaveBusinessAsDefault}
+        businessSettings={businessSettings}
       />
 
       <ClientInfoVisibilityModal
@@ -315,6 +359,8 @@ export function TemplateRenderer({
         visibility={clientInfoVisibility}
         onVisibilityChange={handleClientVisibilityChange}
         onSaveAsDefault={handleSaveClientAsDefault}
+        client={document.client}
+        contactName={document.contact?.name}
       />
     </>
   );

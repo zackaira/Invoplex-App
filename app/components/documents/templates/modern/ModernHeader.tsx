@@ -38,16 +38,19 @@ export function ModernHeader({
     email: true,
   },
   businessSettings,
+  projectsRefreshKey,
+  clientsRefreshKey,
 }: TemplateHeaderProps) {
   // Use the shared hook for all business logic
   const {
     selectedProjectId,
     selectedClientId,
     displayClient,
+    primaryContactName,
     handleIssueDateChange,
     handleProjectChange,
     handleClientChange,
-  } = useDocumentHeader({ document, type, onUpdate });
+  } = useDocumentHeader({ document, type, onUpdate, clientsRefreshKey });
 
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-t-lg">
@@ -70,6 +73,7 @@ export function ModernHeader({
           {/* Project Selection */}
           <div className="mt-2">
             <ProjectSelect
+              key={`projects-${projectsRefreshKey}`}
               value={selectedProjectId}
               onChange={handleProjectChange}
               onCreateNew={onOpenProjectModal}
@@ -112,6 +116,7 @@ export function ModernHeader({
             {isEditable && (
               <>
                 <ClientSelect
+                  key={`clients-${clientsRefreshKey}`}
                   userId={document.userId}
                   value={selectedClientId}
                   onChange={handleClientChange}
@@ -133,7 +138,7 @@ export function ModernHeader({
           <ClientInfoDisplay
             client={{
               ...displayClient,
-              contact: document.contact?.name,
+              contact: primaryContactName,
             }}
             visibility={clientInfoVisibility}
           />

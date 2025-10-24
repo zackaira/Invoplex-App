@@ -41,6 +41,11 @@ interface DataTableProps<TData, TValue> {
   fiscalYearSettings?: FiscalYearSettings;
   documentType?: "quote" | "invoice";
   newDocumentRoute?: string;
+  onDelete?: (
+    ids: string[],
+    clearSelection: () => void
+  ) => void | Promise<void>;
+  isDeleting?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -54,6 +59,8 @@ export function DataTable<TData, TValue>({
   fiscalYearSettings = { fiscalYearStartMonth: 3, fiscalYearStartDay: 1 },
   documentType = "quote",
   newDocumentRoute,
+  onDelete,
+  isDeleting = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -80,8 +87,8 @@ export function DataTable<TData, TValue>({
     if (!dateRange) return data; // "all_time" selected
 
     return data.filter((row) => {
-      const dateValue = (row as any)[dateFilterColumn];
-      return isDateInRange(dateValue, dateRange);
+      const dateValue = (row as Record<string, unknown>)[dateFilterColumn];
+      return isDateInRange(dateValue as string | Date, dateRange);
     });
   }, [data, dateFilter, dateFilterColumn, fiscalYearSettings]);
 
@@ -157,6 +164,11 @@ export function DataTable<TData, TValue>({
     [statusFilterColumn, table]
   );
 
+  // Clear selection callback
+  const clearSelection = React.useCallback(() => {
+    table.resetRowSelection();
+  }, [table]);
+
   return (
     <div className="w-full">
       <DataTableToolbar
@@ -171,6 +183,10 @@ export function DataTable<TData, TValue>({
         fiscalYearSettings={fiscalYearSettings}
         documentType={documentType}
         newDocumentRoute={newDocumentRoute}
+        onDelete={onDelete}
+        statusColumn={statusFilterColumn}
+        clearSelection={clearSelection}
+        isDeleting={isDeleting}
       />
       <div className="overflow-hidden">
         <Table>

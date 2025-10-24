@@ -1,20 +1,23 @@
-import { Button } from "@/components/ui/button";
-import { getClientsByUserId } from "@/lib/actions";
-import Modal from "@/app/components/Modal";
+import { getClientsWithOutstanding } from "@/lib/actions";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./columns";
 
 export default async function Clients() {
-  const clients = await getClientsByUserId("cmgexy4630002r7qfecfve8hq");
+  // TODO: Replace with actual user ID from authentication
+  const userId = "cmgexy4630002r7qfecfve8hq";
 
-  console.log(clients);
+  const clients = await getClientsWithOutstanding(userId);
+
+  // The data is already in the correct format from the server action
+  const transformedClients = clients || [];
 
   return (
-    <div className="p-6">
-      CLIENTS
-      <Modal
-        title="Add Client"
-        description="Add a new client to your business"
-        trigger={<Button>Add Client</Button>}
-        cancelBtnText="Cancel"
+    <div className="group document-list clients">
+      <DataTable
+        columns={columns}
+        data={transformedClients}
+        filterColumn="name"
+        filterPlaceholder="Filter by client name..."
       />
     </div>
   );

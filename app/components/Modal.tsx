@@ -23,6 +23,7 @@ interface ModalProps {
   onSubmit?: () => void | Promise<void>;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  isLoading?: boolean;
 }
 
 export default function Modal({
@@ -35,6 +36,7 @@ export default function Modal({
   onSubmit,
   open,
   onOpenChange,
+  isLoading = false,
 }: ModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -65,11 +67,15 @@ export default function Modal({
           <div className="grid gap-4 py-4">{children}</div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isLoading}>
                 {cancelBtnText}
               </Button>
             </DialogClose>
-            {onSubmit && <Button type="submit">{submitBtnText}</Button>}
+            {onSubmit && (
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Loading..." : submitBtnText}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

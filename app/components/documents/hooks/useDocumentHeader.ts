@@ -39,12 +39,21 @@ interface Client {
   website: string | null;
   createdAt: Date;
   updatedAt: Date;
+  contacts?: Array<{
+    id: string;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    position: string | null;
+    isPrimary: boolean;
+  }>;
 }
 
 interface UseDocumentHeaderProps {
   document: DocumentWithRelations;
   type: "QUOTE" | "INVOICE";
   onUpdate?: (updates: Partial<DocumentWithRelations>) => void;
+  clientsRefreshKey?: number;
 }
 
 /**
@@ -65,14 +74,15 @@ export function useDocumentHeader({
   document,
   type,
   onUpdate,
+  clientsRefreshKey,
 }: UseDocumentHeaderProps) {
   // Number of days a quote is valid for (from issue date)
   const validDays = 15;
 
-  // Track selected project (TODO: backend integration)
+  // Track selected project (initialize from document's current projectId)
   const [selectedProjectId, setSelectedProjectId] = useState<
     string | undefined
-  >(undefined);
+  >(document.projectId || undefined);
 
   // Track selected client (defaults to document's current client)
   const [selectedClientId, setSelectedClientId] = useState<string | undefined>(
@@ -83,6 +93,7 @@ export function useDocumentHeader({
   const [clients, setClients] = useState<Client[]>([]);
 
   // Fetch clients for this user
+  // Re-fetch when clientsRefreshKey changes
   useEffect(() => {
     if (document.userId) {
       getClientsByUserId(document.userId)
@@ -95,7 +106,17 @@ export function useDocumentHeader({
           console.error("Failed to fetch clients:", error);
         });
     }
-  }, [document.userId]);
+  }, [document.userId, clientsRefreshKey]);
+
+  // Sync projectId from document when it changes
+  useEffect(() => {
+    setSelectedProjectId(document.projectId || undefined);
+  }, [document.projectId]);
+
+  // Sync clientId from document when it changes
+  useEffect(() => {
+    setSelectedClientId(document.client?.id);
+  }, [document.client?.id]);
 
   /**
    * Handles issue date changes
@@ -121,14 +142,18 @@ export function useDocumentHeader({
   /**
    * Handles project selection changes
    *
-   * TODO: This will integrate with backend once project feature is complete
+   * Updates the document with the selected project ID
    *
    * @param projectId - The selected project ID
    */
   const handleProjectChange = (projectId: string | undefined) => {
     setSelectedProjectId(projectId);
-    // TODO: Update document with projectId when backend is ready
-    // onUpdate?.({ projectId });
+    // Update document with projectId
+    if (onUpdate) {
+      onUpdate({
+        projectId: projectId || null,
+      } as Partial<DocumentWithRelations>);
+    }
   };
 
   /**
@@ -148,8 +173,8 @@ export function useDocumentHeader({
       if (selectedClient) {
         onUpdate({
           clientId: selectedClient.id,
-          client: selectedClient as any,
-        });
+          client: selectedClient,
+        } as Partial<DocumentWithRelations>);
       }
     }
   };
@@ -161,11 +186,21 @@ export function useDocumentHeader({
   const displayClient =
     clients.find((c) => c.id === selectedClientId) || document.client;
 
+  /**
+   * Get the primary contact name for the display client
+   * First tries to get it from the fetched clients data (which includes contacts)
+   * Falls back to the document's contact if available
+   */
+  const primaryContactName =
+    clients.find((c) => c.id === selectedClientId)?.contacts?.[0]?.name ||
+    document.contact?.name;
+
   // Return all state and handlers for use in template components
   return {
     selectedProjectId,
     selectedClientId,
     displayClient,
+    primaryContactName,
     handleIssueDateChange,
     handleProjectChange,
     handleClientChange,

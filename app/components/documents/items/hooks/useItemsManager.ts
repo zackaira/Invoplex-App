@@ -91,7 +91,7 @@ export function useItemsManager(
       quantity: product.hasQuantityColumn ? "1" : "0",
       amount: product.unitPrice,
       sourceProductId: product.id, // Track which product this came from
-    } as any);
+    } as unknown as DocumentItem & { sourceProductId?: string });
 
     onUpdate?.({ items: [...document.items, newItem] });
   };
@@ -111,7 +111,8 @@ export function useItemsManager(
     }
 
     // Check if this item has a sourceProductId (meaning it came from a saved product)
-    const isUpdating = !!(item as any).sourceProductId;
+    const isUpdating = !!(item as DocumentItem & { sourceProductId?: string })
+      .sourceProductId;
 
     setSelectedItemId(itemId);
     setSelectedItemForSave(name);
@@ -133,7 +134,8 @@ export function useItemsManager(
     try {
       const savedProduct = await saveProduct({
         userId,
-        productId: (item as any).sourceProductId, // Pass the sourceProductId if it exists
+        productId: (item as DocumentItem & { sourceProductId?: string })
+          .sourceProductId, // Pass the sourceProductId if it exists
         name,
         description,
         unitPrice: item.unitPrice.toString(),
@@ -145,7 +147,9 @@ export function useItemsManager(
       // This ensures future saves will update the same product
       const updatedItems = document.items.map((i) =>
         i.id === selectedItemId
-          ? ({ ...i, sourceProductId: savedProduct.id } as any)
+          ? ({ ...i, sourceProductId: savedProduct.id } as DocumentItem & {
+              sourceProductId: string;
+            })
           : i
       );
       onUpdate?.({ items: updatedItems });

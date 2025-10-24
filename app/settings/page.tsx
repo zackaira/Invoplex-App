@@ -36,8 +36,8 @@ export default function Settings() {
 
   // Store loaded data for form initialization
   const [initialData, setInitialData] = useState<{
-    businessProfile?: any;
-    userSettings?: any;
+    businessProfile?: Record<string, unknown>;
+    userSettings?: Record<string, unknown>;
   }>({});
 
   console.log("userId", userId);

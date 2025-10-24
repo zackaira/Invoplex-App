@@ -1,4 +1,4 @@
-import { DocumentWithRelations } from "../../templates/types";
+import { DocumentWithRelations } from "../../types";
 
 export function useDocumentCalculations() {
   const calculateTotals = (

@@ -29,6 +29,19 @@ export interface BusinessInfoVisibilityModalProps {
   visibility: BusinessInfoVisibility;
   onVisibilityChange: (visibility: BusinessInfoVisibility) => void;
   onSaveAsDefault?: (visibility: BusinessInfoVisibility) => void;
+  businessSettings?: {
+    businessName?: string;
+    personalName?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    website?: string | null;
+    taxId?: string | null;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zipCode?: string | null;
+    country?: string | null;
+  };
 }
 
 export function BusinessInfoVisibilityModal({
@@ -37,6 +50,7 @@ export function BusinessInfoVisibilityModal({
   visibility,
   onVisibilityChange,
   onSaveAsDefault,
+  businessSettings,
 }: BusinessInfoVisibilityModalProps) {
   const [localVisibility, setLocalVisibility] =
     React.useState<BusinessInfoVisibility>(visibility);
@@ -45,6 +59,20 @@ export function BusinessInfoVisibilityModal({
   React.useEffect(() => {
     setLocalVisibility(visibility);
   }, [visibility]);
+
+  // Check if any business fields are available
+  const hasAnyFields =
+    businessSettings?.businessName ||
+    businessSettings?.personalName ||
+    businessSettings?.email ||
+    businessSettings?.phone ||
+    businessSettings?.website ||
+    businessSettings?.taxId ||
+    businessSettings?.address ||
+    businessSettings?.city ||
+    businessSettings?.state ||
+    businessSettings?.zipCode ||
+    businessSettings?.country;
 
   const handleToggle = (field: keyof BusinessInfoVisibility) => {
     setLocalVisibility((prev) => ({
@@ -80,47 +108,72 @@ export function BusinessInfoVisibilityModal({
         </DialogHeader>
 
         <div className="space-y-4 py-6">
-          <SettingsSwitch
-            label="Business Name"
-            checked={localVisibility.businessName}
-            onCheckedChange={() => handleToggle("businessName")}
-          />
+          {!hasAnyFields && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No business information has been added yet. Add your business
+              details in Settings to customize what appears on your documents.
+            </p>
+          )}
 
-          <SettingsSwitch
-            label="Personal Name"
-            checked={localVisibility.personalName}
-            onCheckedChange={() => handleToggle("personalName")}
-          />
+          {businessSettings?.businessName && (
+            <SettingsSwitch
+              label="Business Name"
+              checked={localVisibility.businessName}
+              onCheckedChange={() => handleToggle("businessName")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Email"
-            checked={localVisibility.email}
-            onCheckedChange={() => handleToggle("email")}
-          />
+          {businessSettings?.personalName && (
+            <SettingsSwitch
+              label="Personal Name"
+              checked={localVisibility.personalName}
+              onCheckedChange={() => handleToggle("personalName")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Phone"
-            checked={localVisibility.phone}
-            onCheckedChange={() => handleToggle("phone")}
-          />
+          {businessSettings?.email && (
+            <SettingsSwitch
+              label="Email"
+              checked={localVisibility.email}
+              onCheckedChange={() => handleToggle("email")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Website"
-            checked={localVisibility.website}
-            onCheckedChange={() => handleToggle("website")}
-          />
+          {businessSettings?.phone && (
+            <SettingsSwitch
+              label="Phone"
+              checked={localVisibility.phone}
+              onCheckedChange={() => handleToggle("phone")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Tax ID / VAT Number"
-            checked={localVisibility.taxId}
-            onCheckedChange={() => handleToggle("taxId")}
-          />
+          {businessSettings?.website && (
+            <SettingsSwitch
+              label="Website"
+              checked={localVisibility.website}
+              onCheckedChange={() => handleToggle("website")}
+            />
+          )}
 
-          <SettingsSwitch
-            label="Full Address"
-            checked={localVisibility.address}
-            onCheckedChange={() => handleToggle("address")}
-          />
+          {businessSettings?.taxId && (
+            <SettingsSwitch
+              label="Tax ID / VAT Number"
+              checked={localVisibility.taxId}
+              onCheckedChange={() => handleToggle("taxId")}
+            />
+          )}
+
+          {(businessSettings?.address ||
+            businessSettings?.city ||
+            businessSettings?.state ||
+            businessSettings?.zipCode ||
+            businessSettings?.country) && (
+            <SettingsSwitch
+              label="Full Address"
+              checked={localVisibility.address}
+              onCheckedChange={() => handleToggle("address")}
+            />
+          )}
         </div>
 
         <DialogFooter>

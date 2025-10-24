@@ -19,8 +19,19 @@ interface InvoiceSettingsSectionProps {
   setRemoveInvoicePoweredBy: (value: boolean) => void;
   validationErrors?: ValidationError[];
   initialData?: {
-    businessProfile?: any;
-    userSettings?: any;
+    businessProfile?: {
+      bankName?: string;
+      accountNumber?: string;
+      routingNumber?: string;
+      swiftCode?: string;
+    };
+    userSettings?: {
+      invoicePrefix?: string;
+      nextInvoiceNumber?: number;
+      paymentTermsDays?: number;
+      lateFeesPercentage?: number;
+      invoiceNotes?: string;
+    };
   };
 }
 

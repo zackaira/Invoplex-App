@@ -1,6 +1,6 @@
 import { getQuotesByUserId, getUserSettings } from "@/lib/actions";
-import { DataTable } from "@/components/ui/data-table";
 import type { StatusFilterOption } from "@/components/ui/data-table";
+import { DataTableWrapper } from "@/app/components/data-table/DataTableWrapper";
 import { columns } from "./columns";
 
 const quoteStatusOptions: StatusFilterOption[] = [
@@ -15,10 +15,15 @@ export default async function Quotes() {
   // TODO: Replace with actual user ID from authentication
   const userId = "cmgexy4630002r7qfecfve8hq";
 
-  const [quotes, userSettings] = await Promise.all([
+  const [quotes, settingsResult] = await Promise.all([
     getQuotesByUserId(userId),
     getUserSettings(userId),
   ]);
+
+  const userSettings =
+    settingsResult?.success && settingsResult?.data
+      ? settingsResult.data.userSettings
+      : null;
 
   // Transform the data to match our Quote type
   const transformedQuotes = quotes.map((quote) => ({
@@ -35,7 +40,7 @@ export default async function Quotes() {
 
   return (
     <div className="group document-list quotes">
-      <DataTable
+      <DataTableWrapper
         columns={columns}
         data={transformedQuotes}
         filterColumn="client.name"

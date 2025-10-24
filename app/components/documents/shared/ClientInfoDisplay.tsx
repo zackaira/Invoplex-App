@@ -28,12 +28,17 @@ export function ClientInfoDisplay({
 }: ClientInfoDisplayProps) {
   return (
     <>
-      {visibility.name && <p className="font-semibold">{client.name}</p>}
-      {visibility.contact && "contact" in client && client.contact && (
-        <p className="text-sm mt-1">Attn: {client.contact}</p>
+      {visibility.name && (
+        <p className="font-semibold capitalize">{client.name}</p>
       )}
+
+      {visibility.contact && "contact" in client && client.contact && (
+        <p className="text-sm mt-1 capitalize">Attn: {client.contact}</p>
+      )}
+
       <div className="text-sm mt-1">
         {visibility.address && client.address && <p>{client.address}</p>}
+
         {visibility.address &&
           (client.city || client.state || client.zipCode) && (
             <p>
@@ -42,6 +47,7 @@ export function ClientInfoDisplay({
                 .join(", ")}
             </p>
           )}
+
         {visibility.email && client.email && <p>{client.email}</p>}
       </div>
     </>

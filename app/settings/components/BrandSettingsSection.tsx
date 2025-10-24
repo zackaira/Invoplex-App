@@ -17,7 +17,10 @@ interface BrandSettingsSectionProps {
   onLogoSelect: (file: File) => void;
   onLogoRemove: () => void;
   validationErrors?: ValidationError[];
-  initialData?: any;
+  initialData?: {
+    dashboardPrimaryColor?: string;
+    logoUrl?: string | null;
+  };
 }
 
 export function BrandSettingsSection({

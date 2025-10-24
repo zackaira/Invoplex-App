@@ -5,7 +5,7 @@
  * while allowing templates to integrate them seamlessly.
  */
 
-export { ClientSelect, DUMMY_CLIENTS } from "./ClientSelect";
+export { ClientSelect } from "./ClientSelect";
 export type { ClientSelectProps } from "./ClientSelect";
 
 export { AddClientModal } from "./AddClientModal";

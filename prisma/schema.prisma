@@ -36,6 +36,7 @@ model User {
   settings        UserSettings?
   businessProfile BusinessProfile?
   products        Product[]
+  projects        Project[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -192,6 +193,7 @@ model Client {
   // Relations
   contacts    Contact[]
   documents   Document[]
+  projects    Project[]
   
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -244,6 +246,9 @@ model Document {
   contactId       String?        // Selected contact for this document
   contact         Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
   
+  projectId       String?        // Optional project this document belongs to
+  project         Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
   // Dates
   issueDate       DateTime       @default(now())
   dueDate         DateTime?      // For invoices
@@ -293,6 +298,7 @@ model Document {
   @@index([userId])
   @@index([clientId])
   @@index([contactId])
+  @@index([projectId])
   @@index([type, status])
   @@index([issueDate])
   @@index([documentNumber])
@@ -368,6 +374,37 @@ model Product {
   
   @@index([userId])
   @@index([type])
+  @@index([isActive])
+}
+
+// ============================================
+// PROJECTS
+// ============================================
+
+// Stores projects to organize quotes and invoices by client
+// Projects help categorize and track work for specific client initiatives
+model Project {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  title       String   // Project name/title
+  description String?  @db.Text // Optional project description
+  
+  // Status tracking
+  isActive    Boolean  @default(true) // Can be archived instead of deleted
+  
+  // Relations
+  documents   Document[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([clientId])
   @@index([isActive])
 }
 

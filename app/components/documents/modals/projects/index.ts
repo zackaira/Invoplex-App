@@ -1,12 +1,4 @@
-/**
- * Shared components for project management in documents
- *
- * These components handle project selection and creation
- * while allowing templates to integrate them seamlessly.
- */
-
-export { ProjectSelect } from "./ProjectSelect";
-export type { ProjectSelectProps } from "./ProjectSelect";
-
 export { CreateProjectModal } from "./CreateProjectModal";
-export type { CreateProjectModalProps } from "./CreateProjectModal";
+export { EditProjectModal } from "./EditProjectModal";
+export { DeleteProjectModal } from "./DeleteProjectModal";
+export { ProjectSelect } from "./ProjectSelect";

@@ -24,8 +24,20 @@ interface FinancialSettingsSectionProps {
   setShowFinancialSettings: (value: boolean) => void;
   validationErrors?: ValidationError[];
   initialData?: {
-    businessProfile?: any;
-    userSettings?: any;
+    businessProfile?: {
+      taxId?: string;
+      bankName?: string;
+      accountNumber?: string;
+      routingNumber?: string;
+      swiftCode?: string;
+    };
+    userSettings?: {
+      defaultCurrency?: string;
+      currencyDisplayFormat?: string;
+      taxName?: string;
+      fiscalYearStartMonth?: number;
+      fiscalYearStartDay?: number;
+    };
   };
 }
 

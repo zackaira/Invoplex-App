@@ -39,6 +39,7 @@ export type DocumentWithRelations = Prisma.DocumentGetPayload<{
   include: {
     client: true;
     contact: true;
+    project: true;
     items: true;
     payments: true;
   };
@@ -157,6 +158,8 @@ export interface TemplateProps {
   businessInfoVisibility?: BusinessInfoVisibility;
   clientInfoVisibility?: ClientInfoVisibility;
   businessSettings?: BusinessSettings;
+  projectsRefreshKey?: number;
+  clientsRefreshKey?: number;
 }
 
 /**
@@ -182,6 +185,8 @@ export interface TemplateHeaderProps {
   businessInfoVisibility?: BusinessInfoVisibility;
   clientInfoVisibility?: ClientInfoVisibility;
   businessSettings?: BusinessSettings;
+  projectsRefreshKey?: number;
+  clientsRefreshKey?: number;
 }
 
 /**

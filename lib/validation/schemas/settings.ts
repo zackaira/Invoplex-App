@@ -396,3 +396,23 @@ export const templateSettingsSchema = z.object({
 });
 
 export type TemplateSettingsFormData = z.infer<typeof templateSettingsSchema>;
+
+// ============================================
+// CONTACT SCHEMA
+// ============================================
+
+export const contactSchema = z.object({
+  name: z
+    .union([z.string(), z.null()])
+    .transform((val) => val || "")
+    .pipe(z.string().min(1, "Name is required")),
+  email: emailSchema,
+  phone: optionalPhoneSchema,
+  position: z
+    .union([z.string(), z.null()])
+    .transform((val) => val || "")
+    .optional(),
+  isPrimary: z.boolean().default(false),
+});
+
+export type ContactFormData = z.infer<typeof contactSchema>;

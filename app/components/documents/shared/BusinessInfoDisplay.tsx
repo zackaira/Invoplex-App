@@ -15,11 +15,15 @@ export function BusinessInfoDisplay({
     <>
       {businessInfoVisibility.businessName &&
         businessSettings?.businessName && (
-          <p className="font-semibold">{businessSettings.businessName}</p>
+          <p className="font-semibold capitalize">
+            {businessSettings.businessName}
+          </p>
         )}
       {businessInfoVisibility.personalName &&
         businessSettings?.personalName && (
-          <p className="text-sm mt-1">{businessSettings.personalName}</p>
+          <p className="text-sm mt-1 capitalize">
+            {businessSettings.personalName}
+          </p>
         )}
       <div className="text-sm mt-1">
         {businessInfoVisibility.email && businessSettings?.email && (
@@ -31,11 +35,9 @@ export function BusinessInfoDisplay({
         {businessInfoVisibility.website && businessSettings?.website && (
           <p>{businessSettings.website}</p>
         )}
-        {businessInfoVisibility.taxId && businessSettings?.taxId && (
-          <p>Tax ID: {businessSettings.taxId}</p>
-        )}
+
         {businessInfoVisibility.address && businessSettings?.address && (
-          <>
+          <div className="mt-2">
             <p>{businessSettings.address}</p>
             {(businessSettings.city ||
               businessSettings.state ||
@@ -50,7 +52,11 @@ export function BusinessInfoDisplay({
                   .join(", ")}
               </p>
             )}
-          </>
+          </div>
+        )}
+
+        {businessInfoVisibility.taxId && businessSettings?.taxId && (
+          <p className="mt-2">Tax ID: {businessSettings.taxId}</p>
         )}
       </div>
     </>

@@ -48,7 +48,7 @@ export class ZodAdapter implements ValidationAdapter {
    * @param data - The data to validate
    * @returns ValidationResult with success flag, validated data, or errors
    */
-  validate<T>(schema: any, data: unknown): ValidationResult<T> {
+  validate<T>(schema: z.ZodType<T>, data: unknown): ValidationResult<T> {
     const result = schema.safeParse(data);
 
     if (result.success) {
@@ -74,7 +74,7 @@ export class ZodAdapter implements ValidationAdapter {
    * @returns Promise resolving to ValidationResult
    */
   async validateAsync<T>(
-    schema: any,
+    schema: z.ZodType<T>,
     data: unknown
   ): Promise<ValidationResult<T>> {
     const result = await schema.safeParseAsync(data);
@@ -104,7 +104,7 @@ export class ZodAdapter implements ValidationAdapter {
    * @returns FieldValidationResult with validity status and error message
    */
   validateField(
-    schema: any,
+    schema: z.ZodType,
     fieldName: string,
     value: unknown
   ): FieldValidationResult {
@@ -118,7 +118,7 @@ export class ZodAdapter implements ValidationAdapter {
         return { isValid: true };
       }
 
-      const fieldError = result.error.issues.find((issue: any) =>
+      const fieldError = result.error.issues.find((issue: z.ZodIssue) =>
         issue.path.includes(fieldName)
       );
 

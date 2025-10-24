@@ -100,11 +100,13 @@ export function BaseItemsTable({
       <div className={styles.containerClassName}>
         {/* Header */}
         <div className={`grid ${gridCols} ${styles.headerClassName}`}>
-          <div>Type</div>
-          <div>Description</div>
-          {hasAnyQuantityColumn && <div className="text-right">Quantity</div>}
-          <div className="text-right">Unit Price</div>
-          <div className="text-right">Amount</div>
+          <div className="w-18">Type</div>
+          <div className="flex-1">Description</div>
+          {hasAnyQuantityColumn && (
+            <div className="w-20 text-right">Quantity</div>
+          )}
+          <div className="w-27 text-right">Unit Price</div>
+          <div className="w-24 text-right">Amount</div>
           {isEditable && <div className="w-9"></div>}
         </div>
 
@@ -120,10 +122,10 @@ export function BaseItemsTable({
               return (
                 <div
                   key={item.id}
-                  className={`grid ${rowGridCols} ${styles.rowClassName}`}
+                  className={`text-sm grid ${rowGridCols} ${styles.rowClassName}`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700">
+                  <div className="w-18 flex items-center gap-2">
+                    <span className="text-gray-700">
                       {item.itemType || "Product"}
                     </span>
                     {isEditable && (
@@ -135,11 +137,12 @@ export function BaseItemsTable({
                           className="h-6 w-6 text-gray-900 bg-transparent! hover:text-green-600"
                         >
                           <Save className="h-3 w-3" />
+                          <span className="sr-only">Save this item</span>
                         </Button>
                       </TooltipWrapper>
                     )}
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex-1 flex items-center">
                     {isEditable ? (
                       <Textarea
                         id={`item-description-${item.id}`}
@@ -159,7 +162,7 @@ export function BaseItemsTable({
                     )}
                   </div>
                   {hasAnyQuantityColumn && (
-                    <div className="text-right flex items-center justify-end">
+                    <div className="w-20 text-right flex items-center justify-end">
                       {showQuantity ? (
                         isEditable ? (
                           <Input
@@ -171,7 +174,7 @@ export function BaseItemsTable({
                             onChange={(e) =>
                               onUpdate("quantity", e.target.value)
                             }
-                            className="w-20 text-right h-9 !bg-white !border-gray-300 !text-gray-900"
+                            className="w-18 text-right h-9 !bg-white !border-gray-300 !text-gray-900"
                           />
                         ) : (
                           <span className="text-gray-700">
@@ -183,7 +186,7 @@ export function BaseItemsTable({
                       )}
                     </div>
                   )}
-                  <div className="text-right flex items-center justify-end">
+                  <div className="w-27 text-right flex items-center justify-end">
                     {isEditable ? (
                       <InputGroup className="w-28">
                         <InputGroupAddon align="inline-start">
@@ -213,7 +216,7 @@ export function BaseItemsTable({
                       </span>
                     )}
                   </div>
-                  <div className="text-right flex items-center justify-end">
+                  <div className="w-24 text-right flex items-center justify-end">
                     <span className="font-semibold text-gray-900">
                       {formatCurrency(
                         item.amount.toString(),
@@ -223,15 +226,16 @@ export function BaseItemsTable({
                     </span>
                   </div>
                   {isEditable && (
-                    <div className="flex items-center justify-end">
+                    <div className="w-6 flex items-center justify-end">
                       <TooltipWrapper tooltip="Delete this item" side="top">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => handleOpenDeleteModal(item.id)}
-                          className="h-8 w-8 text-gray-900 bg-transparent! hover:text-red-600"
+                          className="h-6 w-6 text-gray-900 bg-transparent! hover:text-red-600"
                         >
                           <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete this item</span>
                         </Button>
                       </TooltipWrapper>
                     </div>

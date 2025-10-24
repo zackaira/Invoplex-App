@@ -9,7 +9,7 @@ import {
 
 interface TooltipWrapperProps {
   children: React.ReactElement;
-  tooltip: string;
+  tooltip?: string;
   side?: "top" | "right" | "bottom" | "left";
   delayDuration?: number;
   sideOffset?: number;
@@ -23,6 +23,11 @@ export function TooltipWrapper({
   delayDuration = 200,
   sideOffset = 4,
 }: TooltipWrapperProps) {
+  // If no tooltip, just return the children without wrapping
+  if (!tooltip) {
+    return children;
+  }
+
   return (
     <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>

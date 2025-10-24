@@ -33,7 +33,7 @@ export type ValidationError = {
 /**
  * Result of validating an entire form/object
  */
-export type ValidationResult<T = any> = {
+export type ValidationResult<T = unknown> = {
   success: boolean; // True if validation passed
   data?: T; // The validated and transformed data (if success)
   errors?: ValidationError[]; // Array of errors (if failed)
@@ -58,14 +58,14 @@ export type FieldValidationResult = {
  * Any validation library adapter must implement these methods.
  * This ensures consistent validation behavior across the application.
  */
-export interface ValidationAdapter<TSchema = any> {
+export interface ValidationAdapter<TSchema = unknown> {
   /**
    * Validate data against a schema
    * @param schema - The validation schema
    * @param data - The data to validate
    * @returns ValidationResult with success status, validated data, or errors
    */
-  validate<T>(schema: any, data: unknown): ValidationResult<T>;
+  validate<T>(schema: TSchema, data: unknown): ValidationResult<T>;
 
   /**
    * Validate data against a schema asynchronously
@@ -73,7 +73,10 @@ export interface ValidationAdapter<TSchema = any> {
    * @param data - The data to validate
    * @returns Promise with ValidationResult
    */
-  validateAsync<T>(schema: any, data: unknown): Promise<ValidationResult<T>>;
+  validateAsync<T>(
+    schema: TSchema,
+    data: unknown
+  ): Promise<ValidationResult<T>>;
 
   /**
    * Validate a single field
@@ -83,7 +86,7 @@ export interface ValidationAdapter<TSchema = any> {
    * @returns FieldValidationResult with validity status and error message
    */
   validateField(
-    schema: any,
+    schema: TSchema,
     fieldName: string,
     value: unknown
   ): FieldValidationResult;

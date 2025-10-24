@@ -54,6 +54,8 @@ function createEmptyQuote(
     },
     contactId: null,
     contact: null,
+    projectId: null,
+    project: null,
     issueDate: now,
     dueDate: null,
     validUntil: validUntil,
@@ -139,7 +141,7 @@ export default function EditQuotePage({
         } else {
           // Fetch existing quote
           const doc = await getDocumentById(id, "QUOTE");
-          setDocument(doc);
+          setDocument(doc as unknown as DocumentWithRelations);
         }
       } catch (error) {
         console.error("Failed to fetch document:", error);
@@ -204,6 +206,13 @@ export default function EditQuotePage({
     });
   };
 
+  const handleCurrencyChange = (currency: string) => {
+    setDocument((prev) => {
+      if (!prev) return prev;
+      return { ...prev, currency };
+    });
+  };
+
   const handleSave = async () => {
     if (!document) return;
 
@@ -229,6 +238,9 @@ export default function EditQuotePage({
           status: document.status,
           clientId: document.clientId,
           contactId: document.contactId,
+          projectId:
+            (document as DocumentWithRelations & { projectId?: string | null })
+              .projectId || null,
           issueDate: new Date(document.issueDate),
           dueDate: document.dueDate ? new Date(document.dueDate) : null,
           validUntil: document.validUntil
@@ -245,12 +257,25 @@ export default function EditQuotePage({
           notes: document.notes,
           terms: document.terms,
           internalNotes: document.internalNotes,
-          showDiscount: (document as any).showDiscount,
-          showTax: (document as any).showTax,
-          showNotes: (document as any).showNotes,
-          showTerms: (document as any).showTerms,
-          businessFieldsToShow: (document as any).businessFieldsToShow,
-          clientFieldsToShow: (document as any).clientFieldsToShow,
+          showDiscount: (
+            document as DocumentWithRelations & { showDiscount?: boolean }
+          ).showDiscount,
+          showTax: (document as DocumentWithRelations & { showTax?: boolean })
+            .showTax,
+          showNotes: (
+            document as DocumentWithRelations & { showNotes?: boolean }
+          ).showNotes,
+          showTerms: (
+            document as DocumentWithRelations & { showTerms?: boolean }
+          ).showTerms,
+          businessFieldsToShow: (
+            document as DocumentWithRelations & {
+              businessFieldsToShow?: string;
+            }
+          ).businessFieldsToShow,
+          clientFieldsToShow: (
+            document as DocumentWithRelations & { clientFieldsToShow?: string }
+          ).clientFieldsToShow,
           items: document.items.map((item, index) => ({
             itemType: item.itemType || "Product",
             description: item.description,
@@ -258,11 +283,14 @@ export default function EditQuotePage({
             unitPrice: item.unitPrice.toString(),
             amount: item.amount.toString(),
             hasQuantityColumn: item.hasQuantityColumn ?? false,
+            sourceProductId: item.sourceProductId ?? undefined,
             order: index,
           })),
         });
         toast.success("Quote created successfully!");
-        router.push(`/quote/${newDoc.id}`);
+        if (newDoc && "id" in newDoc) {
+          router.push(`/quote/${(newDoc as { id: string }).id}`);
+        }
       } else {
         // Update existing quote
         await updateDocument(id, {
@@ -270,6 +298,9 @@ export default function EditQuotePage({
           status: document.status,
           clientId: document.clientId,
           contactId: document.contactId,
+          projectId:
+            (document as DocumentWithRelations & { projectId?: string | null })
+              .projectId || null,
           issueDate: new Date(document.issueDate),
           dueDate: document.dueDate ? new Date(document.dueDate) : null,
           validUntil: document.validUntil
@@ -286,12 +317,25 @@ export default function EditQuotePage({
           notes: document.notes,
           terms: document.terms,
           internalNotes: document.internalNotes,
-          showDiscount: (document as any).showDiscount,
-          showTax: (document as any).showTax,
-          showNotes: (document as any).showNotes,
-          showTerms: (document as any).showTerms,
-          businessFieldsToShow: (document as any).businessFieldsToShow,
-          clientFieldsToShow: (document as any).clientFieldsToShow,
+          showDiscount: (
+            document as DocumentWithRelations & { showDiscount?: boolean }
+          ).showDiscount,
+          showTax: (document as DocumentWithRelations & { showTax?: boolean })
+            .showTax,
+          showNotes: (
+            document as DocumentWithRelations & { showNotes?: boolean }
+          ).showNotes,
+          showTerms: (
+            document as DocumentWithRelations & { showTerms?: boolean }
+          ).showTerms,
+          businessFieldsToShow: (
+            document as DocumentWithRelations & {
+              businessFieldsToShow?: string;
+            }
+          ).businessFieldsToShow,
+          clientFieldsToShow: (
+            document as DocumentWithRelations & { clientFieldsToShow?: string }
+          ).clientFieldsToShow,
           items: document.items.map((item, index) => ({
             itemType: item.itemType || "Product",
             description: item.description,
@@ -299,6 +343,7 @@ export default function EditQuotePage({
             unitPrice: item.unitPrice.toString(),
             amount: item.amount.toString(),
             hasQuantityColumn: item.hasQuantityColumn ?? false,
+            sourceProductId: item.sourceProductId ?? undefined,
             order: index,
           })),
         });
@@ -330,6 +375,7 @@ export default function EditQuotePage({
         isEditable={true}
         onUpdate={handleUpdate}
         onTemplateChange={setTemplateId}
+        onCurrencyChange={handleCurrencyChange}
         onSave={handleSave}
         isSaving={isSaving}
         businessSettings={businessSettings}
